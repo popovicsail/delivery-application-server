@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="EFCore.NamingConventions" Version="8.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.20" />
+    <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="8.0.20" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.20">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -19,11 +20,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Delivery.Application\Delivery.Application.csproj" />
     <ProjectReference Include="..\Delivery.Infrastructure\Delivery.Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Contracts\" />
-    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>
