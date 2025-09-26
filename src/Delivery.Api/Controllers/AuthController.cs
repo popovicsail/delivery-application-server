@@ -1,9 +1,10 @@
-﻿using Delivery.Api.Contracts;
+﻿using System;
+using System.Threading.Tasks;
+using Delivery.Api.Contracts;
+using Delivery.Application.Interfaces;
 using Delivery.Domain.Entities.UserEntities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using Delivery.Application.Interfaces;
 
 namespace Delivery.Api.Controllers
 {
@@ -47,8 +48,54 @@ namespace Delivery.Api.Controllers
             });
         }
 
-        //log out
+        [HttpPost("register")] // /api/auth/register
+        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+        {
+            User user = new User
+            {
+                UserName = request.UserName,
+                Email = request.Email,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+            };
 
-        //registration
+            var createResult = await _userManager.CreateAsync(user, request.Password);
+            if (!createResult.Succeeded)
+            {
+                return BadRequest(createResult.Errors);
+            }
+
+
+            if (request.Role == null)
+            {
+                var identityResult = await _userManager.AddToRoleAsync(user, "Customer");
+                if (!identityResult.Succeeded)
+                {
+                    return BadRequest(identityResult.Errors);
+                }
+            }
+            else
+            {
+                var identityResult = await _userManager.AddToRoleAsync(user, request.Role);
+                if (!identityResult.Succeeded)
+                {
+                    return BadRequest(identityResult.Errors);
+                }
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+            var token = _tokenService.CreateToken(user, roles.ToList());
+
+            return Ok(new LoginResponse
+            {
+                Token = token
+            });
+        }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            return Ok();
+        }
     }
 }

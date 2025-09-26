@@ -15,6 +15,7 @@ namespace Delivery.Domain.Entities.DishEntities
         public string Description { get; set; }
         public double Price { get; set; }
         public string Type { get; set; }
+        public string PictureUrl { get; set; }
 
         public Guid MenuId { get; set; }
         public virtual Menu Menu { get; set; }

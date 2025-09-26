@@ -9,8 +9,10 @@ namespace Delivery.Domain.Entities.UserEntities
 {
     public class User : IdentityUser<Guid>
     {
+        // public Guid Id
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string? ProfilePictureUrl { get; set; }
+
     }
 }
