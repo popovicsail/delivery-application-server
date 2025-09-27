@@ -1,4 +1,4 @@
-﻿namespace Delivery.Api.Contracts
+﻿namespace Delivery.Api.Contracts.Auth
 {
     public class RegisterRequest
     {

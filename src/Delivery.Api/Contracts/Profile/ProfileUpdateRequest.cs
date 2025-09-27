@@ -1,6 +1,6 @@
-﻿namespace Delivery.Api.Contracts
+﻿namespace Delivery.Api.Contracts.Profile
 {
-    public class ProfilePatchRequest
+    public class ProfileUpdateRequest
     {   
         public string FirstName { get; set; }
         public string LastName { get; set; }
