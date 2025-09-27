@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using Delivery.Domain.Entities.DishEntities;
 using Delivery.Domain.Entities.HelperEntities;
 using Delivery.Domain.Entities.RestaurantEntities;
 using Delivery.Domain.Entities.UserEntities;
+using Delivery.Infrastructure.Persistence.Seed;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -133,6 +135,14 @@ namespace Delivery.Infrastructure.Persistence
 
             builder.Entity<Dish>().HasMany(d => d.DishOptionGroups).WithOne(g => g.Dish).HasForeignKey(g => g.DishId);
             builder.Entity<Dish>().HasMany(d => d.Allergens).WithMany();
+
+
+
+
+
+
+
+            TestSeed.Seed(builder);
         }
     }
 }

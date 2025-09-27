@@ -18,7 +18,7 @@ namespace Delivery.Domain.Entities.RestaurantEntities
         public virtual Address Address { get; set; }
 
         public Guid OwnerId { get; set; }
-        public virtual Owner Owner { get; set; }
+        public virtual Owner? Owner { get; set; }
 
         public virtual ICollection<Worker> Workers { get; set; } = new HashSet<Worker>();
         public virtual ICollection<WorkSchedule> WorkSchedules { get; set; } = new HashSet<WorkSchedule>();
