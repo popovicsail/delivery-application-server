@@ -14,7 +14,8 @@ namespace Delivery.Domain.Entities.UserEntities
         public Guid UserId { get; set; }
         public virtual User User { get; set; }
 
-        public virtual ICollection<Address> Addresses { get; set; }
-        public virtual ICollection<Allergen> Allergens { get; set; }
+        public virtual ICollection<Address> Addresses { get; set; } = new HashSet<Address>();
+        public virtual ICollection<Allergen> Allergens { get; set; } = new HashSet<Allergen>();
     }
 }
+
