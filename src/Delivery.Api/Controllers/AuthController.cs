@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Delivery.Api.Contracts;
+using Delivery.Api.Contracts.Auth;
 using Delivery.Application.Interfaces;
 using Delivery.Domain.Entities.UserEntities;
 using Microsoft.AspNetCore.Identity;
@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Delivery.Api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")] // /api/auth
+    [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
@@ -23,7 +23,7 @@ namespace Delivery.Api.Controllers
             _tokenService = tokenService;
         }
 
-        [HttpPost("login")] // /api/auth/login
+        [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
             var user = await _userManager.FindByNameAsync(request.UserName);
@@ -41,14 +41,15 @@ namespace Delivery.Api.Controllers
             var roles = await _userManager.GetRolesAsync(user);
             var token = _tokenService.CreateToken(user, roles.ToList());
 
-
-            return Ok(new LoginResponse
+            var loginResponse = new LoginResponse
             {
                 Token = token
-            });
+            };
+
+            return Ok(loginResponse);
         }
 
-        [HttpPost("register")] // /api/auth/register
+        [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
             User user = new User
@@ -86,10 +87,12 @@ namespace Delivery.Api.Controllers
             var roles = await _userManager.GetRolesAsync(user);
             var token = _tokenService.CreateToken(user, roles.ToList());
 
-            return Ok(new LoginResponse
+            var registerResponse = new RegisterResponse
             {
                 Token = token
-            });
+            };
+
+            return Ok(registerResponse);
         }
 
         [HttpPost("logout")]

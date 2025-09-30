@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using Delivery.Domain.Entities.DishEntities;
 using Delivery.Domain.Entities.HelperEntities;
 using Delivery.Domain.Entities.RestaurantEntities;
 using Delivery.Domain.Entities.UserEntities;
+using Delivery.Infrastructure.Persistence.Seed;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -40,20 +42,13 @@ namespace Delivery.Infrastructure.Persistence
 
             var passwordHasher = new PasswordHasher<User>();
 
-            Guid adminRoleId = Guid.Parse("2301D884-221A-4E7D-B509-0113DCC043E1");
-
-            builder.Entity<IdentityRole<Guid>>().HasData(new IdentityRole<Guid>
-            {
-                Id = adminRoleId,
-                Name = "Administrator",
-                NormalizedName = "ADMINISTRATOR"
-            });
-
+            var adminRoleId = Guid.Parse("2301D884-221A-4E7D-B509-0113DCC043E1");
             builder.Entity<IdentityRole<Guid>>().HasData(
                 new IdentityRole<Guid> { Id = Guid.Parse("5B00155D-77A2-438C-B18F-DC1CC8AF5A43"), Name = "Customer", NormalizedName = "CUSTOMER" },
                 new IdentityRole<Guid> { Id = Guid.Parse("190D206E-0B99-4D0F-B3FA-DA6CEEA6D8CB"), Name = "Courier", NormalizedName = "COURIER" },
                 new IdentityRole<Guid> { Id = Guid.Parse("FC7E84F2-E37E-46E2-A222-A839D3E1A3BB"), Name = "Owner", NormalizedName = "OWNER" },
-                new IdentityRole<Guid> { Id = Guid.Parse("F09ECE5A-1C11-4792-815B-4EF1BC6C6C20"), Name = "Worker", NormalizedName = "WORKER" }
+                new IdentityRole<Guid> { Id = Guid.Parse("F09ECE5A-1C11-4792-815B-4EF1BC6C6C20"), Name = "Worker", NormalizedName = "WORKER" },
+                new IdentityRole<Guid> { Id = adminRoleId, Name = "Administrator", NormalizedName = "ADMINISTRATOR" }
             );
 
             Guid adminUserGuid1 = Guid.Parse("B22698B8-42A2-4115-9631-1C2D1E2AC5F7");
@@ -120,7 +115,7 @@ namespace Delivery.Infrastructure.Persistence
             builder.Entity<Administrator>().HasOne(p => p.User).WithOne().HasForeignKey<Administrator>(p => p.UserId).IsRequired();
 
             builder.Entity<Customer>().HasMany(c => c.Addresses).WithOne().OnDelete(DeleteBehavior.Cascade);
-            builder.Entity<Customer>().HasMany(c => c.Allergens).WithMany();
+            builder.Entity<Customer>().HasMany(c => c.Allergens).WithMany(a => a.Customers);
 
             builder.Entity<Owner>().HasMany(o => o.Restaurants).WithOne(r => r.Owner).HasForeignKey(r => r.OwnerId);
 
@@ -132,7 +127,14 @@ namespace Delivery.Infrastructure.Persistence
             builder.Entity<Menu>().HasMany(m => m.Dishes).WithOne(d => d.Menu).HasForeignKey(d => d.MenuId);
 
             builder.Entity<Dish>().HasMany(d => d.DishOptionGroups).WithOne(g => g.Dish).HasForeignKey(g => g.DishId);
-            builder.Entity<Dish>().HasMany(d => d.Allergens).WithMany();
+            builder.Entity<Dish>().HasMany(d => d.Allergens).WithMany(a => a.Dishes);
+
+
+
+
+
+            TestSeed.Seed(builder);
+
         }
     }
 }

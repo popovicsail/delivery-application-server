@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Delivery.Domain.Entities.DishEntities;
 using Delivery.Domain.Entities.HelperEntities;
 using Delivery.Domain.Entities.RestaurantEntities;
 
-namespace Delivery.Domain.Entities.DishEntities
+namespace Delivery.Api.Contracts.Helper
 {
-    public class Dish
+    public class DishDto
     {
         public Guid Id { get; set; }
         public string Name { get; set; }

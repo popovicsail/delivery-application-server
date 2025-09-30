@@ -10,6 +10,7 @@ namespace Delivery.Domain.Entities.RestaurantEntities
     public class Menu
     {
         public Guid Id { get; set; }
+        public string Name { get; set; }
 
         public Guid RestaurantId { get; set; }
         public virtual Restaurant Restaurant { get; set; }
