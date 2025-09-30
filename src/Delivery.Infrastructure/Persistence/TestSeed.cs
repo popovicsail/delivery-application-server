@@ -4,126 +4,95 @@ using Delivery.Domain.Entities.RestaurantEntities;
 using Delivery.Domain.Entities.UserEntities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System;
 
-namespace Delivery.Infrastructure.Persistence.Seed;
-
-public static class TestSeed
+namespace Delivery.Infrastructure.Persistence.Seed
 {
-    public static void Seed(ModelBuilder builder)
+    public static class TestSeed
     {
-        // === PRIPREMA ID-jeva (GUID-ova) ===
-        #region IDs
-        var allergenGlutenId = Guid.NewGuid();
-        var allergenLactoseId = Guid.NewGuid();
-        var addressRestaurant1Id = Guid.NewGuid();
-        var addressCustomer1Id = Guid.NewGuid();
-        var ownerProfileId = Guid.NewGuid();
-        var customerProfileId = Guid.NewGuid();
-        var restaurantId = Guid.NewGuid();
-        var menuId = Guid.NewGuid();
-        var pizzaId = Guid.NewGuid();
-        var pastaId = Guid.NewGuid();
-        var pizzaOptionsGroupId = Guid.NewGuid();
-        var ketchupId = Guid.NewGuid();
-        var oreganoId = Guid.NewGuid();
-
-        // ID-jevi Role-ova (moraju se poklapati sa onima iz DbContext-a)
-        var customerRoleId = Guid.Parse("5B00155D-77A2-438C-B18F-DC1CC8AF5A43");
-        var ownerRoleId = Guid.Parse("FC7E84F2-E37E-46E2-A222-A839D3E1A3BB");
-
-        // ID-jevi za nove testne User-e
-        var customerUserId = Guid.NewGuid();
-        var ownerUserId = Guid.NewGuid();
-        #endregion
-
-        var passwordHasher = new PasswordHasher<User>();
-
-        // === KORISNICI (Users & Roles) - SADA SU OVDE ===
-        var customerUser = new User
+        public static void Seed(ModelBuilder modelBuilder)
         {
-            Id = customerUserId,
-            UserName = "customer1",
-            NormalizedUserName = "CUSTOMER1",
-            Email = "customer1@example.com",
-            NormalizedEmail = "CUSTOMER1@EXAMPLE.COM",
-            FirstName = "Peter",
-            LastName = "Peterson",
-            EmailConfirmed = true,
-            PhoneNumberConfirmed = true
-        };
-        customerUser.PasswordHash = passwordHasher.HashPassword(customerUser, "CustomerPass1!");
+            // 1. User
+            var userId = Guid.Parse("22222222-2222-2222-2222-222222222222");
+            var user = new User
+            {
+                Id = userId,
+                UserName = "owner1",
+                NormalizedUserName = "OWNER1",
+                Email = "owner1@example.com",
+                NormalizedEmail = "OWNER1@EXAMPLE.COM",
+                FirstName = "Petar",
+                LastName = "Petrović",
+                ProfilePictureUrl = null,
+                SecurityStamp = Guid.NewGuid().ToString(),
+                PasswordHash = "" // možeš ostaviti prazno za test
+            };
+            modelBuilder.Entity<User>().HasData(user);
 
-        var ownerUser = new User
-        {
-            Id = ownerUserId,
-            UserName = "owner1",
-            NormalizedUserName = "OWNER1",
-            Email = "owner1@example.com",
-            NormalizedEmail = "OWNER1@EXAMPLE.COM",
-            FirstName = "Mark",
-            LastName = "Markov",
-            EmailConfirmed = true,
-            PhoneNumberConfirmed = true
-        };
-        ownerUser.PasswordHash = passwordHasher.HashPassword(ownerUser, "OwnerPass1!");
+            // 2. Owner
+            var ownerId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+            var owner = new Owner
+            {
+                Id = ownerId,
+                UserId = userId
+            };
+            modelBuilder.Entity<Owner>().HasData(owner);
 
-        builder.Entity<User>().HasData(customerUser, ownerUser);
-        builder.Entity<IdentityUserRole<Guid>>().HasData(
-            new IdentityUserRole<Guid> { RoleId = customerRoleId, UserId = customerUserId },
-            new IdentityUserRole<Guid> { RoleId = ownerRoleId, UserId = ownerUserId }
-        );
+            // 3. Address
+            var addressId = Guid.Parse("33333333-3333-3333-3333-333333333333");
+            var address = new Address
+            {
+                Id = addressId,
+                StreetAndNumber = "Knez Mihailova 12",
+                City = "Beograd",
+                PostalCode = "11000"
+            };
+            modelBuilder.Entity<Address>().HasData(address);
 
-        // === POMOĆNI ENTITETI ===
-        builder.Entity<Allergen>().HasData(
-            new Allergen { Id = allergenGlutenId, Name = "Gluten", Type = "Cereals" },
-            new Allergen { Id = allergenLactoseId, Name = "Lactose", Type = "Dairy" }
-        );
+            // 4. Restaurant
+            var restaurantId = Guid.Parse("44444444-4444-4444-4444-444444444444");
+            var restaurant = new Restaurant
+            {
+                Id = restaurantId,
+                Name = "Pizzeria Roma",
+                Description = "Autentična italijanska kuhinja sa peći na drva.",
+                AddressId = addressId,
+                OwnerId = ownerId
+            };
+            modelBuilder.Entity<Restaurant>().HasData(restaurant);
 
-        builder.Entity<Address>().HasData(
-            new Address { Id = addressRestaurant1Id, StreetAndNumber = "123 Main St", City = "New York", PostalCode = "10001" },
-            new Address { Id = addressCustomer1Id, StreetAndNumber = "221B Baker Street", City = "London", PostalCode = "NW1 6XE" }
-        );
+            // 5. Menu
+            var menuId = Guid.Parse("55555555-5555-5555-5555-555555555555");
+            var menu = new Menu
+            {
+                Id = menuId,
+                Name = "Pizza Menu",
+                RestaurantId = restaurantId
+            };
+            modelBuilder.Entity<Menu>().HasData(menu);
 
-        // === PROFILI ===
-        // Sada će ovi UserId-jevi postojati kada se ovaj kod izvrši
-        builder.Entity<Owner>().HasData(new Owner { Id = ownerProfileId, UserId = ownerUserId });
-        builder.Entity<Customer>().HasData(new Customer { Id = customerProfileId, UserId = customerUserId });
+            // 6. Dishes
+            var dish1Id = Guid.Parse("66666666-6666-6666-6666-666666666666");
+            var dish2Id = Guid.Parse("77777777-7777-7777-7777-777777777777");
 
-        // === RESTORAN, MENI, JELA, DODACI ===
-        builder.Entity<Restaurant>().HasData(new Restaurant
-        {
-            Id = restaurantId,
-            Name = "The Gilded Spoon",
-            Description = "The best grill in town.",
-            AddressId = addressRestaurant1Id,
-            OwnerId = ownerProfileId
-        });
-
-        builder.Entity<Menu>().HasData(new Menu { Id = menuId, Name = "Main Menu", RestaurantId = restaurantId });
-
-        builder.Entity<Dish>().HasData(
-            new Dish { Id = pizzaId, Name = "Capricciosa", Description = "A timeless classic", Price = 12.50, Type = "Pizza", MenuId = menuId },
-            new Dish { Id = pastaId, Name = "Carbonara", Description = "Cream and bacon", Price = 10.50, Type = "Pasta", MenuId = menuId }
-        );
-
-        builder.Entity<DishOptionGroup>().HasData(
-            new DishOptionGroup { Id = pizzaOptionsGroupId, Name = "Pizza Toppings", DishId = pizzaId }
-        );
-
-        builder.Entity<DishOption>().HasData(
-            new DishOption { Id = ketchupId, Name = "Ketchup", Price = 0.50, DishOptionGroupId = pizzaOptionsGroupId },
-            new DishOption { Id = oreganoId, Name = "Oregano", Price = 0.30, DishOptionGroupId = pizzaOptionsGroupId }
-        );
-
-        // === MANY-TO-MANY VEZE ===
-        builder.Entity("AllergenDish").HasData(
-            new { AllergensId = allergenGlutenId, DishesId = pizzaId },
-            new { AllergensId = allergenLactoseId, DishesId = pizzaId }
-        );
-
-        builder.Entity("AllergenCustomer").HasData(
-            new { AllergensId = allergenLactoseId, CustomersId = customerProfileId }
-        );
+            var dish1 = new Dish
+            {
+                Id = dish1Id,
+                Name = "Margherita",
+                Description = "Pica sa paradajz sosom, sirom i bosiljkom.",
+                Price = 650,
+                MenuId = menuId,
+                Type = "Italian"
+            };
+            var dish2 = new Dish
+            {
+                Id = dish2Id,
+                Name = "Capricciosa",
+                Description = "Pica sa šunkom, pečurkama i sirom.",
+                Price = 750,
+                MenuId = menuId,
+                Type = "Italian"
+            };
+            modelBuilder.Entity<Dish>().HasData(dish1, dish2);
+        }
     }
 }

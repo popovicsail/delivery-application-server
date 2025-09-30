@@ -1,12 +1,10 @@
 ﻿using Delivery.Api.Contracts;
 using Delivery.Api.Contracts.Profile;
 using Delivery.Domain.Entities.UserEntities;
-using Delivery.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Delivery.Api.Controllers
 {
@@ -16,15 +14,13 @@ namespace Delivery.Api.Controllers
     public class ProfileController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
-        private readonly ApplicationDbContext _dbContext;
 
-        public ProfileController(UserManager<User> userManager, ApplicationDbContext dbContext)
+        public ProfileController(UserManager<User> userManager)
         {
             _userManager = userManager;
-            _dbContext = dbContext;
         }
 
-        [HttpGet("my-profile")]
+        [HttpGet("me")]
         public async Task<IActionResult> GetById()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -49,7 +45,7 @@ namespace Delivery.Api.Controllers
             return Ok(profileResponse);
         }
 
-        [HttpPut("my-profile")]
+        [HttpPut("me")]
         public async Task<IActionResult> Update([FromBody] ProfileUpdateRequest updateRequest)
         {
             var user = await _userManager.GetUserAsync(User);

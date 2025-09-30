@@ -9,4 +9,5 @@ namespace Delivery.Api.Contracts.Restaurants
         public string Description { get; set; }
         public List<MenuDto> Menus { get; set; } = new();
     }
+
 }

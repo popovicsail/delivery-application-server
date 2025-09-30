@@ -26,7 +26,7 @@ namespace Delivery.Api.Controllers
            _dbContext = dbContext;
         }
 
-        [HttpGet]
+        [HttpGet("all")]
         public async Task<IActionResult> GetAll()
         {
             var restaurants = await _dbContext.Restaurants.ToListAsync();
@@ -196,7 +196,7 @@ namespace Delivery.Api.Controllers
             return NoContent();
         }
 
-        [HttpGet("{id}/menu")]
+        [HttpGet("{id}/menu")] //!!!!!!!!!!!!!!!!!!!!!OVO TREBA PODELITI NA VISE MANJIH METODA!!!!!!!!!!!!!!!!!!!!!!!!
         public async Task<IActionResult> GetRestaurantMenu([FromRoute] Guid id)
         {
             var restaurant = await _dbContext.Restaurants

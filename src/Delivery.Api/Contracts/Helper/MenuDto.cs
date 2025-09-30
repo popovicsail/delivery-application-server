@@ -4,6 +4,6 @@
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public ICollection<DishDto> Dishes { get; set; }
+        public List<DishDto> Dishes { get; set; } = new();
     }
 }

@@ -1,6 +1,4 @@
-﻿using Delivery.Api.Contracts.Helper;
-
-namespace Delivery.Api.Contracts.Profile
+﻿namespace Delivery.Api.Contracts.Profile
 {
     public class ProfileResponse
     {
@@ -11,7 +9,5 @@ namespace Delivery.Api.Contracts.Profile
         public string LastName { get; set; }
         public string ProfilePictureUrl { get; set; }
         public List<string> Roles { get; set; }
-
-        public AllergenDto Allergens { get; set; }
     }
 }
