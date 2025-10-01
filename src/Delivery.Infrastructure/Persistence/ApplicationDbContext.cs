@@ -134,12 +134,7 @@ namespace Delivery.Infrastructure.Persistence
             builder.Entity<Menu>().HasMany(m => m.Dishes).WithOne(d => d.Menu).HasForeignKey(d => d.MenuId);
 
             builder.Entity<Dish>().HasMany(d => d.DishOptionGroups).WithOne(g => g.Dish).HasForeignKey(g => g.DishId);
-            builder.Entity<Dish>().HasMany(d => d.Allergens).WithMany(d => d.Dishes);
-
-
-
-
-
+            builder.Entity<Dish>().HasMany(d => d.Allergens).WithMany(a => a.Dishes);
 
 
             TestSeed.Seed(builder);

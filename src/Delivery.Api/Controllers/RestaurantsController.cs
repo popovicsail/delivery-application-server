@@ -1,14 +1,15 @@
-﻿using Delivery.Api.Contracts;
+﻿using System.Security.Claims;
+using Delivery.Api.Contracts;
 using Delivery.Api.Contracts.Helper;
 using Delivery.Api.Contracts.Restaurants;
+using Delivery.Domain.Entities.HelperEntities;
+using Delivery.Domain.Entities.RestaurantEntities;
 using Delivery.Domain.Entities.UserEntities;
 using Delivery.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Delivery.Domain.Entities.HelperEntities;
-using Delivery.Domain.Entities.RestaurantEntities;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -20,10 +21,12 @@ namespace Delivery.Api.Controllers
     public class RestaurantsController : ControllerBase
     {
         private readonly ApplicationDbContext _dbContext;
+        private readonly UserManager<User> _userManager;
 
-        public RestaurantsController(ApplicationDbContext dbContext)
+        public RestaurantsController(ApplicationDbContext dbContext, UserManager<User> userManager)
         {
            _dbContext = dbContext;
+           _userManager = userManager;
         }
 
         [HttpGet("all")]
@@ -196,7 +199,7 @@ namespace Delivery.Api.Controllers
             return NoContent();
         }
 
-        [HttpGet("{id}/menu")] //!!!!!!!!!!!!!!!!!!!!!OVO TREBA PODELITI NA VISE MANJIH METODA!!!!!!!!!!!!!!!!!!!!!!!!
+        [HttpGet("{id}/menu")]
         public async Task<IActionResult> GetRestaurantMenu([FromRoute] Guid id)
         {
             var restaurant = await _dbContext.Restaurants
@@ -227,9 +230,44 @@ namespace Delivery.Api.Controllers
                     }).ToList()
                 }).ToList()
             };
-
             return Ok(response);
         }
 
+        [HttpPost("{restaurantId}/workers")]
+        [Authorize(Roles = "Owner")]
+        public async Task<IActionResult> RegisterWorker(Guid restaurantId, [FromBody] RegisterWorkerRequest request)
+        {
+
+            var restaurant = await _dbContext.Restaurants.FindAsync(restaurantId);
+
+            var user = await _userManager.GetUserAsync(User);
+
+            var owner = await _dbContext.Owners.FirstOrDefaultAsync(o => o.UserId == user.Id);
+
+            var newUser = new User
+            {
+                UserName = request.UserName,
+                Email = request.Email,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+            };
+
+            var result = await _userManager.CreateAsync(newUser, request.Password);
+
+            await _userManager.AddToRoleAsync(newUser, "Worker");
+
+            var workerProfile = new Worker
+            {
+                UserId = newUser.Id,
+                RestaurantId = restaurantId,
+                IsSuspended = false
+            };
+            _dbContext.Workers.Add(workerProfile);
+            await _dbContext.SaveChangesAsync();
+
+            return Ok();
+        }
     }
+
 }
+

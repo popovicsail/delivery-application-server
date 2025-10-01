@@ -3,8 +3,10 @@ using System.Threading.Tasks;
 using Delivery.Api.Contracts.Auth;
 using Delivery.Application.Interfaces;
 using Delivery.Domain.Entities.UserEntities;
+using Delivery.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Delivery.Api.Controllers
 {
@@ -15,12 +17,14 @@ namespace Delivery.Api.Controllers
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly ITokenService _tokenService;
+        private readonly ApplicationDbContext _context;
 
-        public AuthController(UserManager<User> userManager, SignInManager<User> signInManager, ITokenService tokenService)
+        public AuthController(UserManager<User> userManager, SignInManager<User> signInManager, ITokenService tokenService, ApplicationDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _tokenService = tokenService;
+            _context = context;
         }
 
         [HttpPost("login")]
@@ -66,26 +70,21 @@ namespace Delivery.Api.Controllers
                 return BadRequest(createResult.Errors);
             }
 
+            await _userManager.AddToRoleAsync(user, "Customer");
 
-            if (request.Role == null)
+            var customerProfile = new Customer
             {
-                var identityResult = await _userManager.AddToRoleAsync(user, "Customer");
-                if (!identityResult.Succeeded)
-                {
-                    return BadRequest(identityResult.Errors);
-                }
-            }
-            else
-            {
-                var identityResult = await _userManager.AddToRoleAsync(user, request.Role);
-                if (!identityResult.Succeeded)
-                {
-                    return BadRequest(identityResult.Errors);
-                }
-            }
+                UserId = user.Id
+            };
+            _context.Customers.Add(customerProfile);
+            await _context.SaveChangesAsync();
 
-            var roles = await _userManager.GetRolesAsync(user);
-            var token = _tokenService.CreateToken(user, roles.ToList());
+
+            var roles = new List<string>
+            {
+                "Customer"
+            };
+            var token = _tokenService.CreateToken(user, roles);
 
             var registerResponse = new RegisterResponse
             {

@@ -3,6 +3,7 @@ using System;
 using Delivery.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Delivery.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251001133545_initialcreate")]
+    partial class initialcreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -568,7 +571,6 @@ namespace Delivery.Infrastructure.Migrations
                             Id = new Guid("b22698b8-42a2-4115-9631-1c2d1e2ac5f7"),
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "3fd535cd-3b08-488e-ae5d-047a45db2898",
-
                             Email = "admin@example1.com",
                             EmailConfirmed = true,
                             FirstName = "Glavni",
@@ -577,7 +579,6 @@ namespace Delivery.Infrastructure.Migrations
                             NormalizedEmail = "ADMIN@EXAMPLE1.COM",
                             NormalizedUserName = "ADMIN1",
                             PasswordHash = "AQAAAAIAAYagAAAAEPKcktDFaDYk+xI0QoYcir90nhOj70iC7HYD31bMjtNFD45kGcHiRdGwDwnTZt0fsQ==",
-
                             PhoneNumberConfirmed = true,
                             TwoFactorEnabled = false,
                             UserName = "admin1"
@@ -587,7 +588,6 @@ namespace Delivery.Infrastructure.Migrations
                             Id = new Guid("bfd2ac09-67d0-4caa-8042-c6241b4f4f7f"),
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "d220d997-6e01-4895-859e-2bfd8d080c17",
-
                             Email = "admin@example2.com",
                             EmailConfirmed = true,
                             FirstName = "Glavni",
@@ -596,7 +596,6 @@ namespace Delivery.Infrastructure.Migrations
                             NormalizedEmail = "ADMIN@EXAMPLE2.COM",
                             NormalizedUserName = "ADMIN2",
                             PasswordHash = "AQAAAAIAAYagAAAAEBJADk79R4+Qtjg7aHb3s7Ab9AJ294mO4dNT+cyV3NvnaM/Ki11oaa6retqUn1xGuw==",
-
                             PhoneNumberConfirmed = true,
                             TwoFactorEnabled = false,
                             UserName = "admin2"
@@ -606,7 +605,6 @@ namespace Delivery.Infrastructure.Migrations
                             Id = new Guid("1ddc68db-bb87-4cef-bdf8-d369bc1d5334"),
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "94267d58-9812-4aba-bfd8-f2643f2d9c03",
-
                             Email = "admin@example3.com",
                             EmailConfirmed = true,
                             FirstName = "Glavni",
@@ -615,7 +613,6 @@ namespace Delivery.Infrastructure.Migrations
                             NormalizedEmail = "ADMIN@EXAMPLE3.COM",
                             NormalizedUserName = "ADMIN3",
                             PasswordHash = "AQAAAAIAAYagAAAAEHYRz4irfKGZCZecOsw68/S1IjsgNuc8fBexWUCsn6zC51RB3jE0vpcBW5JwB4uE+g==",
-
                             PhoneNumberConfirmed = true,
                             TwoFactorEnabled = false,
                             UserName = "admin3"
@@ -625,7 +622,6 @@ namespace Delivery.Infrastructure.Migrations
                             Id = new Guid("22222222-2222-2222-2222-222222222222"),
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "b3a9e8d4-4b9e-4b3c-92b9-df1d4a711345",
-
                             Email = "owner1@example.com",
                             EmailConfirmed = false,
                             FirstName = "Petar",
@@ -635,9 +631,7 @@ namespace Delivery.Infrastructure.Migrations
                             NormalizedUserName = "OWNER1",
                             PasswordHash = "",
                             PhoneNumberConfirmed = false,
-
                             SecurityStamp = "62889a41-e5b7-46f1-a0a4-fd6142dc823a",
-
                             TwoFactorEnabled = false,
                             UserName = "owner1"
                         });

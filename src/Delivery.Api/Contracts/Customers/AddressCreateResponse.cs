@@ -1,9 +1,7 @@
-﻿namespace Delivery.Api.Contracts.Helper
+﻿namespace Delivery.Api.Contracts.Customers
 {
-    public class AddressDto
+    public class AddressUpdateRequest
     {
-
-        public Guid? Id { get; set; }
         public string StreetAndNumber { get; set; }
         public string City { get; set; }
         public string PostalCode { get; set; }
