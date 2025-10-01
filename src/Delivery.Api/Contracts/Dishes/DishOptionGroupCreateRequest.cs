@@ -6,6 +6,7 @@ namespace Delivery.Api.Contracts.Dishes
     {
         public string Name { get; set; }
         public Guid DishId { get; set; }
+        public string Type { get; set; }
         public List<DishOptionDto> DishOptions { get; set; } = new();
     }
 }

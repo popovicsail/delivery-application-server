@@ -58,6 +58,28 @@ namespace Delivery.Infrastructure.Migrations
                         .HasDatabaseName("ix_allergen_dish_dishes_id");
 
                     b.ToTable("allergen_dish", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            AllergensId = new Guid("fcc53b83-25eb-4d96-9916-9ce034b6daea"),
+                            DishesId = new Guid("66666666-6666-6666-6666-666666666666")
+                        },
+                        new
+                        {
+                            AllergensId = new Guid("c2ee3eed-8a58-4bc2-abe6-391253b64a39"),
+                            DishesId = new Guid("66666666-6666-6666-6666-666666666666")
+                        },
+                        new
+                        {
+                            AllergensId = new Guid("fcc53b83-25eb-4d96-9916-9ce034b6daea"),
+                            DishesId = new Guid("77777777-7777-7777-7777-777777777777")
+                        },
+                        new
+                        {
+                            AllergensId = new Guid("c2ee3eed-8a58-4bc2-abe6-391253b64a39"),
+                            DishesId = new Guid("77777777-7777-7777-7777-777777777777")
+                        });
                 });
 
             modelBuilder.Entity("Delivery.Domain.Entities.DishEntities.Dish", b =>
@@ -150,6 +172,22 @@ namespace Delivery.Infrastructure.Migrations
                         .HasDatabaseName("ix_dish_options_dish_option_group_id");
 
                     b.ToTable("dish_options", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("ba4abc17-2b03-494e-a182-46a5def1b980"),
+                            DishOptionGroupId = new Guid("99f25578-4514-4903-8cf5-05abef38348e"),
+                            Name = "Ketchup",
+                            Price = 50.0
+                        },
+                        new
+                        {
+                            Id = new Guid("ecebb65d-12e9-47d4-94f8-ef033cbd8426"),
+                            DishOptionGroupId = new Guid("99f25578-4514-4903-8cf5-05abef38348e"),
+                            Name = "Extra Cheese",
+                            Price = 120.0
+                        });
                 });
 
             modelBuilder.Entity("Delivery.Domain.Entities.DishEntities.DishOptionGroup", b =>
@@ -168,6 +206,11 @@ namespace Delivery.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("name");
 
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("type");
+
                     b.HasKey("Id")
                         .HasName("pk_dish_option_groups");
 
@@ -175,6 +218,15 @@ namespace Delivery.Infrastructure.Migrations
                         .HasDatabaseName("ix_dish_option_groups_dish_id");
 
                     b.ToTable("dish_option_groups", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("99f25578-4514-4903-8cf5-05abef38348e"),
+                            DishId = new Guid("77777777-7777-7777-7777-777777777777"),
+                            Name = "Extra Toppings",
+                            Type = "Zavisni"
+                        });
                 });
 
             modelBuilder.Entity("Delivery.Domain.Entities.HelperEntities.Address", b =>
@@ -242,6 +294,20 @@ namespace Delivery.Infrastructure.Migrations
                         .HasName("pk_allergens");
 
                     b.ToTable("allergens", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("fcc53b83-25eb-4d96-9916-9ce034b6daea"),
+                            Name = "Gluten",
+                            Type = "Cereals"
+                        },
+                        new
+                        {
+                            Id = new Guid("c2ee3eed-8a58-4bc2-abe6-391253b64a39"),
+                            Name = "Lactose",
+                            Type = "Dairy"
+                        });
                 });
 
             modelBuilder.Entity("Delivery.Domain.Entities.HelperEntities.WorkSchedule", b =>
@@ -567,7 +633,7 @@ namespace Delivery.Infrastructure.Migrations
                         {
                             Id = new Guid("b22698b8-42a2-4115-9631-1c2d1e2ac5f7"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "cc60bebb-b978-488e-a9eb-4f50309b47b0",
+                            ConcurrencyStamp = "171fdd30-6141-403b-b0cf-2e43a4b50f9d",
                             Email = "admin@example1.com",
                             EmailConfirmed = true,
                             FirstName = "Glavni",
@@ -575,7 +641,7 @@ namespace Delivery.Infrastructure.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE1.COM",
                             NormalizedUserName = "ADMIN1",
-                            PasswordHash = "AQAAAAIAAYagAAAAEBKcGk8xlr+thfIJi8uOdTQq91BuCY1OivsVPRcDUHmMWSy9t8f5s3IrBboksnP35w==",
+                            PasswordHash = "AQAAAAIAAYagAAAAED3vY84ClyIQ6l95QXoNN4k31BIsd3eXtVVBCx4dns9wq+JglXtX/XJCNHxnc33Zzg==",
                             PhoneNumberConfirmed = true,
                             TwoFactorEnabled = false,
                             UserName = "admin1"
@@ -584,7 +650,7 @@ namespace Delivery.Infrastructure.Migrations
                         {
                             Id = new Guid("bfd2ac09-67d0-4caa-8042-c6241b4f4f7f"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "01577aed-6bba-46e2-95ea-a1b1acc2e0e1",
+                            ConcurrencyStamp = "05f85f84-7f03-4be8-bfb7-0595e0c82bc7",
                             Email = "admin@example2.com",
                             EmailConfirmed = true,
                             FirstName = "Glavni",
@@ -592,7 +658,7 @@ namespace Delivery.Infrastructure.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE2.COM",
                             NormalizedUserName = "ADMIN2",
-                            PasswordHash = "AQAAAAIAAYagAAAAEHNs+EWeRBE+eqjf+jNUU2sqPnZxwA4dBdRgK0jHocnK8JQ6Ac97m+vQ2Ha3w0u0Jg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAECKJA7PiQjXUYXEJdadv3qMwcRxeiOK9p4CzQGzY5tpNMW8q6ZXflsc945LXyVbhGQ==",
                             PhoneNumberConfirmed = true,
                             TwoFactorEnabled = false,
                             UserName = "admin2"
@@ -601,7 +667,7 @@ namespace Delivery.Infrastructure.Migrations
                         {
                             Id = new Guid("1ddc68db-bb87-4cef-bdf8-d369bc1d5334"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "e3699622-4c4e-481f-88f4-c0f810145d61",
+                            ConcurrencyStamp = "b6867144-549b-4d8e-887e-39a366a08516",
                             Email = "admin@example3.com",
                             EmailConfirmed = true,
                             FirstName = "Glavni",
@@ -609,7 +675,7 @@ namespace Delivery.Infrastructure.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE3.COM",
                             NormalizedUserName = "ADMIN3",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKC3r2AcvZKWEQYBQOsIfMmhvYjjcYavbCHxFLN8fLeG/zYJzN5ciI7iuH7sRn4FHw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJH789JImAdKB+gW0NrkGmdWlSIthj1BzS/vxjQXGBNd39GKRXLO2BExd1b3Cl8O0Q==",
                             PhoneNumberConfirmed = true,
                             TwoFactorEnabled = false,
                             UserName = "admin3"
@@ -618,17 +684,17 @@ namespace Delivery.Infrastructure.Migrations
                         {
                             Id = new Guid("22222222-2222-2222-2222-222222222222"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "e427f1ca-d5aa-49f5-b59f-3795e9cc7b73",
+                            ConcurrencyStamp = "d4f417be-a5f7-48ea-8722-e77a683839a3",
                             Email = "owner1@example.com",
-                            EmailConfirmed = false,
+                            EmailConfirmed = true,
                             FirstName = "Petar",
                             LastName = "Petrović",
                             LockoutEnabled = false,
                             NormalizedEmail = "OWNER1@EXAMPLE.COM",
                             NormalizedUserName = "OWNER1",
-                            PasswordHash = "",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPVzhFRQDohVGeG3WQk79OG5pkdccoYPfgd8zcjC6Wkbw/d2C+wmV8Z+eMLKxOP+Jg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "f6539dec-c085-4088-9c69-fecb99c2947a",
+                            SecurityStamp = "ce3a30da-2232-47ff-aecd-a97de952df33",
                             TwoFactorEnabled = false,
                             UserName = "owner1"
                         });

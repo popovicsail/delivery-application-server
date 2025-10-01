@@ -451,6 +451,7 @@ namespace Delivery.Infrastructure.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     name = table.Column<string>(type: "text", nullable: false),
+                    type = table.Column<string>(type: "text", nullable: false),
                     dish_id = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -501,16 +502,25 @@ namespace Delivery.Infrastructure.Migrations
                 columns: new[] { "id", "access_failed_count", "concurrency_stamp", "email", "email_confirmed", "first_name", "last_name", "lockout_enabled", "lockout_end", "normalized_email", "normalized_user_name", "password_hash", "phone_number", "phone_number_confirmed", "profile_picture_url", "security_stamp", "two_factor_enabled", "user_name" },
                 values: new object[,]
                 {
-                    { new Guid("1ddc68db-bb87-4cef-bdf8-d369bc1d5334"), 0, "e3699622-4c4e-481f-88f4-c0f810145d61", "admin@example3.com", true, "Glavni", "Admin", false, null, "ADMIN@EXAMPLE3.COM", "ADMIN3", "AQAAAAIAAYagAAAAEKC3r2AcvZKWEQYBQOsIfMmhvYjjcYavbCHxFLN8fLeG/zYJzN5ciI7iuH7sRn4FHw==", null, true, null, null, false, "admin3" },
-                    { new Guid("22222222-2222-2222-2222-222222222222"), 0, "e427f1ca-d5aa-49f5-b59f-3795e9cc7b73", "owner1@example.com", false, "Petar", "Petrović", false, null, "OWNER1@EXAMPLE.COM", "OWNER1", "", null, false, null, "f6539dec-c085-4088-9c69-fecb99c2947a", false, "owner1" },
-                    { new Guid("b22698b8-42a2-4115-9631-1c2d1e2ac5f7"), 0, "cc60bebb-b978-488e-a9eb-4f50309b47b0", "admin@example1.com", true, "Glavni", "Admin", false, null, "ADMIN@EXAMPLE1.COM", "ADMIN1", "AQAAAAIAAYagAAAAEBKcGk8xlr+thfIJi8uOdTQq91BuCY1OivsVPRcDUHmMWSy9t8f5s3IrBboksnP35w==", null, true, null, null, false, "admin1" },
-                    { new Guid("bfd2ac09-67d0-4caa-8042-c6241b4f4f7f"), 0, "01577aed-6bba-46e2-95ea-a1b1acc2e0e1", "admin@example2.com", true, "Glavni", "Admin", false, null, "ADMIN@EXAMPLE2.COM", "ADMIN2", "AQAAAAIAAYagAAAAEHNs+EWeRBE+eqjf+jNUU2sqPnZxwA4dBdRgK0jHocnK8JQ6Ac97m+vQ2Ha3w0u0Jg==", null, true, null, null, false, "admin2" }
+                    { new Guid("1ddc68db-bb87-4cef-bdf8-d369bc1d5334"), 0, "b6867144-549b-4d8e-887e-39a366a08516", "admin@example3.com", true, "Glavni", "Admin", false, null, "ADMIN@EXAMPLE3.COM", "ADMIN3", "AQAAAAIAAYagAAAAEJH789JImAdKB+gW0NrkGmdWlSIthj1BzS/vxjQXGBNd39GKRXLO2BExd1b3Cl8O0Q==", null, true, null, null, false, "admin3" },
+                    { new Guid("22222222-2222-2222-2222-222222222222"), 0, "d4f417be-a5f7-48ea-8722-e77a683839a3", "owner1@example.com", true, "Petar", "Petrović", false, null, "OWNER1@EXAMPLE.COM", "OWNER1", "AQAAAAIAAYagAAAAEPVzhFRQDohVGeG3WQk79OG5pkdccoYPfgd8zcjC6Wkbw/d2C+wmV8Z+eMLKxOP+Jg==", null, false, null, "ce3a30da-2232-47ff-aecd-a97de952df33", false, "owner1" },
+                    { new Guid("b22698b8-42a2-4115-9631-1c2d1e2ac5f7"), 0, "171fdd30-6141-403b-b0cf-2e43a4b50f9d", "admin@example1.com", true, "Glavni", "Admin", false, null, "ADMIN@EXAMPLE1.COM", "ADMIN1", "AQAAAAIAAYagAAAAED3vY84ClyIQ6l95QXoNN4k31BIsd3eXtVVBCx4dns9wq+JglXtX/XJCNHxnc33Zzg==", null, true, null, null, false, "admin1" },
+                    { new Guid("bfd2ac09-67d0-4caa-8042-c6241b4f4f7f"), 0, "05f85f84-7f03-4be8-bfb7-0595e0c82bc7", "admin@example2.com", true, "Glavni", "Admin", false, null, "ADMIN@EXAMPLE2.COM", "ADMIN2", "AQAAAAIAAYagAAAAECKJA7PiQjXUYXEJdadv3qMwcRxeiOK9p4CzQGzY5tpNMW8q6ZXflsc945LXyVbhGQ==", null, true, null, null, false, "admin2" }
                 });
 
             migrationBuilder.InsertData(
                 table: "addresses",
                 columns: new[] { "id", "city", "customer_id", "postal_code", "street_and_number" },
                 values: new object[] { new Guid("33333333-3333-3333-3333-333333333333"), "Beograd", null, "11000", "Knez Mihailova 12" });
+
+            migrationBuilder.InsertData(
+                table: "allergens",
+                columns: new[] { "id", "name", "type" },
+                values: new object[,]
+                {
+                    { new Guid("c2ee3eed-8a58-4bc2-abe6-391253b64a39"), "Lactose", "Dairy" },
+                    { new Guid("fcc53b83-25eb-4d96-9916-9ce034b6daea"), "Gluten", "Cereals" }
+                });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",
@@ -544,6 +554,31 @@ namespace Delivery.Infrastructure.Migrations
                 {
                     { new Guid("66666666-6666-6666-6666-666666666666"), "Pica sa paradajz sosom, sirom i bosiljkom.", new Guid("55555555-5555-5555-5555-555555555555"), "Margherita", null, 650.0, "Italian" },
                     { new Guid("77777777-7777-7777-7777-777777777777"), "Pica sa šunkom, pečurkama i sirom.", new Guid("55555555-5555-5555-5555-555555555555"), "Capricciosa", null, 750.0, "Italian" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "allergen_dish",
+                columns: new[] { "allergens_id", "dishes_id" },
+                values: new object[,]
+                {
+                    { new Guid("c2ee3eed-8a58-4bc2-abe6-391253b64a39"), new Guid("66666666-6666-6666-6666-666666666666") },
+                    { new Guid("c2ee3eed-8a58-4bc2-abe6-391253b64a39"), new Guid("77777777-7777-7777-7777-777777777777") },
+                    { new Guid("fcc53b83-25eb-4d96-9916-9ce034b6daea"), new Guid("66666666-6666-6666-6666-666666666666") },
+                    { new Guid("fcc53b83-25eb-4d96-9916-9ce034b6daea"), new Guid("77777777-7777-7777-7777-777777777777") }
+                });
+
+            migrationBuilder.InsertData(
+                table: "dish_option_groups",
+                columns: new[] { "id", "dish_id", "name", "type" },
+                values: new object[] { new Guid("99f25578-4514-4903-8cf5-05abef38348e"), new Guid("77777777-7777-7777-7777-777777777777"), "Extra Toppings", "Zavisni" });
+
+            migrationBuilder.InsertData(
+                table: "dish_options",
+                columns: new[] { "id", "dish_option_group_id", "name", "price" },
+                values: new object[,]
+                {
+                    { new Guid("ba4abc17-2b03-494e-a182-46a5def1b980"), new Guid("99f25578-4514-4903-8cf5-05abef38348e"), "Ketchup", 50.0 },
+                    { new Guid("ecebb65d-12e9-47d4-94f8-ef033cbd8426"), new Guid("99f25578-4514-4903-8cf5-05abef38348e"), "Extra Cheese", 120.0 }
                 });
 
             migrationBuilder.CreateIndex(

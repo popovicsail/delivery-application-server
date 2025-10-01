@@ -10,6 +10,7 @@ namespace Delivery.Domain.Entities.DishEntities
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public string Type { get; set; }
       
         public Guid DishId { get; set; }
         public virtual Dish Dish{ get; set; }
