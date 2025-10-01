@@ -230,7 +230,6 @@ namespace Delivery.Api.Controllers
                     }).ToList()
                 }).ToList()
             };
-
             return Ok(response);
         }
 
