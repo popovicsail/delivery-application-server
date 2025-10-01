@@ -16,6 +16,7 @@ namespace Delivery.Domain.Entities.RestaurantEntities
 
         public Guid AddressId { get; set; }
         public virtual Address Address { get; set; }
+        public string PhoneNumber { get; set; }
 
         public Guid OwnerId { get; set; }
         public virtual Owner? Owner { get; set; }

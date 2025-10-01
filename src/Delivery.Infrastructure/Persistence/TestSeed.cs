@@ -56,6 +56,7 @@ namespace Delivery.Infrastructure.Persistence.Seed
                 Name = "Pizzeria Roma",
                 Description = "Autentična italijanska kuhinja sa peći na drva.",
                 AddressId = addressId,
+                PhoneNumber = "065/555-333-1",
                 OwnerId = ownerId
             };
             modelBuilder.Entity<Restaurant>().HasData(restaurant);
