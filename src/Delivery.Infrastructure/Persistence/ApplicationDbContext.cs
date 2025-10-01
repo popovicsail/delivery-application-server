@@ -136,6 +136,7 @@ namespace Delivery.Infrastructure.Persistence
             builder.Entity<Dish>().HasMany(d => d.DishOptionGroups).WithOne(g => g.Dish).HasForeignKey(g => g.DishId);
             builder.Entity<Dish>().HasMany(d => d.Allergens).WithMany(a => a.Dishes);
 
+
             TestSeed.Seed(builder);
         }
     }
