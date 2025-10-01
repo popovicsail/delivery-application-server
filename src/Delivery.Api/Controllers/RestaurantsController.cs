@@ -267,6 +267,26 @@ namespace Delivery.Api.Controllers
 
             return Ok();
         }
+
+        [HttpGet("my-restaurants")]
+        public async Task<IActionResult> GetMyRestaurants()
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            var owner = await _dbContext.Owners
+                .FirstOrDefaultAsync(o => o.UserId == user.Id);
+
+            var restaurants = await _dbContext.Restaurants
+                .Where(r => r.OwnerId == owner.Id)
+                .Select(r => new RestaurantSummaryResponse
+            {
+                Id = r.Id,
+                Name = r.Name,
+                Description = r.Description
+            }).ToListAsync();
+
+            return Ok(restaurants);
+        }
     }
 
 }
