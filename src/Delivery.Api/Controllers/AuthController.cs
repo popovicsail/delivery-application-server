@@ -41,11 +41,12 @@ namespace Delivery.Api.Controllers
             var roles = await _userManager.GetRolesAsync(user);
             var token = _tokenService.CreateToken(user, roles.ToList());
 
-
-            return Ok(new LoginResponse
+            var loginResponse = new LoginResponse
             {
                 Token = token
-            });
+            };
+
+            return Ok(loginResponse);
         }
 
         [HttpPost("register")]
@@ -86,10 +87,12 @@ namespace Delivery.Api.Controllers
             var roles = await _userManager.GetRolesAsync(user);
             var token = _tokenService.CreateToken(user, roles.ToList());
 
-            return Ok(new LoginResponse
+            var registerResponse = new RegisterResponse
             {
                 Token = token
-            });
+            };
+
+            return Ok(registerResponse);
         }
 
         [HttpPost("logout")]

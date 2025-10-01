@@ -28,15 +28,15 @@ namespace Delivery.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("allergens_id");
 
-                    b.Property<Guid>("CustomerId")
+                    b.Property<Guid>("CustomersId")
                         .HasColumnType("uuid")
-                        .HasColumnName("customer_id");
+                        .HasColumnName("customers_id");
 
-                    b.HasKey("AllergensId", "CustomerId")
+                    b.HasKey("AllergensId", "CustomersId")
                         .HasName("pk_allergen_customer");
 
-                    b.HasIndex("CustomerId")
-                        .HasDatabaseName("ix_allergen_customer_customer_id");
+                    b.HasIndex("CustomersId")
+                        .HasDatabaseName("ix_allergen_customer_customers_id");
 
                     b.ToTable("allergen_customer", (string)null);
                 });
@@ -47,15 +47,15 @@ namespace Delivery.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("allergens_id");
 
-                    b.Property<Guid>("DishId")
+                    b.Property<Guid>("DishesId")
                         .HasColumnType("uuid")
-                        .HasColumnName("dish_id");
+                        .HasColumnName("dishes_id");
 
-                    b.HasKey("AllergensId", "DishId")
+                    b.HasKey("AllergensId", "DishesId")
                         .HasName("pk_allergen_dish");
 
-                    b.HasIndex("DishId")
-                        .HasDatabaseName("ix_allergen_dish_dish_id");
+                    b.HasIndex("DishesId")
+                        .HasDatabaseName("ix_allergen_dish_dishes_id");
 
                     b.ToTable("allergen_dish", (string)null);
                 });
@@ -130,7 +130,7 @@ namespace Delivery.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<Guid?>("DishOptionGroupId")
+                    b.Property<Guid>("DishOptionGroupId")
                         .HasColumnType("uuid")
                         .HasColumnName("dish_option_group_id");
 
@@ -573,7 +573,7 @@ namespace Delivery.Infrastructure.Migrations
                         {
                             Id = new Guid("b22698b8-42a2-4115-9631-1c2d1e2ac5f7"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "b6f769d2-3a3d-4ff8-b8bd-719a3a693e6d",
+                            ConcurrencyStamp = "526dce0a-b566-4d7e-8fc2-f013db9ad263",
                             Email = "admin@example1.com",
                             EmailConfirmed = true,
                             FirstName = "Glavni",
@@ -581,7 +581,7 @@ namespace Delivery.Infrastructure.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE1.COM",
                             NormalizedUserName = "ADMIN1",
-                            PasswordHash = "AQAAAAIAAYagAAAAEN6Iu15iyEMKb3tom6lgyba7Hm7z45Gqv3N9GVIsm5EG90ETqrq8bcTZMhDk0r52IA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAELaHwgg6I2OGkiz1hlaw1fBZE5U7N3Wmf3JBQHPvol70ybZqgV6MC7JW+H9ZmEXvqA==",
                             PhoneNumberConfirmed = true,
                             TwoFactorEnabled = false,
                             UserName = "admin1"
@@ -590,7 +590,7 @@ namespace Delivery.Infrastructure.Migrations
                         {
                             Id = new Guid("bfd2ac09-67d0-4caa-8042-c6241b4f4f7f"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "e64de65f-ada6-4dcf-9c30-d710987cf410",
+                            ConcurrencyStamp = "8759b20d-d512-4c86-a69d-b60f25900f55",
                             Email = "admin@example2.com",
                             EmailConfirmed = true,
                             FirstName = "Glavni",
@@ -598,7 +598,7 @@ namespace Delivery.Infrastructure.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE2.COM",
                             NormalizedUserName = "ADMIN2",
-                            PasswordHash = "AQAAAAIAAYagAAAAEIBs651TzjLIHvnjivVZ5N/32Ohfc3LaZYU13ljea4qlVaqO8/vRYs72WGvmJpmrhw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEModddbDJIBdyrGmqm3HXXTLeT0a+f88dv/DxcwdmwZNM2mr/qr8MlwEt1tXKuvXOg==",
                             PhoneNumberConfirmed = true,
                             TwoFactorEnabled = false,
                             UserName = "admin2"
@@ -607,7 +607,7 @@ namespace Delivery.Infrastructure.Migrations
                         {
                             Id = new Guid("1ddc68db-bb87-4cef-bdf8-d369bc1d5334"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f58d7bd6-b89c-4e94-8a97-579a693b8939",
+                            ConcurrencyStamp = "d6890bb9-1bc1-471c-9bbc-7b5bf0ed70bf",
                             Email = "admin@example3.com",
                             EmailConfirmed = true,
                             FirstName = "Glavni",
@@ -615,7 +615,7 @@ namespace Delivery.Infrastructure.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE3.COM",
                             NormalizedUserName = "ADMIN3",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPaCtQqJVufOyMyH5+drnMVixhJ6nI3gKNQYcAmoUk8f0yLNJ1opocHy0YSo9OkzeQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDrrwgt9L++HkACArELkjJPgasOWWkbyw1cP5CVwjDm66Drl6XL4YsWXMIQXRU3vmA==",
                             PhoneNumberConfirmed = true,
                             TwoFactorEnabled = false,
                             UserName = "admin3"
@@ -624,7 +624,7 @@ namespace Delivery.Infrastructure.Migrations
                         {
                             Id = new Guid("22222222-2222-2222-2222-222222222222"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f04b2ba1-44fe-4ae7-8677-6cd55018932c",
+                            ConcurrencyStamp = "e9a7c985-d2bd-43ba-a8f4-994e56d1ce51",
                             Email = "owner1@example.com",
                             EmailConfirmed = false,
                             FirstName = "Petar",
@@ -634,7 +634,7 @@ namespace Delivery.Infrastructure.Migrations
                             NormalizedUserName = "OWNER1",
                             PasswordHash = "",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "9ac9d171-2598-44e4-8366-19f0e54d815d",
+                            SecurityStamp = "4e9f22b5-121a-4490-a9d9-cd2034ab6017",
                             TwoFactorEnabled = false,
                             UserName = "owner1"
                         });
@@ -894,10 +894,10 @@ namespace Delivery.Infrastructure.Migrations
 
                     b.HasOne("Delivery.Domain.Entities.UserEntities.Customer", null)
                         .WithMany()
-                        .HasForeignKey("CustomerId")
+                        .HasForeignKey("CustomersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_allergen_customer_customers_customer_id");
+                        .HasConstraintName("fk_allergen_customer_customers_customers_id");
                 });
 
             modelBuilder.Entity("AllergenDish", b =>
@@ -911,10 +911,10 @@ namespace Delivery.Infrastructure.Migrations
 
                     b.HasOne("Delivery.Domain.Entities.DishEntities.Dish", null)
                         .WithMany()
-                        .HasForeignKey("DishId")
+                        .HasForeignKey("DishesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_allergen_dish_dishes_dish_id");
+                        .HasConstraintName("fk_allergen_dish_dishes_dishes_id");
                 });
 
             modelBuilder.Entity("Delivery.Domain.Entities.DishEntities.Dish", b =>
@@ -931,10 +931,14 @@ namespace Delivery.Infrastructure.Migrations
 
             modelBuilder.Entity("Delivery.Domain.Entities.DishEntities.DishOption", b =>
                 {
-                    b.HasOne("Delivery.Domain.Entities.DishEntities.DishOptionGroup", null)
+                    b.HasOne("Delivery.Domain.Entities.DishEntities.DishOptionGroup", "DishOptionGroup")
                         .WithMany("DishOptions")
                         .HasForeignKey("DishOptionGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("fk_dish_options_dish_option_groups_dish_option_group_id");
+
+                    b.Navigation("DishOptionGroup");
                 });
 
             modelBuilder.Entity("Delivery.Domain.Entities.DishEntities.DishOptionGroup", b =>
