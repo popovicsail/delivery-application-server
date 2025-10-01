@@ -122,7 +122,7 @@ namespace Delivery.Infrastructure.Persistence
             builder.Entity<Administrator>().HasOne(p => p.User).WithOne().HasForeignKey<Administrator>(p => p.UserId).IsRequired();
 
             builder.Entity<Customer>().HasMany(c => c.Addresses).WithOne().OnDelete(DeleteBehavior.Cascade);
-            builder.Entity<Customer>().HasMany(c => c.Allergens).WithMany();
+            builder.Entity<Customer>().HasMany(c => c.Allergens).WithMany(a => a.Customers);
 
             builder.Entity<Owner>().HasMany(o => o.Restaurants).WithOne(r => r.Owner).HasForeignKey(r => r.OwnerId);
 
@@ -134,13 +134,7 @@ namespace Delivery.Infrastructure.Persistence
             builder.Entity<Menu>().HasMany(m => m.Dishes).WithOne(d => d.Menu).HasForeignKey(d => d.MenuId);
 
             builder.Entity<Dish>().HasMany(d => d.DishOptionGroups).WithOne(g => g.Dish).HasForeignKey(g => g.DishId);
-            builder.Entity<Dish>().HasMany(d => d.Allergens).WithMany();
-
-
-
-
-
-
+            builder.Entity<Dish>().HasMany(d => d.Allergens).WithMany(a => a.Dishes);
 
             TestSeed.Seed(builder);
         }

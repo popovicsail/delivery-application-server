@@ -4,10 +4,12 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace Delivery.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class initialcreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -272,11 +274,11 @@ namespace Delivery.Infrastructure.Migrations
                 columns: table => new
                 {
                     allergens_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    customer_id = table.Column<Guid>(type: "uuid", nullable: false)
+                    customers_id = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_allergen_customer", x => new { x.allergens_id, x.customer_id });
+                    table.PrimaryKey("pk_allergen_customer", x => new { x.allergens_id, x.customers_id });
                     table.ForeignKey(
                         name: "fk_allergen_customer_allergens_allergens_id",
                         column: x => x.allergens_id,
@@ -284,8 +286,8 @@ namespace Delivery.Infrastructure.Migrations
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "fk_allergen_customer_customers_customer_id",
-                        column: x => x.customer_id,
+                        name: "fk_allergen_customer_customers_customers_id",
+                        column: x => x.customers_id,
                         principalTable: "customers",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
@@ -323,6 +325,7 @@ namespace Delivery.Infrastructure.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "text", nullable: false),
                     restaurant_id = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -370,7 +373,8 @@ namespace Delivery.Infrastructure.Migrations
                     name = table.Column<string>(type: "text", nullable: false),
                     description = table.Column<string>(type: "text", nullable: false),
                     price = table.Column<double>(type: "double precision", nullable: false),
-                    type = table.Column<int>(type: "integer", nullable: false),
+                    type = table.Column<string>(type: "text", nullable: false),
+                    picture_url = table.Column<string>(type: "text", nullable: true),
                     menu_id = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -389,7 +393,7 @@ namespace Delivery.Infrastructure.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
-                    week_day = table.Column<int>(type: "integer", nullable: false),
+                    week_day = table.Column<string>(type: "text", nullable: false),
                     work_start = table.Column<TimeSpan>(type: "time", nullable: false),
                     work_end = table.Column<TimeSpan>(type: "time", nullable: false),
                     courier_id = table.Column<Guid>(type: "uuid", nullable: true),
@@ -422,11 +426,11 @@ namespace Delivery.Infrastructure.Migrations
                 columns: table => new
                 {
                     allergens_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    dish_id = table.Column<Guid>(type: "uuid", nullable: false)
+                    dishes_id = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_allergen_dish", x => new { x.allergens_id, x.dish_id });
+                    table.PrimaryKey("pk_allergen_dish", x => new { x.allergens_id, x.dishes_id });
                     table.ForeignKey(
                         name: "fk_allergen_dish_allergens_allergens_id",
                         column: x => x.allergens_id,
@@ -434,8 +438,8 @@ namespace Delivery.Infrastructure.Migrations
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "fk_allergen_dish_dishes_dish_id",
-                        column: x => x.dish_id,
+                        name: "fk_allergen_dish_dishes_dishes_id",
+                        column: x => x.dishes_id,
                         principalTable: "dishes",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
@@ -467,7 +471,7 @@ namespace Delivery.Infrastructure.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     name = table.Column<string>(type: "text", nullable: false),
                     price = table.Column<double>(type: "double precision", nullable: false),
-                    dish_option_group_id = table.Column<Guid>(type: "uuid", nullable: true)
+                    dish_option_group_id = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -476,7 +480,70 @@ namespace Delivery.Infrastructure.Migrations
                         name: "fk_dish_options_dish_option_groups_dish_option_group_id",
                         column: x => x.dish_option_group_id,
                         principalTable: "dish_option_groups",
-                        principalColumn: "id");
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "id", "concurrency_stamp", "name", "normalized_name" },
+                values: new object[,]
+                {
+                    { new Guid("190d206e-0b99-4d0f-b3fa-da6ceea6d8cb"), null, "Courier", "COURIER" },
+                    { new Guid("2301d884-221a-4e7d-b509-0113dcc043e1"), null, "Administrator", "ADMINISTRATOR" },
+                    { new Guid("5b00155d-77a2-438c-b18f-dc1cc8af5a43"), null, "Customer", "CUSTOMER" },
+                    { new Guid("f09ece5a-1c11-4792-815b-4ef1bc6c6c20"), null, "Worker", "WORKER" },
+                    { new Guid("fc7e84f2-e37e-46e2-a222-a839d3e1a3bb"), null, "Owner", "OWNER" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUsers",
+                columns: new[] { "id", "access_failed_count", "concurrency_stamp", "email", "email_confirmed", "first_name", "last_name", "lockout_enabled", "lockout_end", "normalized_email", "normalized_user_name", "password_hash", "phone_number", "phone_number_confirmed", "profile_picture_url", "security_stamp", "two_factor_enabled", "user_name" },
+                values: new object[,]
+                {
+                    { new Guid("1ddc68db-bb87-4cef-bdf8-d369bc1d5334"), 0, "94267d58-9812-4aba-bfd8-f2643f2d9c03", "admin@example3.com", true, "Glavni", "Admin", false, null, "ADMIN@EXAMPLE3.COM", "ADMIN3", "AQAAAAIAAYagAAAAEHYRz4irfKGZCZecOsw68/S1IjsgNuc8fBexWUCsn6zC51RB3jE0vpcBW5JwB4uE+g==", null, true, null, null, false, "admin3" },
+                    { new Guid("22222222-2222-2222-2222-222222222222"), 0, "b3a9e8d4-4b9e-4b3c-92b9-df1d4a711345", "owner1@example.com", false, "Petar", "Petrović", false, null, "OWNER1@EXAMPLE.COM", "OWNER1", "", null, false, null, "62889a41-e5b7-46f1-a0a4-fd6142dc823a", false, "owner1" },
+                    { new Guid("b22698b8-42a2-4115-9631-1c2d1e2ac5f7"), 0, "3fd535cd-3b08-488e-ae5d-047a45db2898", "admin@example1.com", true, "Glavni", "Admin", false, null, "ADMIN@EXAMPLE1.COM", "ADMIN1", "AQAAAAIAAYagAAAAEPKcktDFaDYk+xI0QoYcir90nhOj70iC7HYD31bMjtNFD45kGcHiRdGwDwnTZt0fsQ==", null, true, null, null, false, "admin1" },
+                    { new Guid("bfd2ac09-67d0-4caa-8042-c6241b4f4f7f"), 0, "d220d997-6e01-4895-859e-2bfd8d080c17", "admin@example2.com", true, "Glavni", "Admin", false, null, "ADMIN@EXAMPLE2.COM", "ADMIN2", "AQAAAAIAAYagAAAAEBJADk79R4+Qtjg7aHb3s7Ab9AJ294mO4dNT+cyV3NvnaM/Ki11oaa6retqUn1xGuw==", null, true, null, null, false, "admin2" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "addresses",
+                columns: new[] { "id", "city", "customer_id", "postal_code", "street_and_number" },
+                values: new object[] { new Guid("33333333-3333-3333-3333-333333333333"), "Beograd", null, "11000", "Knez Mihailova 12" });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUserRoles",
+                columns: new[] { "role_id", "user_id" },
+                values: new object[,]
+                {
+                    { new Guid("2301d884-221a-4e7d-b509-0113dcc043e1"), new Guid("1ddc68db-bb87-4cef-bdf8-d369bc1d5334") },
+                    { new Guid("2301d884-221a-4e7d-b509-0113dcc043e1"), new Guid("b22698b8-42a2-4115-9631-1c2d1e2ac5f7") },
+                    { new Guid("2301d884-221a-4e7d-b509-0113dcc043e1"), new Guid("bfd2ac09-67d0-4caa-8042-c6241b4f4f7f") }
+                });
+
+            migrationBuilder.InsertData(
+                table: "owners",
+                columns: new[] { "id", "user_id" },
+                values: new object[] { new Guid("11111111-1111-1111-1111-111111111111"), new Guid("22222222-2222-2222-2222-222222222222") });
+
+            migrationBuilder.InsertData(
+                table: "restaurants",
+                columns: new[] { "id", "address_id", "description", "name", "owner_id" },
+                values: new object[] { new Guid("44444444-4444-4444-4444-444444444444"), new Guid("33333333-3333-3333-3333-333333333333"), "Autentična italijanska kuhinja sa peći na drva.", "Pizzeria Roma", new Guid("11111111-1111-1111-1111-111111111111") });
+
+            migrationBuilder.InsertData(
+                table: "menus",
+                columns: new[] { "id", "name", "restaurant_id" },
+                values: new object[] { new Guid("55555555-5555-5555-5555-555555555555"), "Pizza Menu", new Guid("44444444-4444-4444-4444-444444444444") });
+
+            migrationBuilder.InsertData(
+                table: "dishes",
+                columns: new[] { "id", "description", "menu_id", "name", "picture_url", "price", "type" },
+                values: new object[,]
+                {
+                    { new Guid("66666666-6666-6666-6666-666666666666"), "Pica sa paradajz sosom, sirom i bosiljkom.", new Guid("55555555-5555-5555-5555-555555555555"), "Margherita", null, 650.0, "Italian" },
+                    { new Guid("77777777-7777-7777-7777-777777777777"), "Pica sa šunkom, pečurkama i sirom.", new Guid("55555555-5555-5555-5555-555555555555"), "Capricciosa", null, 750.0, "Italian" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -491,14 +558,14 @@ namespace Delivery.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "ix_allergen_customer_customer_id",
+                name: "ix_allergen_customer_customers_id",
                 table: "allergen_customer",
-                column: "customer_id");
+                column: "customers_id");
 
             migrationBuilder.CreateIndex(
-                name: "ix_allergen_dish_dish_id",
+                name: "ix_allergen_dish_dishes_id",
                 table: "allergen_dish",
-                column: "dish_id");
+                column: "dishes_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_asp_net_role_claims_role_id",

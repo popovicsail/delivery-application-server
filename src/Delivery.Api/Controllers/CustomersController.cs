@@ -1,6 +1,7 @@
 ﻿using Delivery.Api.Contracts.Customers;
 using Delivery.Api.Contracts.Helper;
 using Delivery.Domain.Entities.DishEntities;
+using Delivery.Domain.Entities.HelperEntities;
 using Delivery.Domain.Entities.UserEntities;
 using Delivery.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
@@ -66,6 +67,102 @@ namespace Delivery.Api.Controllers
             };
 
             return Ok(response);
+        }
+
+        [HttpGet("my-addresses")]
+        public async Task<IActionResult> GetMyAddresses()
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            var customer = await _dbContext.Customers
+                .Include(c => c.Addresses)
+                .FirstOrDefaultAsync(c => c.UserId == user.Id);
+
+            var addressDtos = customer.Addresses.Select(a => new AddressDto
+            {
+                Id = a.Id,
+                StreetAndNumber = a.StreetAndNumber,
+                City = a.City,
+                PostalCode = a.PostalCode
+            }).ToList();
+
+            return Ok(addressDtos);
+        }
+
+        [HttpPost("my-addresses")]
+        public async Task<IActionResult> CreateAddress([FromBody] AddressCreateRequest request)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            var customer = await _dbContext.Customers.FirstOrDefaultAsync(c => c.UserId == user.Id);
+
+            var newAddress = new Address
+            {
+                StreetAndNumber = request.StreetAndNumber,
+                City = request.City,
+                PostalCode = request.PostalCode
+            };
+
+            customer.Addresses.Add(newAddress);
+            await _dbContext.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        [HttpPut("my-addresses/{addressId}")]
+        public async Task<IActionResult> UpdateAddress(Guid addressId, [FromBody] AddressUpdateRequest request)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            var customer = await _dbContext.Customers
+                .Include(c => c.Addresses)
+                .FirstOrDefaultAsync(c => c.UserId == user.Id);
+
+            var address = customer.Addresses.FirstOrDefault(a => a.Id == addressId);
+
+            address.StreetAndNumber = request.StreetAndNumber;
+            address.City = request.City;
+            address.PostalCode = request.PostalCode;
+
+            await _dbContext.SaveChangesAsync();
+            return NoContent();
+        }
+
+        [HttpDelete("my-addresses/{addressId}")]
+        public async Task<IActionResult> DeleteAddress(Guid addressId)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            var customer = await _dbContext.Customers
+                .Include(c => c.Addresses)
+                .FirstOrDefaultAsync(c => c.UserId == user.Id);
+
+            var address = customer.Addresses.FirstOrDefault(a => a.Id == addressId);
+
+            _dbContext.Addresses.Remove(address);
+            await _dbContext.SaveChangesAsync();
+            return NoContent();
+        }
+
+        [HttpPut("my-allergens")]
+        public async Task<IActionResult> UpdateMyAllergens([FromBody] UpdateCustomerAllergensRequest request)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized();
+
+            var customer = await _dbContext.Customers
+                .Include(c => c.Allergens)
+                .FirstOrDefaultAsync(c => c.UserId == user.Id);
+
+            var newAllergens = await _dbContext.Allergens
+                .Where(a => request.AllergenIds.Contains(a.Id))
+                .ToListAsync();
+
+            customer.Allergens = newAllergens;
+
+            await _dbContext.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 
