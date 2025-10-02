@@ -11,7 +11,7 @@ namespace Delivery.Api.Contracts.Restaurants
         public string Description { get; set; }
 
         public AddressDto Address { get; set; }
-
+        public string PhoneNumber { get; set; }
         public OwnerDto Owner { get; set; }
     }
 }

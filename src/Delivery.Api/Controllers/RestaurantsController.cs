@@ -30,15 +30,34 @@ namespace Delivery.Api.Controllers
         }
 
         [HttpGet("all")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> GetAll()
         {
-            var restaurants = await _dbContext.Restaurants.ToListAsync();
+            var restaurants = await _dbContext.Restaurants
+                .Include(r => r.Owner)
+                    .ThenInclude(o => o.User)
+                .Include(r => r.Address)
+                .ToListAsync();
 
             var response = restaurants.Select(r => new RestaurantSummaryResponse
             {
                 Id = r.Id,
                 Name = r.Name,
-                Description = r.Description
+                Description = r.Description,
+                PhoneNumber = r.PhoneNumber,
+                Address = new AddressDto
+                {
+                    StreetAndNumber = r.Address.StreetAndNumber,
+                    City = r.Address.City,
+                    PostalCode = r.Address.PostalCode
+                },
+                Owner = new OwnerDto
+                {
+                    Id = r.Owner.Id,
+                    UserId = r.Owner.UserId,
+                    FirstName = r.Owner.User.FirstName,
+                    LastName = r.Owner.User.LastName
+                }
             }).ToList();
 
             if (!response.Any())
@@ -68,6 +87,7 @@ namespace Delivery.Api.Controllers
                 Id = restaurant.Id,
                 Name = restaurant.Name,
                 Description = restaurant.Description,
+                PhoneNumber = restaurant.PhoneNumber,
                 Address = new AddressDto
                 {
                     StreetAndNumber = restaurant.Address.StreetAndNumber,
@@ -93,12 +113,13 @@ namespace Delivery.Api.Controllers
             var restaurant = new Restaurant()
             {
                 Name = createRequest.Name,
-                Description = createRequest.Description,
+                Description = "Popuni",
+                PhoneNumber = "Popuni",
                 Address = new Address()
                 {
-                    StreetAndNumber = createRequest.Address.StreetAndNumber,
-                    City = createRequest.Address.City,
-                    PostalCode = createRequest.Address.PostalCode
+                    StreetAndNumber = "Popuni",
+                    City = "Popuni",
+                    PostalCode = "Popuni"
                 },
                 OwnerId = createRequest.OwnerId
             };
@@ -118,6 +139,7 @@ namespace Delivery.Api.Controllers
                 Id = restaurantUpdated.Id,
                 Name = restaurantUpdated.Name,
                 Description = restaurantUpdated.Description,
+                PhoneNumber = restaurantUpdated.PhoneNumber,
                 Address = new AddressDto
                 {
                     StreetAndNumber = restaurantUpdated.Address.StreetAndNumber,
@@ -152,10 +174,10 @@ namespace Delivery.Api.Controllers
 
             restaurant.Name = updateRequest.Name;
             restaurant.Description = updateRequest.Description;
+            restaurant.PhoneNumber = updateRequest.PhoneNumber;
             restaurant.Address.StreetAndNumber = updateRequest.Address.StreetAndNumber;
             restaurant.Address.City = updateRequest.Address.City;
             restaurant.Address.PostalCode = updateRequest.Address.PostalCode;
-            restaurant.OwnerId = updateRequest.OwnerId;
 
             await _dbContext.SaveChangesAsync();
 
@@ -164,6 +186,7 @@ namespace Delivery.Api.Controllers
                 Id = restaurant.Id,
                 Name = restaurant.Name,
                 Description = restaurant.Description,
+                PhoneNumber = restaurant.PhoneNumber,
                 Address = new AddressDto
                 {
                     StreetAndNumber = restaurant.Address.StreetAndNumber,
@@ -217,6 +240,7 @@ namespace Delivery.Api.Controllers
                 Id = restaurant.Id,
                 Name = restaurant.Name,
                 Description = restaurant.Description,
+                PhoneNumber = restaurant.PhoneNumber,
                 Menus = restaurant.Menus.Select(m => new MenuDto
                 {
                     Id = m.Id,
