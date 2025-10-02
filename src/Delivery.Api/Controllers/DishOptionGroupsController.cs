@@ -25,7 +25,6 @@ namespace Delivery.Api.Controllers
         {
             var dish = await _dbContext.Dishes.FirstOrDefaultAsync(d => d.Id == request.DishId);
 
-
             var newGroup = new DishOptionGroup
             {
                 Name = request.Name,
