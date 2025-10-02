@@ -43,72 +43,30 @@ namespace Delivery.Infrastructure.Persistence
 
             var passwordHasher = new PasswordHasher<User>();
 
-            Guid adminRoleId = Guid.Parse("2301D884-221A-4E7D-B509-0113DCC043E1");
-
-            builder.Entity<IdentityRole<Guid>>().HasData(new IdentityRole<Guid>
-            {
-                Id = adminRoleId,
-                Name = "Administrator",
-                NormalizedName = "ADMINISTRATOR"
-            });
-
+            var adminRoleId = Guid.Parse("2301d884-221a-4e7d-b509-0113dcc043e1");
             builder.Entity<IdentityRole<Guid>>().HasData(
-                new IdentityRole<Guid> { Id = Guid.Parse("5B00155D-77A2-438C-B18F-DC1CC8AF5A43"), Name = "Customer", NormalizedName = "CUSTOMER" },
-                new IdentityRole<Guid> { Id = Guid.Parse("190D206E-0B99-4D0F-B3FA-DA6CEEA6D8CB"), Name = "Courier", NormalizedName = "COURIER" },
-                new IdentityRole<Guid> { Id = Guid.Parse("FC7E84F2-E37E-46E2-A222-A839D3E1A3BB"), Name = "Owner", NormalizedName = "OWNER" },
-                new IdentityRole<Guid> { Id = Guid.Parse("F09ECE5A-1C11-4792-815B-4EF1BC6C6C20"), Name = "Worker", NormalizedName = "WORKER" }
+                new IdentityRole<Guid> { Id = adminRoleId, Name = "Administrator", NormalizedName = "ADMINISTRATOR" },
+                new IdentityRole<Guid> { Id = Guid.Parse("5b00155d-77a2-438c-b18f-dc1cc8af5a43"), Name = "Customer", NormalizedName = "CUSTOMER" },
+                new IdentityRole<Guid> { Id = Guid.Parse("190d206e-0b99-4d0f-b3fa-da6ceea6d8cb"), Name = "Courier", NormalizedName = "COURIER" },
+                new IdentityRole<Guid> { Id = Guid.Parse("fc7e84f2-e37e-46e2-a222-a839d3e1a3bb"), Name = "Owner", NormalizedName = "OWNER" },
+                new IdentityRole<Guid> { Id = Guid.Parse("f09ece5a-1c11-4792-815b-4ef1bc6c6c20"), Name = "Worker", NormalizedName = "WORKER" }
             );
 
-            Guid adminUserGuid1 = Guid.Parse("B22698B8-42A2-4115-9631-1C2D1E2AC5F7");
-            var adminUser1 = new User
-            {
-                Id = adminUserGuid1,
-                UserName = "admin1",
-                NormalizedUserName = "ADMIN1",
-                Email = "admin@example1.com",
-                NormalizedEmail = "ADMIN@EXAMPLE1.COM",
-                FirstName = "Glavni",
-                LastName = "Admin",
-                EmailConfirmed = true,
-                PhoneNumberConfirmed = true
-            };
+            var adminUser1 = new User { Id = Guid.Parse("b22698b8-42a2-4115-9631-1c2d1e2ac5f7"), UserName = "admin1", NormalizedUserName = "ADMIN1", Email = "admin1@example.com", NormalizedEmail = "ADMIN1@EXAMPLE.COM", FirstName = "Main", LastName = "Admin", EmailConfirmed = true, SecurityStamp = Guid.NewGuid().ToString() };
+            var adminUser2 = new User { Id = Guid.Parse("bfd2ac09-67d0-4caa-8042-c6241b4f4f7f"), UserName = "admin2", NormalizedUserName = "ADMIN2", Email = "admin2@example.com", NormalizedEmail = "ADMIN2@EXAMPLE.COM", FirstName = "Second", LastName = "Admin", EmailConfirmed = true, SecurityStamp = Guid.NewGuid().ToString() };
+            var adminUser3 = new User { Id = Guid.Parse("1ddc68db-bb87-4cef-bdf8-d369bc1d5334"), UserName = "admin3", NormalizedUserName = "ADMIN3", Email = "admin3@example.com", NormalizedEmail = "ADMIN3@EXAMPLE.COM", FirstName = "Third", LastName = "Admin", EmailConfirmed = true, SecurityStamp = Guid.NewGuid().ToString() };
+
             adminUser1.PasswordHash = passwordHasher.HashPassword(adminUser1, "AdminPass1!");
-            builder.Entity<User>().HasData(adminUser1);
-            builder.Entity<IdentityUserRole<Guid>>().HasData(new IdentityUserRole<Guid> { RoleId = adminRoleId, UserId = adminUser1.Id });
-
-            Guid adminUserGuid2 = Guid.Parse("BFD2AC09-67D0-4CAA-8042-C6241B4F4F7F");
-            var adminUser2 = new User
-            {
-                Id = adminUserGuid2,
-                UserName = "admin2",
-                NormalizedUserName = "ADMIN2",
-                Email = "admin@example2.com",
-                NormalizedEmail = "ADMIN@EXAMPLE2.COM",
-                FirstName = "Glavni",
-                LastName = "Admin",
-                EmailConfirmed = true,
-                PhoneNumberConfirmed = true
-            };
             adminUser2.PasswordHash = passwordHasher.HashPassword(adminUser2, "AdminPass2!");
-            builder.Entity<User>().HasData(adminUser2);
-            builder.Entity<IdentityUserRole<Guid>>().HasData(new IdentityUserRole<Guid> { RoleId = adminRoleId, UserId = adminUser2.Id });
-
-            Guid adminUserGuid3 = Guid.Parse("1DDC68DB-BB87-4CEF-BDF8-D369BC1D5334");
-            var adminUser3 = new User
-            {
-                Id = adminUserGuid3,
-                UserName = "admin3",
-                NormalizedUserName = "ADMIN3",
-                Email = "admin@example3.com",
-                NormalizedEmail = "ADMIN@EXAMPLE3.COM",
-                FirstName = "Glavni",
-                LastName = "Admin",
-                EmailConfirmed = true,
-                PhoneNumberConfirmed = true
-            };
             adminUser3.PasswordHash = passwordHasher.HashPassword(adminUser3, "AdminPass3!");
-            builder.Entity<User>().HasData(adminUser3);
-            builder.Entity<IdentityUserRole<Guid>>().HasData(new IdentityUserRole<Guid> { RoleId = adminRoleId, UserId = adminUser3.Id });
+
+            builder.Entity<User>().HasData(adminUser1, adminUser2, adminUser3);
+
+            builder.Entity<IdentityUserRole<Guid>>().HasData(
+                new IdentityUserRole<Guid> { RoleId = adminRoleId, UserId = adminUser1.Id },
+                new IdentityUserRole<Guid> { RoleId = adminRoleId, UserId = adminUser2.Id },
+                new IdentityUserRole<Guid> { RoleId = adminRoleId, UserId = adminUser3.Id }
+            );
 
             builder.Entity<WorkSchedule>(entity =>
             {

@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Delivery.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -301,7 +301,9 @@ namespace Delivery.Infrastructure.Migrations
                     name = table.Column<string>(type: "text", nullable: false),
                     description = table.Column<string>(type: "text", nullable: false),
                     address_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    owner_id = table.Column<Guid>(type: "uuid", nullable: false)
+                    phone_number = table.Column<string>(type: "text", nullable: false),
+                    owner_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    base_work_sched_id = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -316,6 +318,30 @@ namespace Delivery.Infrastructure.Migrations
                         name: "fk_restaurants_owners_owner_id",
                         column: x => x.owner_id,
                         principalTable: "owners",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "base_work_scheds",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    saturday = table.Column<bool>(type: "boolean", nullable: false),
+                    sunday = table.Column<bool>(type: "boolean", nullable: false),
+                    work_day_start = table.Column<TimeSpan>(type: "interval", nullable: false),
+                    work_day_end = table.Column<TimeSpan>(type: "interval", nullable: false),
+                    weekend_start = table.Column<TimeSpan>(type: "interval", nullable: true),
+                    weekend_end = table.Column<TimeSpan>(type: "interval", nullable: true),
+                    restaurant_id = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_base_work_scheds", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_base_work_scheds_restaurants_restaurant_id",
+                        column: x => x.restaurant_id,
+                        principalTable: "restaurants",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -502,84 +528,59 @@ namespace Delivery.Infrastructure.Migrations
                 columns: new[] { "id", "access_failed_count", "concurrency_stamp", "email", "email_confirmed", "first_name", "last_name", "lockout_enabled", "lockout_end", "normalized_email", "normalized_user_name", "password_hash", "phone_number", "phone_number_confirmed", "profile_picture_url", "security_stamp", "two_factor_enabled", "user_name" },
                 values: new object[,]
                 {
-                    { new Guid("1ddc68db-bb87-4cef-bdf8-d369bc1d5334"), 0, "b6867144-549b-4d8e-887e-39a366a08516", "admin@example3.com", true, "Glavni", "Admin", false, null, "ADMIN@EXAMPLE3.COM", "ADMIN3", "AQAAAAIAAYagAAAAEJH789JImAdKB+gW0NrkGmdWlSIthj1BzS/vxjQXGBNd39GKRXLO2BExd1b3Cl8O0Q==", null, true, null, null, false, "admin3" },
-                    { new Guid("22222222-2222-2222-2222-222222222222"), 0, "d4f417be-a5f7-48ea-8722-e77a683839a3", "owner1@example.com", true, "Petar", "Petrović", false, null, "OWNER1@EXAMPLE.COM", "OWNER1", "AQAAAAIAAYagAAAAEPVzhFRQDohVGeG3WQk79OG5pkdccoYPfgd8zcjC6Wkbw/d2C+wmV8Z+eMLKxOP+Jg==", null, false, null, "ce3a30da-2232-47ff-aecd-a97de952df33", false, "owner1" },
-                    { new Guid("b22698b8-42a2-4115-9631-1c2d1e2ac5f7"), 0, "171fdd30-6141-403b-b0cf-2e43a4b50f9d", "admin@example1.com", true, "Glavni", "Admin", false, null, "ADMIN@EXAMPLE1.COM", "ADMIN1", "AQAAAAIAAYagAAAAED3vY84ClyIQ6l95QXoNN4k31BIsd3eXtVVBCx4dns9wq+JglXtX/XJCNHxnc33Zzg==", null, true, null, null, false, "admin1" },
-                    { new Guid("bfd2ac09-67d0-4caa-8042-c6241b4f4f7f"), 0, "05f85f84-7f03-4be8-bfb7-0595e0c82bc7", "admin@example2.com", true, "Glavni", "Admin", false, null, "ADMIN@EXAMPLE2.COM", "ADMIN2", "AQAAAAIAAYagAAAAECKJA7PiQjXUYXEJdadv3qMwcRxeiOK9p4CzQGzY5tpNMW8q6ZXflsc945LXyVbhGQ==", null, true, null, null, false, "admin2" }
+                    { new Guid("11111111-1111-1111-1111-111111111111"), 0, "43ee0682-06c3-48c0-abbb-d4d6e5e80b51", "owner1@example.com", true, "Petar", "Petrovic", false, null, "OWNER1@EXAMPLE.COM", "OWNER1", "AQAAAAIAAYagAAAAEAyWbK2k9OxO2hUmfxjywAGCgcbL1SdmEMl6/nT2ORfAGSQGcroZIpLM8hBmzUCuJA==", null, false, null, "f6f7a5eb-5b6e-4f51-8fa7-2acbda551fbc", false, "owner1" },
+                    { new Guid("1ddc68db-bb87-4cef-bdf8-d369bc1d5334"), 0, "63365b22-1353-432f-a311-fcf044f77e42", "admin3@example.com", true, "Third", "Admin", false, null, "ADMIN3@EXAMPLE.COM", "ADMIN3", "AQAAAAIAAYagAAAAEEN+F0d8sysT40QVXoW2jrLdZigA9u1JLDSa8LcXuSi9rOH1N0qEDl/rpww/bW+vfw==", null, false, null, "f54f7096-8373-43eb-a826-1e71ce1a97c4", false, "admin3" },
+                    { new Guid("22222222-2222-2222-2222-222222222222"), 0, "893e8fc2-117b-41f3-8b5e-6b3d8adf7498", "customer1@example.com", true, "Marko", "Markovic", false, null, "CUSTOMER1@EXAMPLE.COM", "CUSTOMER1", "AQAAAAIAAYagAAAAEH8WpPC8/NOLCPdZb03kMZioRUd3jCII9Om2TjSfOayMwlS6ngxkLatly8ZKPy/yXw==", null, false, null, "6312669f-1949-454f-8a0f-fdef2ef6763a", false, "customer1" },
+                    { new Guid("b22698b8-42a2-4115-9631-1c2d1e2ac5f7"), 0, "511d82ff-b05f-4f62-8cc4-5592ebf92710", "admin1@example.com", true, "Main", "Admin", false, null, "ADMIN1@EXAMPLE.COM", "ADMIN1", "AQAAAAIAAYagAAAAEHW/3j+BNViKzUu9TCjLslJvmgFI+DCTtrLNxhXTPrgAC3Sqnpo7XM6Z0UbzDJRaLw==", null, false, null, "8b4a65e7-b5c7-4b84-9872-9e7bb839c98c", false, "admin1" },
+                    { new Guid("bfd2ac09-67d0-4caa-8042-c6241b4f4f7f"), 0, "bdd45bf8-a186-4bb8-adc5-d06e2fa9edff", "admin2@example.com", true, "Second", "Admin", false, null, "ADMIN2@EXAMPLE.COM", "ADMIN2", "AQAAAAIAAYagAAAAED9y2ioucPReP/KPKI8B0Trxrj/E9/xUw4/3SyGOFk4yu2n+wmdhE1LWlPzqoWDXBw==", null, false, null, "98dd838d-3c63-4233-8cfe-4290398d8352", false, "admin2" }
                 });
 
             migrationBuilder.InsertData(
                 table: "addresses",
                 columns: new[] { "id", "city", "customer_id", "postal_code", "street_and_number" },
-                values: new object[] { new Guid("33333333-3333-3333-3333-333333333333"), "Beograd", null, "11000", "Knez Mihailova 12" });
-
-            migrationBuilder.InsertData(
-                table: "allergens",
-                columns: new[] { "id", "name", "type" },
-                values: new object[,]
-                {
-                    { new Guid("c2ee3eed-8a58-4bc2-abe6-391253b64a39"), "Lactose", "Dairy" },
-                    { new Guid("fcc53b83-25eb-4d96-9916-9ce034b6daea"), "Gluten", "Cereals" }
-                });
+                values: new object[] { new Guid("0ae8817f-c15b-4c96-b640-08eba5d7062f"), "Beograd", null, "11000", "Knez Mihailova 12" });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",
                 columns: new[] { "role_id", "user_id" },
                 values: new object[,]
                 {
+                    { new Guid("fc7e84f2-e37e-46e2-a222-a839d3e1a3bb"), new Guid("11111111-1111-1111-1111-111111111111") },
                     { new Guid("2301d884-221a-4e7d-b509-0113dcc043e1"), new Guid("1ddc68db-bb87-4cef-bdf8-d369bc1d5334") },
+                    { new Guid("5b00155d-77a2-438c-b18f-dc1cc8af5a43"), new Guid("22222222-2222-2222-2222-222222222222") },
                     { new Guid("2301d884-221a-4e7d-b509-0113dcc043e1"), new Guid("b22698b8-42a2-4115-9631-1c2d1e2ac5f7") },
                     { new Guid("2301d884-221a-4e7d-b509-0113dcc043e1"), new Guid("bfd2ac09-67d0-4caa-8042-c6241b4f4f7f") }
                 });
 
             migrationBuilder.InsertData(
+                table: "customers",
+                columns: new[] { "id", "user_id" },
+                values: new object[] { new Guid("44444444-4444-4444-4444-444444444444"), new Guid("22222222-2222-2222-2222-222222222222") });
+
+            migrationBuilder.InsertData(
                 table: "owners",
                 columns: new[] { "id", "user_id" },
-                values: new object[] { new Guid("11111111-1111-1111-1111-111111111111"), new Guid("22222222-2222-2222-2222-222222222222") });
+                values: new object[] { new Guid("33333333-3333-3333-3333-333333333333"), new Guid("11111111-1111-1111-1111-111111111111") });
 
             migrationBuilder.InsertData(
                 table: "restaurants",
-                columns: new[] { "id", "address_id", "description", "name", "owner_id" },
-                values: new object[] { new Guid("44444444-4444-4444-4444-444444444444"), new Guid("33333333-3333-3333-3333-333333333333"), "Autentična italijanska kuhinja sa peći na drva.", "Pizzeria Roma", new Guid("11111111-1111-1111-1111-111111111111") });
+                columns: new[] { "id", "address_id", "base_work_sched_id", "description", "name", "owner_id", "phone_number" },
+                values: new object[] { new Guid("2892b3b0-d5c3-49c2-99ef-7fcd771bf56d"), new Guid("0ae8817f-c15b-4c96-b640-08eba5d7062f"), new Guid("fe47784e-c332-40a3-b532-cf51a7460f14"), "Autentična italijanska kuhinja.", "Pizzeria Roma", new Guid("33333333-3333-3333-3333-333333333333"), "222" });
+
+            migrationBuilder.InsertData(
+                table: "base_work_scheds",
+                columns: new[] { "id", "restaurant_id", "saturday", "sunday", "weekend_end", "weekend_start", "work_day_end", "work_day_start" },
+                values: new object[] { new Guid("fe47784e-c332-40a3-b532-cf51a7460f14"), new Guid("2892b3b0-d5c3-49c2-99ef-7fcd771bf56d"), true, true, new TimeSpan(0, 21, 30, 0, 0), new TimeSpan(0, 12, 0, 0, 0), new TimeSpan(0, 22, 0, 0, 0), new TimeSpan(0, 10, 0, 0, 0) });
 
             migrationBuilder.InsertData(
                 table: "menus",
                 columns: new[] { "id", "name", "restaurant_id" },
-                values: new object[] { new Guid("55555555-5555-5555-5555-555555555555"), "Pizza Menu", new Guid("44444444-4444-4444-4444-444444444444") });
+                values: new object[] { new Guid("55555555-5555-5555-5555-555555555555"), "Pizza Menu", new Guid("2892b3b0-d5c3-49c2-99ef-7fcd771bf56d") });
 
             migrationBuilder.InsertData(
                 table: "dishes",
                 columns: new[] { "id", "description", "menu_id", "name", "picture_url", "price", "type" },
-                values: new object[,]
-                {
-                    { new Guid("66666666-6666-6666-6666-666666666666"), "Pica sa paradajz sosom, sirom i bosiljkom.", new Guid("55555555-5555-5555-5555-555555555555"), "Margherita", null, 650.0, "Italian" },
-                    { new Guid("77777777-7777-7777-7777-777777777777"), "Pica sa šunkom, pečurkama i sirom.", new Guid("55555555-5555-5555-5555-555555555555"), "Capricciosa", null, 750.0, "Italian" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "allergen_dish",
-                columns: new[] { "allergens_id", "dishes_id" },
-                values: new object[,]
-                {
-                    { new Guid("c2ee3eed-8a58-4bc2-abe6-391253b64a39"), new Guid("66666666-6666-6666-6666-666666666666") },
-                    { new Guid("c2ee3eed-8a58-4bc2-abe6-391253b64a39"), new Guid("77777777-7777-7777-7777-777777777777") },
-                    { new Guid("fcc53b83-25eb-4d96-9916-9ce034b6daea"), new Guid("66666666-6666-6666-6666-666666666666") },
-                    { new Guid("fcc53b83-25eb-4d96-9916-9ce034b6daea"), new Guid("77777777-7777-7777-7777-777777777777") }
-                });
-
-            migrationBuilder.InsertData(
-                table: "dish_option_groups",
-                columns: new[] { "id", "dish_id", "name", "type" },
-                values: new object[] { new Guid("99f25578-4514-4903-8cf5-05abef38348e"), new Guid("77777777-7777-7777-7777-777777777777"), "Extra Toppings", "Zavisni" });
-
-            migrationBuilder.InsertData(
-                table: "dish_options",
-                columns: new[] { "id", "dish_option_group_id", "name", "price" },
-                values: new object[,]
-                {
-                    { new Guid("ba4abc17-2b03-494e-a182-46a5def1b980"), new Guid("99f25578-4514-4903-8cf5-05abef38348e"), "Ketchup", 50.0 },
-                    { new Guid("ecebb65d-12e9-47d4-94f8-ef033cbd8426"), new Guid("99f25578-4514-4903-8cf5-05abef38348e"), "Extra Cheese", 120.0 }
-                });
+                values: new object[] { new Guid("cc2fde26-ca91-4fa6-95a1-dd2207dd7d05"), "Pica sa šunkom i sirom.", new Guid("55555555-5555-5555-5555-555555555555"), "Capricciosa", null, 750.0, "Pizza" });
 
             migrationBuilder.CreateIndex(
                 name: "ix_addresses_customer_id",
@@ -637,6 +638,12 @@ namespace Delivery.Infrastructure.Migrations
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "normalized_user_name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_base_work_scheds_restaurant_id",
+                table: "base_work_scheds",
+                column: "restaurant_id",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -741,6 +748,9 @@ namespace Delivery.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "base_work_scheds");
 
             migrationBuilder.DropTable(
                 name: "dish_options");
