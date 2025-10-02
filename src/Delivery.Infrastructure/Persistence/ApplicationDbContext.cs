@@ -25,6 +25,7 @@ namespace Delivery.Infrastructure.Persistence
 
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Allergen> Allergens { get; set; }
+        public DbSet<BaseWorkSched> BaseWorkScheds { get; set; }
         public DbSet<WorkSchedule> WorkSchedules { get; set; }
 
         public DbSet<Menu> Menus { get; set; }
@@ -130,6 +131,7 @@ namespace Delivery.Infrastructure.Persistence
             builder.Entity<Restaurant>().HasMany(r => r.Workers).WithOne(w => w.Restaurant).HasForeignKey(w => w.RestaurantId);
             builder.Entity<Restaurant>().HasMany(r => r.Menus).WithOne(m => m.Restaurant).HasForeignKey(m => m.RestaurantId);
             builder.Entity<Restaurant>().HasMany(r => r.WorkSchedules).WithOne().OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<Restaurant>().HasOne(r => r.BaseWorkSched).WithOne(b => b.Restaurant).HasForeignKey<BaseWorkSched>(b => b.RestaurantId).OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<Menu>().HasMany(m => m.Dishes).WithOne(d => d.Menu).HasForeignKey(d => d.MenuId);
 
