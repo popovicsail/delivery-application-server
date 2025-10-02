@@ -33,6 +33,8 @@ public static class TestSeed
         var toppingsGroupId = Guid.NewGuid();
         var ketchupId = Guid.NewGuid();
         var cheeseId = Guid.NewGuid();
+
+        var baseWorkSchedId = Guid.NewGuid();
         #endregion
 
         // --- Kreiranje Entiteta ---
@@ -77,7 +79,8 @@ public static class TestSeed
             Description = "Autentična italijanska kuhinja sa peći na drva.",
             AddressId = addressId,
             PhoneNumber = "065/555-333-1",
-            OwnerId = ownerId
+            OwnerId = ownerId,
+            BaseWorkSchedId = baseWorkSchedId
         };
         modelBuilder.Entity<Restaurant>().HasData(restaurant);
 
@@ -104,6 +107,10 @@ public static class TestSeed
         var extraCheese = new DishOption { Id = cheeseId, Name = "Extra Cheese", Price = 120, DishOptionGroupId = toppingsGroupId };
         modelBuilder.Entity<DishOption>().HasData(ketchup, extraCheese);
 
+        //10. Osnovno Radno Vreme (NOVO)
+        var baseWorkSched = new BaseWorkSched { Id = baseWorkSchedId, Saturday = true, Sunday = true, WorkDayStart = new TimeSpan(10, 0, 0), 
+            WorkDayEnd = new TimeSpan(22, 0, 0), WeekendStart = new TimeSpan(12, 0, 0), WeekendEnd = new TimeSpan(21, 30, 0), RestaurantId = restaurantId};
+        modelBuilder.Entity<BaseWorkSched>().HasData(baseWorkSched);
         // --- Povezivanje (Many-to-Many) ---
 
         // Povezujemo alergene sa jelima (NOVO)

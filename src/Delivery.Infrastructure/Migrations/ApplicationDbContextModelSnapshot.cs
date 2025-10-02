@@ -62,22 +62,22 @@ namespace Delivery.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            AllergensId = new Guid("fcc53b83-25eb-4d96-9916-9ce034b6daea"),
+                            AllergensId = new Guid("5acfa33c-1c6a-4f35-8fbb-7a095cdd8a6b"),
                             DishesId = new Guid("66666666-6666-6666-6666-666666666666")
                         },
                         new
                         {
-                            AllergensId = new Guid("c2ee3eed-8a58-4bc2-abe6-391253b64a39"),
+                            AllergensId = new Guid("a674c52b-af17-4097-af01-244b4c9b4762"),
                             DishesId = new Guid("66666666-6666-6666-6666-666666666666")
                         },
                         new
                         {
-                            AllergensId = new Guid("fcc53b83-25eb-4d96-9916-9ce034b6daea"),
+                            AllergensId = new Guid("5acfa33c-1c6a-4f35-8fbb-7a095cdd8a6b"),
                             DishesId = new Guid("77777777-7777-7777-7777-777777777777")
                         },
                         new
                         {
-                            AllergensId = new Guid("c2ee3eed-8a58-4bc2-abe6-391253b64a39"),
+                            AllergensId = new Guid("a674c52b-af17-4097-af01-244b4c9b4762"),
                             DishesId = new Guid("77777777-7777-7777-7777-777777777777")
                         });
                 });
@@ -176,15 +176,15 @@ namespace Delivery.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("ba4abc17-2b03-494e-a182-46a5def1b980"),
-                            DishOptionGroupId = new Guid("99f25578-4514-4903-8cf5-05abef38348e"),
+                            Id = new Guid("7a207e5e-ee98-4904-b91a-8809fc7d814a"),
+                            DishOptionGroupId = new Guid("559bb13f-2d52-4206-b34a-92807278504b"),
                             Name = "Ketchup",
                             Price = 50.0
                         },
                         new
                         {
-                            Id = new Guid("ecebb65d-12e9-47d4-94f8-ef033cbd8426"),
-                            DishOptionGroupId = new Guid("99f25578-4514-4903-8cf5-05abef38348e"),
+                            Id = new Guid("5fe0a1fb-3564-44a5-a2e3-e2e12e59b133"),
+                            DishOptionGroupId = new Guid("559bb13f-2d52-4206-b34a-92807278504b"),
                             Name = "Extra Cheese",
                             Price = 120.0
                         });
@@ -222,7 +222,7 @@ namespace Delivery.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("99f25578-4514-4903-8cf5-05abef38348e"),
+                            Id = new Guid("559bb13f-2d52-4206-b34a-92807278504b"),
                             DishId = new Guid("77777777-7777-7777-7777-777777777777"),
                             Name = "Extra Toppings",
                             Type = "Zavisni"
@@ -298,15 +298,73 @@ namespace Delivery.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("fcc53b83-25eb-4d96-9916-9ce034b6daea"),
+                            Id = new Guid("5acfa33c-1c6a-4f35-8fbb-7a095cdd8a6b"),
                             Name = "Gluten",
                             Type = "Cereals"
                         },
                         new
                         {
-                            Id = new Guid("c2ee3eed-8a58-4bc2-abe6-391253b64a39"),
+                            Id = new Guid("a674c52b-af17-4097-af01-244b4c9b4762"),
                             Name = "Lactose",
                             Type = "Dairy"
+                        });
+                });
+
+            modelBuilder.Entity("Delivery.Domain.Entities.HelperEntities.BaseWorkSched", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("RestaurantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("restaurant_id");
+
+                    b.Property<bool>("Saturday")
+                        .HasColumnType("boolean")
+                        .HasColumnName("saturday");
+
+                    b.Property<bool>("Sunday")
+                        .HasColumnType("boolean")
+                        .HasColumnName("sunday");
+
+                    b.Property<TimeSpan?>("WeekendEnd")
+                        .HasColumnType("interval")
+                        .HasColumnName("weekend_end");
+
+                    b.Property<TimeSpan?>("WeekendStart")
+                        .HasColumnType("interval")
+                        .HasColumnName("weekend_start");
+
+                    b.Property<TimeSpan>("WorkDayEnd")
+                        .HasColumnType("interval")
+                        .HasColumnName("work_day_end");
+
+                    b.Property<TimeSpan>("WorkDayStart")
+                        .HasColumnType("interval")
+                        .HasColumnName("work_day_start");
+
+                    b.HasKey("Id")
+                        .HasName("pk_base_work_scheds");
+
+                    b.HasIndex("RestaurantId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_base_work_scheds_restaurant_id");
+
+                    b.ToTable("base_work_scheds", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("9f7f967b-3940-45cf-92b2-09f33970cbbd"),
+                            RestaurantId = new Guid("44444444-4444-4444-4444-444444444444"),
+                            Saturday = true,
+                            Sunday = true,
+                            WeekendEnd = new TimeSpan(0, 21, 30, 0, 0),
+                            WeekendStart = new TimeSpan(0, 12, 0, 0, 0),
+                            WorkDayEnd = new TimeSpan(0, 22, 0, 0, 0),
+                            WorkDayStart = new TimeSpan(0, 10, 0, 0, 0)
                         });
                 });
 
@@ -401,6 +459,10 @@ namespace Delivery.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("address_id");
 
+                    b.Property<Guid?>("BaseWorkSchedId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("base_work_sched_id");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text")
@@ -437,6 +499,7 @@ namespace Delivery.Infrastructure.Migrations
                         {
                             Id = new Guid("44444444-4444-4444-4444-444444444444"),
                             AddressId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            BaseWorkSchedId = new Guid("9f7f967b-3940-45cf-92b2-09f33970cbbd"),
                             Description = "Autentična italijanska kuhinja sa peći na drva.",
                             Name = "Pizzeria Roma",
                             OwnerId = new Guid("11111111-1111-1111-1111-111111111111"),
@@ -639,7 +702,7 @@ namespace Delivery.Infrastructure.Migrations
                         {
                             Id = new Guid("b22698b8-42a2-4115-9631-1c2d1e2ac5f7"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "171fdd30-6141-403b-b0cf-2e43a4b50f9d",
+                            ConcurrencyStamp = "20cb8368-c77c-410a-97f5-add2e2249e43",
                             Email = "admin@example1.com",
                             EmailConfirmed = true,
                             FirstName = "Glavni",
@@ -647,7 +710,7 @@ namespace Delivery.Infrastructure.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE1.COM",
                             NormalizedUserName = "ADMIN1",
-                            PasswordHash = "AQAAAAIAAYagAAAAED3vY84ClyIQ6l95QXoNN4k31BIsd3eXtVVBCx4dns9wq+JglXtX/XJCNHxnc33Zzg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHO3WBYCTwad7HxXWX/zv/5nSTBj+Fq0KUE85nz+ynzw8zuhSORUZxDu3FWCYW5Qmg==",
                             PhoneNumberConfirmed = true,
                             TwoFactorEnabled = false,
                             UserName = "admin1"
@@ -656,7 +719,7 @@ namespace Delivery.Infrastructure.Migrations
                         {
                             Id = new Guid("bfd2ac09-67d0-4caa-8042-c6241b4f4f7f"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "05f85f84-7f03-4be8-bfb7-0595e0c82bc7",
+                            ConcurrencyStamp = "30a73fb8-999a-4286-a89e-f6f97cf2eb6d",
                             Email = "admin@example2.com",
                             EmailConfirmed = true,
                             FirstName = "Glavni",
@@ -664,7 +727,7 @@ namespace Delivery.Infrastructure.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE2.COM",
                             NormalizedUserName = "ADMIN2",
-                            PasswordHash = "AQAAAAIAAYagAAAAECKJA7PiQjXUYXEJdadv3qMwcRxeiOK9p4CzQGzY5tpNMW8q6ZXflsc945LXyVbhGQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEB+EfZyKZqAiVOH1HioorHiNC102ByZnZJF8VHkK0Y09bRVuiyBLT7fylUvcYT3rKQ==",
                             PhoneNumberConfirmed = true,
                             TwoFactorEnabled = false,
                             UserName = "admin2"
@@ -673,7 +736,7 @@ namespace Delivery.Infrastructure.Migrations
                         {
                             Id = new Guid("1ddc68db-bb87-4cef-bdf8-d369bc1d5334"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "b6867144-549b-4d8e-887e-39a366a08516",
+                            ConcurrencyStamp = "4c7ff72a-aa89-4330-95f5-adaf3b78b7c4",
                             Email = "admin@example3.com",
                             EmailConfirmed = true,
                             FirstName = "Glavni",
@@ -681,7 +744,7 @@ namespace Delivery.Infrastructure.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE3.COM",
                             NormalizedUserName = "ADMIN3",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJH789JImAdKB+gW0NrkGmdWlSIthj1BzS/vxjQXGBNd39GKRXLO2BExd1b3Cl8O0Q==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEM8ChGAFZ4lTGs5wfQOIRlGBqZIo2HOdh4ex0RmQVmEDVj2BGLiLjzmvsV8eC0yFFg==",
                             PhoneNumberConfirmed = true,
                             TwoFactorEnabled = false,
                             UserName = "admin3"
@@ -690,7 +753,7 @@ namespace Delivery.Infrastructure.Migrations
                         {
                             Id = new Guid("22222222-2222-2222-2222-222222222222"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "d4f417be-a5f7-48ea-8722-e77a683839a3",
+                            ConcurrencyStamp = "1c3779f2-100d-4ece-8963-eae08daf124e",
                             Email = "owner1@example.com",
                             EmailConfirmed = true,
                             FirstName = "Petar",
@@ -698,9 +761,9 @@ namespace Delivery.Infrastructure.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "OWNER1@EXAMPLE.COM",
                             NormalizedUserName = "OWNER1",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPVzhFRQDohVGeG3WQk79OG5pkdccoYPfgd8zcjC6Wkbw/d2C+wmV8Z+eMLKxOP+Jg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEArwp7RMpMmpP2C25b4gewsIqrGt8s10Fx1Ak3FFBZrkQNmiQlqB5Xpzqcyy6/r4IQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "ce3a30da-2232-47ff-aecd-a97de952df33",
+                            SecurityStamp = "d6826e77-6db1-442e-abb7-b4697e7ed310",
                             TwoFactorEnabled = false,
                             UserName = "owner1"
                         });
@@ -1028,6 +1091,18 @@ namespace Delivery.Infrastructure.Migrations
                         .HasConstraintName("fk_addresses_customers_customer_id");
                 });
 
+            modelBuilder.Entity("Delivery.Domain.Entities.HelperEntities.BaseWorkSched", b =>
+                {
+                    b.HasOne("Delivery.Domain.Entities.RestaurantEntities.Restaurant", "Restaurant")
+                        .WithOne("BaseWorkSched")
+                        .HasForeignKey("Delivery.Domain.Entities.HelperEntities.BaseWorkSched", "RestaurantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_base_work_scheds_restaurants_restaurant_id");
+
+                    b.Navigation("Restaurant");
+                });
+
             modelBuilder.Entity("Delivery.Domain.Entities.HelperEntities.WorkSchedule", b =>
                 {
                     b.HasOne("Delivery.Domain.Entities.UserEntities.Courier", null)
@@ -1223,6 +1298,8 @@ namespace Delivery.Infrastructure.Migrations
 
             modelBuilder.Entity("Delivery.Domain.Entities.RestaurantEntities.Restaurant", b =>
                 {
+                    b.Navigation("BaseWorkSched");
+
                     b.Navigation("Menus");
 
                     b.Navigation("WorkSchedules");

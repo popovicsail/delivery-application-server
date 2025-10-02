@@ -301,13 +301,39 @@ namespace Delivery.Api.Controllers
                 .FirstOrDefaultAsync(o => o.UserId == user.Id);
 
             var restaurants = await _dbContext.Restaurants
+                .Include(r => r.Address)
+                .Include(r => r.BaseWorkSched)
                 .Where(r => r.OwnerId == owner.Id)
                 .Select(r => new RestaurantSummaryResponse
             {
                 Id = r.Id,
                 Name = r.Name,
-                Description = r.Description
-            }).ToListAsync();
+                Description = r.Description,
+                PhoneNumber = r.PhoneNumber,
+                Address = new AddressDto
+                {
+                    StreetAndNumber = r.Address.StreetAndNumber,
+                    City = r.Address.City,
+                    PostalCode = r.Address.PostalCode
+                },
+                Owner = new OwnerDto
+                {
+                    Id = owner.Id,
+                    UserId = owner.UserId,
+                    FirstName = owner.User.FirstName,
+                    LastName = owner.User.LastName
+                },
+                BaseWorkSched = new BaseWorkSchedDto
+                {
+                    Id = r.BaseWorkSched.Id,
+                    Saturday = r.BaseWorkSched.Saturday,
+                    Sunday = r.BaseWorkSched.Sunday,
+                    WorkDayStart = r.BaseWorkSched.WorkDayStart,
+                    WorkDayEnd = r.BaseWorkSched.WorkDayEnd,
+                    WeekendStart = r.BaseWorkSched.WeekendStart,
+                    WeekendEnd = r.BaseWorkSched.WeekendEnd
+                }
+                }).ToListAsync();
 
             return Ok(restaurants);
         }
