@@ -18,6 +18,8 @@ public static class TestSeed
         var userId = Guid.Parse("22222222-2222-2222-2222-222222222222");
         var ownerId = Guid.Parse("11111111-1111-1111-1111-111111111111");
 
+        var ownerRoleId = Guid.Parse("FC7E84F2-E37E-46E2-A222-A839D3E1A3BB");
+
         // Restoran i Adresa
         var addressId = Guid.Parse("33333333-3333-3333-3333-333333333333");
         var restaurantId = Guid.Parse("44444444-4444-4444-4444-444444444444");
@@ -119,6 +121,15 @@ public static class TestSeed
             new { AllergensId = allergenLactoseId, DishesId = dishMargheritaId },
             new { AllergensId = allergenGlutenId, DishesId = dishCapricciosaId },
             new { AllergensId = allergenLactoseId, DishesId = dishCapricciosaId }
+        );
+
+        modelBuilder.Entity<IdentityUserRole<Guid>>().HasData(
+
+        new IdentityUserRole<Guid>
+        {
+            RoleId = ownerRoleId,
+            UserId = userId
+        }
         );
     }
 }
