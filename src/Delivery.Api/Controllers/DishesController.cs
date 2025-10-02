@@ -28,7 +28,9 @@ namespace Delivery.Api.Controllers
             {
                 Id = d.Id,
                 Name = d.Name,
-                Price = d.Price
+                Price = d.Price,
+                Description = d.Description,
+                Type = d.Type
             }).ToListAsync();
 
             return Ok(dishes);
