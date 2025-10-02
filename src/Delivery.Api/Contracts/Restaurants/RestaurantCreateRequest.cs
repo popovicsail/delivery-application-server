@@ -6,9 +6,6 @@ namespace Delivery.Api.Contracts.Restaurants
     public class RestaurantCreateRequest
     {
         public string Name { get; set; }
-        public string Description { get; set; }
-        public AddressDto Address { get; set; }
-        public string PhoneNumber { get; set; }
         public Guid OwnerId { get; set; }
     }
 }
