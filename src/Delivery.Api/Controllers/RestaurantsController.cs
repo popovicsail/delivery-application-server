@@ -121,7 +121,16 @@ namespace Delivery.Api.Controllers
                     City = "Popuni",
                     PostalCode = "Popuni"
                 },
-                OwnerId = createRequest.OwnerId
+                OwnerId = createRequest.OwnerId,
+                BaseWorkSched = new BaseWorkSched()
+                {
+                    Saturday = true,
+                    Sunday = true,
+                    WorkDayStart = new TimeSpan(8, 0, 0),
+                    WorkDayEnd = new TimeSpan(17, 0, 0),
+                    WeekendStart = new TimeSpan(10, 0, 0),
+                    WeekendEnd = new TimeSpan(16, 0, 0)
+                }
             };
 
             _dbContext.Restaurants.Add(restaurant);
@@ -305,7 +314,7 @@ namespace Delivery.Api.Controllers
                 .Include(r => r.BaseWorkSched)
                 .Where(r => r.OwnerId == owner.Id)
                 .Select(r => new RestaurantSummaryResponse
-            {
+                {
                 Id = r.Id,
                 Name = r.Name,
                 Description = r.Description,
