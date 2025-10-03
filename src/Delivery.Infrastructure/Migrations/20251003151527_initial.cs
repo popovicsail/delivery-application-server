@@ -303,7 +303,8 @@ namespace Delivery.Infrastructure.Migrations
                     address_id = table.Column<Guid>(type: "uuid", nullable: false),
                     phone_number = table.Column<string>(type: "text", nullable: false),
                     owner_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    base_work_sched_id = table.Column<Guid>(type: "uuid", nullable: true)
+                    base_work_sched_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    image = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -528,17 +529,17 @@ namespace Delivery.Infrastructure.Migrations
                 columns: new[] { "id", "access_failed_count", "concurrency_stamp", "email", "email_confirmed", "first_name", "last_name", "lockout_enabled", "lockout_end", "normalized_email", "normalized_user_name", "password_hash", "phone_number", "phone_number_confirmed", "profile_picture_url", "security_stamp", "two_factor_enabled", "user_name" },
                 values: new object[,]
                 {
-                    { new Guid("11111111-1111-1111-1111-111111111111"), 0, "43ee0682-06c3-48c0-abbb-d4d6e5e80b51", "owner1@example.com", true, "Petar", "Petrovic", false, null, "OWNER1@EXAMPLE.COM", "OWNER1", "AQAAAAIAAYagAAAAEAyWbK2k9OxO2hUmfxjywAGCgcbL1SdmEMl6/nT2ORfAGSQGcroZIpLM8hBmzUCuJA==", null, false, null, "f6f7a5eb-5b6e-4f51-8fa7-2acbda551fbc", false, "owner1" },
-                    { new Guid("1ddc68db-bb87-4cef-bdf8-d369bc1d5334"), 0, "63365b22-1353-432f-a311-fcf044f77e42", "admin3@example.com", true, "Third", "Admin", false, null, "ADMIN3@EXAMPLE.COM", "ADMIN3", "AQAAAAIAAYagAAAAEEN+F0d8sysT40QVXoW2jrLdZigA9u1JLDSa8LcXuSi9rOH1N0qEDl/rpww/bW+vfw==", null, false, null, "f54f7096-8373-43eb-a826-1e71ce1a97c4", false, "admin3" },
-                    { new Guid("22222222-2222-2222-2222-222222222222"), 0, "893e8fc2-117b-41f3-8b5e-6b3d8adf7498", "customer1@example.com", true, "Marko", "Markovic", false, null, "CUSTOMER1@EXAMPLE.COM", "CUSTOMER1", "AQAAAAIAAYagAAAAEH8WpPC8/NOLCPdZb03kMZioRUd3jCII9Om2TjSfOayMwlS6ngxkLatly8ZKPy/yXw==", null, false, null, "6312669f-1949-454f-8a0f-fdef2ef6763a", false, "customer1" },
-                    { new Guid("b22698b8-42a2-4115-9631-1c2d1e2ac5f7"), 0, "511d82ff-b05f-4f62-8cc4-5592ebf92710", "admin1@example.com", true, "Main", "Admin", false, null, "ADMIN1@EXAMPLE.COM", "ADMIN1", "AQAAAAIAAYagAAAAEHW/3j+BNViKzUu9TCjLslJvmgFI+DCTtrLNxhXTPrgAC3Sqnpo7XM6Z0UbzDJRaLw==", null, false, null, "8b4a65e7-b5c7-4b84-9872-9e7bb839c98c", false, "admin1" },
-                    { new Guid("bfd2ac09-67d0-4caa-8042-c6241b4f4f7f"), 0, "bdd45bf8-a186-4bb8-adc5-d06e2fa9edff", "admin2@example.com", true, "Second", "Admin", false, null, "ADMIN2@EXAMPLE.COM", "ADMIN2", "AQAAAAIAAYagAAAAED9y2ioucPReP/KPKI8B0Trxrj/E9/xUw4/3SyGOFk4yu2n+wmdhE1LWlPzqoWDXBw==", null, false, null, "98dd838d-3c63-4233-8cfe-4290398d8352", false, "admin2" }
+                    { new Guid("11111111-1111-1111-1111-111111111111"), 0, "af07b4c1-07e7-4f59-af11-bf6855cbafaa", "owner1@example.com", true, "Petar", "Petrovic", false, null, "OWNER1@EXAMPLE.COM", "OWNER1", "AQAAAAIAAYagAAAAELN/ad1vG+3DWCp5cQ0iCp/RUA1Hy5kqpYQ/HqEAOVqeXUeU2T8rEe7AReUzkg3a2g==", null, false, null, "3d304b05-0963-4e73-a7dd-e159a5b6cdfd", false, "owner1" },
+                    { new Guid("1ddc68db-bb87-4cef-bdf8-d369bc1d5334"), 0, "403ae674-c54b-44f2-bae7-52563deb2da9", "admin3@example.com", true, "Third", "Admin", false, null, "ADMIN3@EXAMPLE.COM", "ADMIN3", "AQAAAAIAAYagAAAAEHEo7h1qyRAgeY6VXEWlGYM0W1Dt3hg4RikComaUqrsSR9GhdTPKEm/HFyuwz9q6xQ==", null, false, null, "5d40d011-a16c-48fd-bf8a-451652aa5e89", false, "admin3" },
+                    { new Guid("22222222-2222-2222-2222-222222222222"), 0, "c5a947a0-5261-4bbb-9dbd-e5e03e3ad01d", "customer1@example.com", true, "Marko", "Markovic", false, null, "CUSTOMER1@EXAMPLE.COM", "CUSTOMER1", "AQAAAAIAAYagAAAAEELUaRiFn1iKGJUUQeMumi8puSz8EQy/OW/eth1ZEQJJZv14+Cu8YNjngFcsxkgbuw==", null, false, null, "523ce08a-f4b5-4cea-a7cf-b7f115f1dff7", false, "customer1" },
+                    { new Guid("b22698b8-42a2-4115-9631-1c2d1e2ac5f7"), 0, "a3e4d34e-1d44-40d9-a965-f4ec5b1f9d18", "admin1@example.com", true, "Main", "Admin", false, null, "ADMIN1@EXAMPLE.COM", "ADMIN1", "AQAAAAIAAYagAAAAEEL7fGdXNbnjCY0jUjM1nEKnD1LOeMmGjAUDvIZX0D/Wz0N2iVkZtWrxkzHpummTOQ==", null, false, null, "c028b0a6-9584-4e86-a956-3e38474efa9f", false, "admin1" },
+                    { new Guid("bfd2ac09-67d0-4caa-8042-c6241b4f4f7f"), 0, "5138cc34-8a69-4ce4-bad3-30a28bc08a28", "admin2@example.com", true, "Second", "Admin", false, null, "ADMIN2@EXAMPLE.COM", "ADMIN2", "AQAAAAIAAYagAAAAEGWER/W+ecdTTO7sUVr6s160RHesk8lWdx+KPMSkY3pmBcPcmDIjqmUMk6sxN+ou8g==", null, false, null, "3f9117ec-4dfd-4d27-b5d2-f9596797850b", false, "admin2" }
                 });
 
             migrationBuilder.InsertData(
                 table: "addresses",
                 columns: new[] { "id", "city", "customer_id", "postal_code", "street_and_number" },
-                values: new object[] { new Guid("0ae8817f-c15b-4c96-b640-08eba5d7062f"), "Beograd", null, "11000", "Knez Mihailova 12" });
+                values: new object[] { new Guid("b7ef45f8-0097-49ce-bac9-6a965cef38e0"), "Beograd", null, "11000", "Knez Mihailova 12" });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",
@@ -564,23 +565,23 @@ namespace Delivery.Infrastructure.Migrations
 
             migrationBuilder.InsertData(
                 table: "restaurants",
-                columns: new[] { "id", "address_id", "base_work_sched_id", "description", "name", "owner_id", "phone_number" },
-                values: new object[] { new Guid("2892b3b0-d5c3-49c2-99ef-7fcd771bf56d"), new Guid("0ae8817f-c15b-4c96-b640-08eba5d7062f"), new Guid("fe47784e-c332-40a3-b532-cf51a7460f14"), "Autentična italijanska kuhinja.", "Pizzeria Roma", new Guid("33333333-3333-3333-3333-333333333333"), "222" });
+                columns: new[] { "id", "address_id", "base_work_sched_id", "description", "image", "name", "owner_id", "phone_number" },
+                values: new object[] { new Guid("e28d7f8c-92b0-4775-a091-7a76147c888b"), new Guid("b7ef45f8-0097-49ce-bac9-6a965cef38e0"), new Guid("762c0f60-6c50-47c8-a4f7-6e93800df240"), "Autentična italijanska kuhinja.", "", "Pizzeria Roma", new Guid("33333333-3333-3333-3333-333333333333"), "222" });
 
             migrationBuilder.InsertData(
                 table: "base_work_scheds",
                 columns: new[] { "id", "restaurant_id", "saturday", "sunday", "weekend_end", "weekend_start", "work_day_end", "work_day_start" },
-                values: new object[] { new Guid("fe47784e-c332-40a3-b532-cf51a7460f14"), new Guid("2892b3b0-d5c3-49c2-99ef-7fcd771bf56d"), true, true, new TimeSpan(0, 21, 30, 0, 0), new TimeSpan(0, 12, 0, 0, 0), new TimeSpan(0, 22, 0, 0, 0), new TimeSpan(0, 10, 0, 0, 0) });
+                values: new object[] { new Guid("762c0f60-6c50-47c8-a4f7-6e93800df240"), new Guid("e28d7f8c-92b0-4775-a091-7a76147c888b"), true, true, new TimeSpan(0, 21, 30, 0, 0), new TimeSpan(0, 12, 0, 0, 0), new TimeSpan(0, 22, 0, 0, 0), new TimeSpan(0, 10, 0, 0, 0) });
 
             migrationBuilder.InsertData(
                 table: "menus",
                 columns: new[] { "id", "name", "restaurant_id" },
-                values: new object[] { new Guid("55555555-5555-5555-5555-555555555555"), "Pizza Menu", new Guid("2892b3b0-d5c3-49c2-99ef-7fcd771bf56d") });
+                values: new object[] { new Guid("55555555-5555-5555-5555-555555555555"), "Pizza Menu", new Guid("e28d7f8c-92b0-4775-a091-7a76147c888b") });
 
             migrationBuilder.InsertData(
                 table: "dishes",
                 columns: new[] { "id", "description", "menu_id", "name", "picture_url", "price", "type" },
-                values: new object[] { new Guid("cc2fde26-ca91-4fa6-95a1-dd2207dd7d05"), "Pica sa šunkom i sirom.", new Guid("55555555-5555-5555-5555-555555555555"), "Capricciosa", null, 750.0, "Pizza" });
+                values: new object[] { new Guid("09b9d444-c2cf-48c6-a9ea-50f56434dadb"), "Pica sa šunkom i sirom.", new Guid("55555555-5555-5555-5555-555555555555"), "Capricciosa", null, 750.0, "Pizza" });
 
             migrationBuilder.CreateIndex(
                 name: "ix_addresses_customer_id",
