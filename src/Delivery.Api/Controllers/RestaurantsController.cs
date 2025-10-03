@@ -75,6 +75,7 @@ namespace Delivery.Api.Controllers
                 .Include(r => r.Owner)
                     .ThenInclude(o => o.User)
                 .Include(r => r.Address)
+                .Include(r => r.BaseWorkSched)
                 .FirstOrDefaultAsync(r => r.Id == id);
 
             if (restaurant == null)
@@ -82,12 +83,15 @@ namespace Delivery.Api.Controllers
                 return NotFound();
             }
 
+
+
             var response = new RestaurantDetailResponse()
             {
                 Id = restaurant.Id,
                 Name = restaurant.Name,
                 Description = restaurant.Description,
                 PhoneNumber = restaurant.PhoneNumber,
+                Image = restaurant.Image,
                 Address = new AddressDto
                 {
                     StreetAndNumber = restaurant.Address.StreetAndNumber,
@@ -100,6 +104,16 @@ namespace Delivery.Api.Controllers
                     UserId = restaurant.Owner.UserId,
                     FirstName = restaurant.Owner.User.FirstName,
                     LastName = restaurant.Owner.User.LastName
+                },
+                BaseWorkSched = new BaseWorkSchedDto
+                {
+                    Id = restaurant.BaseWorkSched.Id,
+                    Saturday = restaurant.BaseWorkSched.Saturday,
+                    Sunday = restaurant.BaseWorkSched.Sunday,
+                    WorkDayStart = restaurant.BaseWorkSched.WorkDayStart,
+                    WorkDayEnd = restaurant.BaseWorkSched.WorkDayEnd,
+                    WeekendStart = restaurant.BaseWorkSched.WeekendStart,
+                    WeekendEnd = restaurant.BaseWorkSched.WeekendEnd
                 }
             };
 
@@ -115,6 +129,7 @@ namespace Delivery.Api.Controllers
                 Name = createRequest.Name,
                 Description = "Popuni",
                 PhoneNumber = "Popuni",
+                Image = "",
                 Address = new Address()
                 {
                     StreetAndNumber = "Popuni",
@@ -168,12 +183,13 @@ namespace Delivery.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update([FromBody] RestaurantUpdateRequest updateRequest, [FromRoute] Guid id)
+        public async Task<IActionResult> Update([FromForm] RestaurantUpdateRequest updateRequest, IFormFile? file, [FromRoute] Guid id)
         {
             var restaurant = await _dbContext.Restaurants
                 .Include(r => r.Owner)
                     .ThenInclude(o => o.User)
-                .Include(r => r.Address)              
+                .Include(r => r.Address)
+                .Include(r => r.BaseWorkSched)
                 .FirstOrDefaultAsync(r => r.Id == id);
 
             if (restaurant == null)
@@ -187,6 +203,25 @@ namespace Delivery.Api.Controllers
             restaurant.Address.StreetAndNumber = updateRequest.Address.StreetAndNumber;
             restaurant.Address.City = updateRequest.Address.City;
             restaurant.Address.PostalCode = updateRequest.Address.PostalCode;
+            if (updateRequest.BaseWorkSched != null)
+            {
+                restaurant.BaseWorkSched.Saturday = updateRequest.BaseWorkSched.Saturday;
+                restaurant.BaseWorkSched.Sunday = updateRequest.BaseWorkSched.Sunday;
+                restaurant.BaseWorkSched.WorkDayStart = updateRequest.BaseWorkSched.WorkDayStart;
+                restaurant.BaseWorkSched.WorkDayEnd = updateRequest.BaseWorkSched.WorkDayEnd;
+                restaurant.BaseWorkSched.WeekendStart = updateRequest.BaseWorkSched.WeekendStart;
+                restaurant.BaseWorkSched.WeekendEnd = updateRequest.BaseWorkSched.WeekendEnd;
+            }
+
+
+            if (file != null && file.Length > 0)
+            {
+                using var ms = new MemoryStream();
+                await file.CopyToAsync(ms);
+                var fileBytes = ms.ToArray();
+
+                restaurant.Image = $"data:{file.ContentType};base64,{Convert.ToBase64String(fileBytes)}";
+            }
 
             await _dbContext.SaveChangesAsync();
 
@@ -196,6 +231,7 @@ namespace Delivery.Api.Controllers
                 Name = restaurant.Name,
                 Description = restaurant.Description,
                 PhoneNumber = restaurant.PhoneNumber,
+                Image = restaurant.Image,
                 Address = new AddressDto
                 {
                     StreetAndNumber = restaurant.Address.StreetAndNumber,
@@ -208,6 +244,16 @@ namespace Delivery.Api.Controllers
                     UserId = restaurant.Owner.UserId,
                     FirstName = restaurant.Owner.User.FirstName,
                     LastName = restaurant.Owner.User.LastName
+                },
+                BaseWorkSched = new BaseWorkSchedDto
+                {
+                    Id = restaurant.BaseWorkSched.Id,
+                    Saturday = restaurant.BaseWorkSched.Saturday,
+                    Sunday = restaurant.BaseWorkSched.Sunday,
+                    WorkDayStart = restaurant.BaseWorkSched.WorkDayStart,
+                    WorkDayEnd = restaurant.BaseWorkSched.WorkDayEnd,
+                    WeekendStart = restaurant.BaseWorkSched.WeekendStart,
+                    WeekendEnd = restaurant.BaseWorkSched.WeekendEnd
                 }
             };
 
@@ -319,6 +365,7 @@ namespace Delivery.Api.Controllers
                 Name = r.Name,
                 Description = r.Description,
                 PhoneNumber = r.PhoneNumber,
+                Image = r.Image,
                 Address = new AddressDto
                 {
                     StreetAndNumber = r.Address.StreetAndNumber,

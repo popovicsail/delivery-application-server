@@ -105,7 +105,7 @@ namespace Delivery.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("cc2fde26-ca91-4fa6-95a1-dd2207dd7d05"),
+                            Id = new Guid("09b9d444-c2cf-48c6-a9ea-50f56434dadb"),
                             Description = "Pica sa šunkom i sirom.",
                             MenuId = new Guid("55555555-5555-5555-5555-555555555555"),
                             Name = "Capricciosa",
@@ -210,7 +210,7 @@ namespace Delivery.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("0ae8817f-c15b-4c96-b640-08eba5d7062f"),
+                            Id = new Guid("b7ef45f8-0097-49ce-bac9-6a965cef38e0"),
                             City = "Beograd",
                             PostalCode = "11000",
                             StreetAndNumber = "Knez Mihailova 12"
@@ -287,8 +287,8 @@ namespace Delivery.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("fe47784e-c332-40a3-b532-cf51a7460f14"),
-                            RestaurantId = new Guid("2892b3b0-d5c3-49c2-99ef-7fcd771bf56d"),
+                            Id = new Guid("762c0f60-6c50-47c8-a4f7-6e93800df240"),
+                            RestaurantId = new Guid("e28d7f8c-92b0-4775-a091-7a76147c888b"),
                             Saturday = true,
                             Sunday = true,
                             WeekendEnd = new TimeSpan(0, 21, 30, 0, 0),
@@ -374,7 +374,7 @@ namespace Delivery.Infrastructure.Migrations
                         {
                             Id = new Guid("55555555-5555-5555-5555-555555555555"),
                             Name = "Pizza Menu",
-                            RestaurantId = new Guid("2892b3b0-d5c3-49c2-99ef-7fcd771bf56d")
+                            RestaurantId = new Guid("e28d7f8c-92b0-4775-a091-7a76147c888b")
                         });
                 });
 
@@ -397,6 +397,11 @@ namespace Delivery.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("description");
+
+                    b.Property<string>("Image")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("image");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -427,10 +432,11 @@ namespace Delivery.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("2892b3b0-d5c3-49c2-99ef-7fcd771bf56d"),
-                            AddressId = new Guid("0ae8817f-c15b-4c96-b640-08eba5d7062f"),
-                            BaseWorkSchedId = new Guid("fe47784e-c332-40a3-b532-cf51a7460f14"),
+                            Id = new Guid("e28d7f8c-92b0-4775-a091-7a76147c888b"),
+                            AddressId = new Guid("b7ef45f8-0097-49ce-bac9-6a965cef38e0"),
+                            BaseWorkSchedId = new Guid("762c0f60-6c50-47c8-a4f7-6e93800df240"),
                             Description = "Autentična italijanska kuhinja.",
+                            Image = "",
                             Name = "Pizzeria Roma",
                             OwnerId = new Guid("33333333-3333-3333-3333-333333333333"),
                             PhoneNumber = "222"
@@ -639,7 +645,7 @@ namespace Delivery.Infrastructure.Migrations
                         {
                             Id = new Guid("b22698b8-42a2-4115-9631-1c2d1e2ac5f7"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "511d82ff-b05f-4f62-8cc4-5592ebf92710",
+                            ConcurrencyStamp = "a3e4d34e-1d44-40d9-a965-f4ec5b1f9d18",
                             Email = "admin1@example.com",
                             EmailConfirmed = true,
                             FirstName = "Main",
@@ -647,9 +653,9 @@ namespace Delivery.Infrastructure.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN1@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN1",
-                            PasswordHash = "AQAAAAIAAYagAAAAEHW/3j+BNViKzUu9TCjLslJvmgFI+DCTtrLNxhXTPrgAC3Sqnpo7XM6Z0UbzDJRaLw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEL7fGdXNbnjCY0jUjM1nEKnD1LOeMmGjAUDvIZX0D/Wz0N2iVkZtWrxkzHpummTOQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "8b4a65e7-b5c7-4b84-9872-9e7bb839c98c",
+                            SecurityStamp = "c028b0a6-9584-4e86-a956-3e38474efa9f",
                             TwoFactorEnabled = false,
                             UserName = "admin1"
                         },
@@ -657,7 +663,7 @@ namespace Delivery.Infrastructure.Migrations
                         {
                             Id = new Guid("bfd2ac09-67d0-4caa-8042-c6241b4f4f7f"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "bdd45bf8-a186-4bb8-adc5-d06e2fa9edff",
+                            ConcurrencyStamp = "5138cc34-8a69-4ce4-bad3-30a28bc08a28",
                             Email = "admin2@example.com",
                             EmailConfirmed = true,
                             FirstName = "Second",
@@ -665,9 +671,9 @@ namespace Delivery.Infrastructure.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN2@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN2",
-                            PasswordHash = "AQAAAAIAAYagAAAAED9y2ioucPReP/KPKI8B0Trxrj/E9/xUw4/3SyGOFk4yu2n+wmdhE1LWlPzqoWDXBw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGWER/W+ecdTTO7sUVr6s160RHesk8lWdx+KPMSkY3pmBcPcmDIjqmUMk6sxN+ou8g==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "98dd838d-3c63-4233-8cfe-4290398d8352",
+                            SecurityStamp = "3f9117ec-4dfd-4d27-b5d2-f9596797850b",
                             TwoFactorEnabled = false,
                             UserName = "admin2"
                         },
@@ -675,7 +681,7 @@ namespace Delivery.Infrastructure.Migrations
                         {
                             Id = new Guid("1ddc68db-bb87-4cef-bdf8-d369bc1d5334"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "63365b22-1353-432f-a311-fcf044f77e42",
+                            ConcurrencyStamp = "403ae674-c54b-44f2-bae7-52563deb2da9",
                             Email = "admin3@example.com",
                             EmailConfirmed = true,
                             FirstName = "Third",
@@ -683,9 +689,9 @@ namespace Delivery.Infrastructure.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN3@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN3",
-                            PasswordHash = "AQAAAAIAAYagAAAAEEN+F0d8sysT40QVXoW2jrLdZigA9u1JLDSa8LcXuSi9rOH1N0qEDl/rpww/bW+vfw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHEo7h1qyRAgeY6VXEWlGYM0W1Dt3hg4RikComaUqrsSR9GhdTPKEm/HFyuwz9q6xQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "f54f7096-8373-43eb-a826-1e71ce1a97c4",
+                            SecurityStamp = "5d40d011-a16c-48fd-bf8a-451652aa5e89",
                             TwoFactorEnabled = false,
                             UserName = "admin3"
                         },
@@ -693,7 +699,7 @@ namespace Delivery.Infrastructure.Migrations
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111111"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "43ee0682-06c3-48c0-abbb-d4d6e5e80b51",
+                            ConcurrencyStamp = "af07b4c1-07e7-4f59-af11-bf6855cbafaa",
                             Email = "owner1@example.com",
                             EmailConfirmed = true,
                             FirstName = "Petar",
@@ -701,9 +707,9 @@ namespace Delivery.Infrastructure.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "OWNER1@EXAMPLE.COM",
                             NormalizedUserName = "OWNER1",
-                            PasswordHash = "AQAAAAIAAYagAAAAEAyWbK2k9OxO2hUmfxjywAGCgcbL1SdmEMl6/nT2ORfAGSQGcroZIpLM8hBmzUCuJA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAELN/ad1vG+3DWCp5cQ0iCp/RUA1Hy5kqpYQ/HqEAOVqeXUeU2T8rEe7AReUzkg3a2g==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "f6f7a5eb-5b6e-4f51-8fa7-2acbda551fbc",
+                            SecurityStamp = "3d304b05-0963-4e73-a7dd-e159a5b6cdfd",
                             TwoFactorEnabled = false,
                             UserName = "owner1"
                         },
@@ -711,7 +717,7 @@ namespace Delivery.Infrastructure.Migrations
                         {
                             Id = new Guid("22222222-2222-2222-2222-222222222222"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "893e8fc2-117b-41f3-8b5e-6b3d8adf7498",
+                            ConcurrencyStamp = "c5a947a0-5261-4bbb-9dbd-e5e03e3ad01d",
                             Email = "customer1@example.com",
                             EmailConfirmed = true,
                             FirstName = "Marko",
@@ -719,9 +725,9 @@ namespace Delivery.Infrastructure.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "CUSTOMER1@EXAMPLE.COM",
                             NormalizedUserName = "CUSTOMER1",
-                            PasswordHash = "AQAAAAIAAYagAAAAEH8WpPC8/NOLCPdZb03kMZioRUd3jCII9Om2TjSfOayMwlS6ngxkLatly8ZKPy/yXw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEELUaRiFn1iKGJUUQeMumi8puSz8EQy/OW/eth1ZEQJJZv14+Cu8YNjngFcsxkgbuw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "6312669f-1949-454f-8a0f-fdef2ef6763a",
+                            SecurityStamp = "523ce08a-f4b5-4cea-a7cf-b7f115f1dff7",
                             TwoFactorEnabled = false,
                             UserName = "customer1"
                         });

@@ -24,6 +24,8 @@ namespace Delivery.Domain.Entities.RestaurantEntities
         public Guid? BaseWorkSchedId { get; set; }
         public virtual BaseWorkSched? BaseWorkSched { get; set; }
 
+        public string Image { get; set; }
+
         public virtual ICollection<WorkSchedule> WorkSchedules { get; set; } = new HashSet<WorkSchedule>();
         public virtual ICollection<Worker> Workers { get; set; } = new HashSet<Worker>();
         public virtual ICollection<Menu> Menus { get; set; } = new HashSet<Menu>();
