@@ -62,6 +62,8 @@ namespace Delivery.Api.Controllers
                 Email = request.Email,
                 FirstName = request.FirstName,
                 LastName = request.LastName,
+                ProfilePictureMimeType = "image/png",
+                ProfilePictureBase64 = DefaultAvatar.Base64
             };
 
             var createResult = await _userManager.CreateAsync(user, request.Password);

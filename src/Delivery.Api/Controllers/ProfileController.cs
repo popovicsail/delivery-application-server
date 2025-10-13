@@ -39,8 +39,11 @@ namespace Delivery.Api.Controllers
                 Email = user.Email,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
+                ProfilePictureBase64 = user.ProfilePictureBase64,
+                ProfilePictureMimeType = user.ProfilePictureMimeType,
                 Roles = roles.ToList()
             };
+
 
             return Ok(profileResponse);
         }
@@ -58,6 +61,29 @@ namespace Delivery.Api.Controllers
             user.FirstName = updateRequest.FirstName;
             user.LastName = updateRequest.LastName;
 
+            // ✅ Ako je poslata slika, validiraj i sačuvaj
+            if (!string.IsNullOrWhiteSpace(updateRequest.ProfilePictureBase64) &&
+                !string.IsNullOrWhiteSpace(updateRequest.ProfilePictureMimeType))
+            {
+                var allowedMimeTypes = new[] { "image/png", "image/jpeg" };
+                if (!allowedMimeTypes.Contains(updateRequest.ProfilePictureMimeType.ToLower()))
+                {
+                    return BadRequest("Only PNG and JPEG images are allowed.");
+                }
+
+                try
+                {
+                    Convert.FromBase64String(updateRequest.ProfilePictureBase64);
+                }
+                catch
+                {
+                    return BadRequest("Invalid Base64 string.");
+                }
+
+                user.ProfilePictureBase64 = updateRequest.ProfilePictureBase64;
+                user.ProfilePictureMimeType = updateRequest.ProfilePictureMimeType;
+            }
+
             await _userManager.UpdateAsync(user);
 
             var roles = await _userManager.GetRolesAsync(user);
@@ -69,6 +95,8 @@ namespace Delivery.Api.Controllers
                 Email = user.Email,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
+                ProfilePictureBase64 = user.ProfilePictureBase64,
+                ProfilePictureMimeType = user.ProfilePictureMimeType,
                 Roles = roles.ToList()
             };
 

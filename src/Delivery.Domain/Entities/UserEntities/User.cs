@@ -16,7 +16,9 @@ namespace Delivery.Domain.Entities.UserEntities
         // public string Email
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string? ProfilePictureUrl { get; set; }
+        public string? ProfilePictureBase64 { get; set; }   // samo Base64 string
+        public string? ProfilePictureMimeType { get; set; } // npr. "image/png"
+
 
         //public ICollection Roles - Pristupa se preko UserManager<User>
     }
