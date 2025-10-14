@@ -183,6 +183,11 @@ namespace Delivery.Api.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Unauthorized();
 
+            if (await _userManager.IsInRoleAsync(user, "Administrator"))
+            {
+                return Ok(new { Role = "Administrator" });
+            }
+
             var customer = await _dbContext.Customers
                 .Include(c => c.Allergens)
                 .FirstOrDefaultAsync(c => c.UserId == user.Id);
