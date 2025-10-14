@@ -1,10 +1,11 @@
-﻿using Delivery.Domain.Entities.DishEntities;
+﻿using System;
+using Delivery.Api.Contracts.Auth;
+using Delivery.Domain.Entities.DishEntities;
 using Delivery.Domain.Entities.HelperEntities;
 using Delivery.Domain.Entities.RestaurantEntities;
 using Delivery.Domain.Entities.UserEntities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System;
 
 namespace Delivery.Infrastructure.Persistence.Seed;
 
@@ -20,11 +21,11 @@ public static class TestSeed
 
         // --- Testni Korisnici (Users) ---
         var ownerUserId = Guid.Parse("11111111-1111-1111-1111-111111111111");
-        var ownerUser = new User { Id = ownerUserId, UserName = "owner1", NormalizedUserName = "OWNER1", Email = "owner1@example.com", NormalizedEmail = "OWNER1@EXAMPLE.COM", FirstName = "Petar", LastName = "Petrovic", EmailConfirmed = true, SecurityStamp = Guid.NewGuid().ToString() };
+        var ownerUser = new User { Id = ownerUserId, UserName = "owner1", NormalizedUserName = "OWNER1", Email = "owner1@example.com", NormalizedEmail = "OWNER1@EXAMPLE.COM", FirstName = "Petar", LastName = "Petrovic", EmailConfirmed = true, SecurityStamp = Guid.NewGuid().ToString(), ProfilePictureBase64 = DefaultAvatar.Base64 };
         ownerUser.PasswordHash = passwordHasher.HashPassword(ownerUser, "OwnerPass1!");
 
         var customerUserId = Guid.Parse("22222222-2222-2222-2222-222222222222");
-        var customerUser = new User { Id = customerUserId, UserName = "customer1", NormalizedUserName = "CUSTOMER1", Email = "customer1@example.com", NormalizedEmail = "CUSTOMER1@EXAMPLE.COM", FirstName = "Marko", LastName = "Markovic", EmailConfirmed = true, SecurityStamp = Guid.NewGuid().ToString() };
+        var customerUser = new User { Id = customerUserId, UserName = "customer1", NormalizedUserName = "CUSTOMER1", Email = "customer1@example.com", NormalizedEmail = "CUSTOMER1@EXAMPLE.COM", FirstName = "Marko", LastName = "Markovic", EmailConfirmed = true, SecurityStamp = Guid.NewGuid().ToString(), ProfilePictureBase64 = DefaultAvatar.Base64 };
         customerUser.PasswordHash = passwordHasher.HashPassword(customerUser, "CustomerPass1!");
 
         var baseWorkSchedId = Guid.NewGuid();

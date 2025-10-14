@@ -40,7 +40,6 @@ namespace Delivery.Api.Controllers
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 ProfilePictureBase64 = user.ProfilePictureBase64,
-                ProfilePictureMimeType = user.ProfilePictureMimeType,
                 Roles = roles.ToList()
             };
 
@@ -49,41 +48,36 @@ namespace Delivery.Api.Controllers
         }
 
         [HttpPut("me")]
-        public async Task<IActionResult> Update([FromBody] ProfileUpdateRequest updateRequest)
+        public async Task<IActionResult> Update([FromForm] ProfileUpdateRequest updateRequest)
         {
             var user = await _userManager.GetUserAsync(User);
-
             if (user == null)
-            {
-                return NotFound("ERROR: User not found.");
-            }
+                return NotFound("User not found.");
 
             user.FirstName = updateRequest.FirstName;
             user.LastName = updateRequest.LastName;
+            user.Email = updateRequest.Email;
 
-            if (!string.IsNullOrWhiteSpace(updateRequest.ProfilePictureBase64) &&
-                !string.IsNullOrWhiteSpace(updateRequest.ProfilePictureMimeType))
+
+            if (updateRequest.ProfilePicture is { Length: > 0 })
             {
                 var allowedMimeTypes = new[] { "image/png", "image/jpeg" };
-                if (!allowedMimeTypes.Contains(updateRequest.ProfilePictureMimeType.ToLower()))
-                {
+                var contentType = updateRequest.ProfilePicture.ContentType.ToLower();
+
+                if (!allowedMimeTypes.Contains(contentType))
                     return BadRequest("Only PNG and JPEG images are allowed.");
-                }
 
-                try
-                {
-                    Convert.FromBase64String(updateRequest.ProfilePictureBase64);
-                }
-                catch
-                {
-                    return BadRequest("Invalid Base64 string.");
-                }
+                await using var ms = new MemoryStream();
+                await updateRequest.ProfilePicture.CopyToAsync(ms);
+                var fileBytes = ms.ToArray();
 
-                user.ProfilePictureBase64 = updateRequest.ProfilePictureBase64;
-                user.ProfilePictureMimeType = updateRequest.ProfilePictureMimeType;
+
+                user.ProfilePictureBase64 = $"data:{contentType};base64,{Convert.ToBase64String(fileBytes)}";
             }
 
-            await _userManager.UpdateAsync(user);
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+                return BadRequest(result.Errors);
 
             var roles = await _userManager.GetRolesAsync(user);
 
@@ -95,11 +89,12 @@ namespace Delivery.Api.Controllers
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 ProfilePictureBase64 = user.ProfilePictureBase64,
-                ProfilePictureMimeType = user.ProfilePictureMimeType,
                 Roles = roles.ToList()
             };
 
             return Ok(profileResponse);
         }
+
+
     }
 }

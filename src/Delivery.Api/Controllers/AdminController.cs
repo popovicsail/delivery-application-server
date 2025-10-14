@@ -1,4 +1,5 @@
 ﻿using Delivery.Api.Contracts.Admin;
+using Delivery.Api.Contracts.Auth;
 using Delivery.Domain.Entities.UserEntities;
 using Delivery.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
@@ -30,6 +31,7 @@ namespace Delivery.Api.Controllers
                 Email = request.Email,
                 FirstName = request.FirstName,
                 LastName = request.LastName,
+                ProfilePictureBase64 = DefaultAvatar.Base64
             };
 
             var result = await _userManager.CreateAsync(newUser, request.Password);
@@ -50,6 +52,7 @@ namespace Delivery.Api.Controllers
 
             return Ok();
         }
+
 
         [HttpDelete("delete-user/{userId}")]
         public async Task<IActionResult> DeleteUser(string userId)
@@ -77,7 +80,6 @@ namespace Delivery.Api.Controllers
         }
 
 
-
         [HttpPost("register-owner")]
         public async Task<IActionResult> RegisterOwner([FromBody] RegisterOwnerRequest request)
         {
@@ -87,6 +89,7 @@ namespace Delivery.Api.Controllers
                 Email = request.Email,
                 FirstName = request.FirstName,
                 LastName = request.LastName,
+                ProfilePictureBase64 = DefaultAvatar.Base64
             };
 
             var result = await _userManager.CreateAsync(newUser, request.Password);
@@ -104,8 +107,8 @@ namespace Delivery.Api.Controllers
             _context.Owners.Add(ownerProfile);
             await _context.SaveChangesAsync();
 
-
             return Ok();
         }
+
     }
 }
