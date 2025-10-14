@@ -164,6 +164,23 @@ namespace Delivery.Api.Controllers
 
             return NoContent();
         }
+
+        [HttpGet("my-allergens")]
+        public async Task<IActionResult> GetMyAllergens()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized();
+
+            var customer = await _dbContext.Customers
+                .Include(c => c.Allergens)
+                .FirstOrDefaultAsync(c => c.UserId == user.Id);
+
+            if (customer == null) return NotFound();
+
+            var allergenIds = customer.Allergens.Select(a => a.Id).ToList();
+
+            return Ok(new { allergenIds });
+        }
     }
 
 }

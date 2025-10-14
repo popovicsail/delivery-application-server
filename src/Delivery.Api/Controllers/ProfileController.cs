@@ -61,7 +61,6 @@ namespace Delivery.Api.Controllers
             user.FirstName = updateRequest.FirstName;
             user.LastName = updateRequest.LastName;
 
-            // ✅ Ako je poslata slika, validiraj i sačuvaj
             if (!string.IsNullOrWhiteSpace(updateRequest.ProfilePictureBase64) &&
                 !string.IsNullOrWhiteSpace(updateRequest.ProfilePictureMimeType))
             {

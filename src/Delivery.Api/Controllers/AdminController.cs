@@ -51,6 +51,32 @@ namespace Delivery.Api.Controllers
             return Ok();
         }
 
+        [HttpDelete("delete-user/{userId}")]
+        public async Task<IActionResult> DeleteUser(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound("Korisnik nije pronađen.");
+            }
+
+            // Proveri da li je korisnik admin
+            var roles = await _userManager.GetRolesAsync(user);
+            if (roles.Contains("Administrator"))
+            {
+                return BadRequest("Nije dozvoljeno brisanje administratora.");
+            }
+
+            var result = await _userManager.DeleteAsync(user);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            return Ok($"Korisnik {user.UserName} je uspešno obrisan.");
+        }
+
+
 
         [HttpPost("register-owner")]
         public async Task<IActionResult> RegisterOwner([FromBody] RegisterOwnerRequest request)
