@@ -74,9 +74,21 @@ namespace Delivery.Api.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
 
+
+
             var customer = await _dbContext.Customers
                 .Include(c => c.Addresses)
                 .FirstOrDefaultAsync(c => c.UserId == user.Id);
+
+            if (customer == null)
+            {
+                return Ok(new { Message = "Admin nema customer profil" });
+            }
+
+            if (await _userManager.IsInRoleAsync(user, "Administrator"))
+            {
+                return Ok(new { Role = "Administrator" });
+            }
 
             var addressDtos = customer.Addresses.Select(a => new AddressDto
             {
@@ -163,6 +175,28 @@ namespace Delivery.Api.Controllers
             await _dbContext.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        [HttpGet("my-allergens")]
+        public async Task<IActionResult> GetMyAllergens()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized();
+
+            if (await _userManager.IsInRoleAsync(user, "Administrator"))
+            {
+                return Ok(new { Role = "Administrator" });
+            }
+
+            var customer = await _dbContext.Customers
+                .Include(c => c.Allergens)
+                .FirstOrDefaultAsync(c => c.UserId == user.Id);
+
+            if (customer == null) return NotFound();
+
+            var allergenIds = customer.Allergens.Select(a => a.Id).ToList();
+
+            return Ok(new { allergenIds });
         }
     }
 

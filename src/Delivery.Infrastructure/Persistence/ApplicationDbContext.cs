@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
+using Delivery.Api.Contracts.Auth;
 using Delivery.Domain.Entities.DishEntities;
 using Delivery.Domain.Entities.HelperEntities;
 using Delivery.Domain.Entities.RestaurantEntities;
@@ -52,9 +53,9 @@ namespace Delivery.Infrastructure.Persistence
                 new IdentityRole<Guid> { Id = Guid.Parse("f09ece5a-1c11-4792-815b-4ef1bc6c6c20"), Name = "Worker", NormalizedName = "WORKER" }
             );
 
-            var adminUser1 = new User { Id = Guid.Parse("b22698b8-42a2-4115-9631-1c2d1e2ac5f7"), UserName = "admin1", NormalizedUserName = "ADMIN1", Email = "admin1@example.com", NormalizedEmail = "ADMIN1@EXAMPLE.COM", FirstName = "Main", LastName = "Admin", EmailConfirmed = true, SecurityStamp = Guid.NewGuid().ToString() };
-            var adminUser2 = new User { Id = Guid.Parse("bfd2ac09-67d0-4caa-8042-c6241b4f4f7f"), UserName = "admin2", NormalizedUserName = "ADMIN2", Email = "admin2@example.com", NormalizedEmail = "ADMIN2@EXAMPLE.COM", FirstName = "Second", LastName = "Admin", EmailConfirmed = true, SecurityStamp = Guid.NewGuid().ToString() };
-            var adminUser3 = new User { Id = Guid.Parse("1ddc68db-bb87-4cef-bdf8-d369bc1d5334"), UserName = "admin3", NormalizedUserName = "ADMIN3", Email = "admin3@example.com", NormalizedEmail = "ADMIN3@EXAMPLE.COM", FirstName = "Third", LastName = "Admin", EmailConfirmed = true, SecurityStamp = Guid.NewGuid().ToString() };
+            var adminUser1 = new User { Id = Guid.Parse("b22698b8-42a2-4115-9631-1c2d1e2ac5f7"), UserName = "admin1", NormalizedUserName = "ADMIN1", Email = "admin1@example.com", NormalizedEmail = "ADMIN1@EXAMPLE.COM", FirstName = "Main", LastName = "Admin", EmailConfirmed = true, SecurityStamp = Guid.NewGuid().ToString(), ProfilePictureBase64 = DefaultAvatar.Base64 };
+            var adminUser2 = new User { Id = Guid.Parse("bfd2ac09-67d0-4caa-8042-c6241b4f4f7f"), UserName = "admin2", NormalizedUserName = "ADMIN2", Email = "admin2@example.com", NormalizedEmail = "ADMIN2@EXAMPLE.COM", FirstName = "Second", LastName = "Admin", EmailConfirmed = true, SecurityStamp = Guid.NewGuid().ToString(), ProfilePictureBase64 = DefaultAvatar.Base64 };
+            var adminUser3 = new User { Id = Guid.Parse("1ddc68db-bb87-4cef-bdf8-d369bc1d5334"), UserName = "admin3", NormalizedUserName = "ADMIN3", Email = "admin3@example.com", NormalizedEmail = "ADMIN3@EXAMPLE.COM", FirstName = "Third", LastName = "Admin", EmailConfirmed = true, SecurityStamp = Guid.NewGuid().ToString(), ProfilePictureBase64 = DefaultAvatar.Base64 };
 
             adminUser1.PasswordHash = passwordHasher.HashPassword(adminUser1, "AdminPass1!");
             adminUser2.PasswordHash = passwordHasher.HashPassword(adminUser2, "AdminPass2!");
