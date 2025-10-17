@@ -1,11 +1,16 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
+using Delivery.Application.Dtos.CommonDtos.AddressDtos;
+using Delivery.Application.Dtos.CommonDtos.AllergenDtos.Requests;
 using Delivery.Application.Dtos.Users.CustomerDtos.Requests;
 using Delivery.Application.Dtos.Users.CustomerDtos.Responses;
 using Delivery.Application.Exceptions;
 using Delivery.Application.Interfaces;
+using Delivery.Domain.Entities.CommonEntities;
 using Delivery.Domain.Entities.UserEntities;
 using Delivery.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
+
 
 
 namespace Delivery.Application.Services;
@@ -107,5 +112,101 @@ public class CustomerService : ICustomerService
         await _unitOfWork.CompleteAsync();
 
         return;
+    }
+
+    public async Task<List<AddressDto>> GetMyAddressesAsync(ClaimsPrincipal principal)
+    {
+        var user = await _userManager.GetUserAsync(principal);
+        if (user == null) throw new UnauthorizedException("Korisnik mora biti ulogovan");
+
+        var customer = await _unitOfWork.Customers.GetByUserIdAsync(user.Id);
+        if (customer == null) throw new NotFoundException("Customer profil nije pronađen.");
+
+        return customer.Addresses
+            .Select(a => _mapper.Map<AddressDto>(a))
+            .ToList();
+    }
+
+    public async Task CreateAddressAsync(ClaimsPrincipal principal, AddressCreateRequest request)
+    {
+        var user = await _userManager.GetUserAsync(principal);
+        if (user == null) throw new UnauthorizedException("Korisnik mora biti ulogovan");
+
+        var customer = await _unitOfWork.Customers.GetByUserIdAsync(user.Id);
+        if (customer == null) throw new NotFoundException("Customer profil nije pronađen.");
+
+        var newAddress = _mapper.Map<Address>(request);
+        customer.Addresses.Add(newAddress);
+
+        await _unitOfWork.Customers.UpdateAsync(customer.Id, customer);
+        await _unitOfWork.CompleteAsync();
+    }
+
+    public async Task UpdateAddressAsync(ClaimsPrincipal principal, Guid addressId, AddressUpdateRequest request)
+    {
+        var user = await _userManager.GetUserAsync(principal);
+        if (user == null) throw new UnauthorizedException("Korisnik mora biti ulogovan");
+
+        var customer = await _unitOfWork.Customers.GetOneAsync(user.Id);
+        if (customer == null) throw new NotFoundException("Customer profil nije pronađen.");
+
+        var address = customer.Addresses.FirstOrDefault(a => a.Id == addressId);
+        if (address == null) throw new NotFoundException("Adresa nije pronađena.");
+
+        _mapper.Map(request, address);
+
+        await _unitOfWork.Customers.UpdateAsync(customer.Id, customer);
+        await _unitOfWork.CompleteAsync();
+    }
+
+    public async Task DeleteAddressAsync(ClaimsPrincipal principal, Guid addressId)
+    {
+        var user = await _userManager.GetUserAsync(principal);
+        if (user == null) throw new UnauthorizedException("Korisnik mora biti ulogovan");
+
+        var customer = await _unitOfWork.Customers.GetOneAsync(user.Id);
+        if (customer == null) throw new NotFoundException("Customer profil nije pronađen.");
+
+        var address = customer.Addresses.FirstOrDefault(a => a.Id == addressId);
+        if (address == null) throw new NotFoundException("Adresa nije pronađena.");
+
+        customer.Addresses.Remove(address);
+
+        await _unitOfWork.Customers.UpdateAsync(customer.Id, customer);
+        await _unitOfWork.CompleteAsync();
+    }
+
+
+    public async Task<List<Guid>> GetMyAllergensAsync(ClaimsPrincipal principal)
+    {
+        var user = await _userManager.GetUserAsync(principal);
+        if (user == null) throw new UnauthorizedException("Korisnik mora biti ulogovan");
+
+        var customer = await _unitOfWork.Customers.GetOneAsync(user.Id);
+        if (customer == null) throw new NotFoundException("Customer profil nije pronađen.");
+
+        return customer.Allergens.Select(a => a.Id).ToList();
+    }
+
+    public async Task UpdateMyAllergensAsync(ClaimsPrincipal principal, UpdateCustomerAllergensRequest request)
+    {
+        var user = await _userManager.GetUserAsync(principal);
+        if (user == null)
+            throw new UnauthorizedException("Korisnik mora biti ulogovan");
+
+        // Dohvati customera sa njegovim alergenima
+        var customer = await _unitOfWork.Customers.GetOneAsync(user.Id);
+        if (customer == null)
+            throw new NotFoundException("Customer profil nije pronađen.");
+
+        // Dohvati alergene po ID‑jevima iz requesta
+        var allergens = await _unitOfWork.Allergens.FindAsync(request.AllergenIds);
+
+        // Zameni kolekciju
+        customer.Allergens = allergens.ToList();
+
+        // Update i commit
+        await _unitOfWork.Customers.UpdateAsync(customer.Id, customer);
+        await _unitOfWork.CompleteAsync();
     }
 }

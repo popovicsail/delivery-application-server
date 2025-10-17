@@ -32,6 +32,7 @@ public class ExceptionHandlingMiddleware : IMiddleware
             BadRequestException => StatusCodes.Status400BadRequest,
             ForbiddenException => StatusCodes.Status403Forbidden,
             NotFoundException => StatusCodes.Status404NotFound,
+            UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
             _ => StatusCodes.Status500InternalServerError
         };
         var response = new { error = exception.Message };

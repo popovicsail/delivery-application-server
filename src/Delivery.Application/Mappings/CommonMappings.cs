@@ -14,6 +14,10 @@ public class CommonMappings : Profile
     {
         CreateMap<BaseWorkSched, BaseWorkSchedDto>().ReverseMap();
 
+        CreateMap<AddressCreateRequest, Address>();
+
+        CreateMap<AddressUpdateRequest, Address>();
+
         CreateMap<AddressDto, Address>().ReverseMap();
 
         CreateMap<AllergenCreateRequestDto, Allergen>();

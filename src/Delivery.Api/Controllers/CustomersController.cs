@@ -1,4 +1,6 @@
-﻿using Delivery.Application.Dtos.Users.CustomerDtos.Requests;
+﻿using Delivery.Application.Dtos.CommonDtos.AddressDtos;
+using Delivery.Application.Dtos.CommonDtos.AllergenDtos.Requests;
+using Delivery.Application.Dtos.Users.CustomerDtos.Requests;
 using Delivery.Application.Dtos.Users.CustomerDtos.Responses;
 using Delivery.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -56,5 +58,59 @@ public class CustomersController : ControllerBase
         await _customerService.DeleteAsync(id);
 
         return NoContent();
+    }
+
+
+
+
+    // -----------------------------
+    // Moje adrese
+    // -----------------------------
+
+    [HttpGet("my-addresses")]
+    public async Task<IActionResult> GetMyAddresses()
+    {
+        var addresses = await _customerService.GetMyAddressesAsync(User);
+        return Ok(addresses);
+    }
+
+    [HttpPost("my-addresses")]
+    public async Task<IActionResult> CreateAddress([FromBody] AddressCreateRequest request)
+    {
+        await _customerService.CreateAddressAsync(User, request);
+        return Ok();
+    }
+
+    [HttpPut("my-addresses/{addressId:guid}")]
+    public async Task<IActionResult> UpdateAddress(Guid addressId, [FromBody] AddressUpdateRequest request)
+    {
+        await _customerService.UpdateAddressAsync(User, addressId, request);
+        return NoContent();
+    }
+
+    [HttpDelete("my-addresses/{addressId:guid}")]
+    public async Task<IActionResult> DeleteAddress(Guid addressId)
+    {
+        await _customerService.DeleteAddressAsync(User, addressId);
+        return NoContent();
+    }
+
+    // -----------------------------
+    // Moji alergeni
+    // -----------------------------
+
+    [HttpGet("my-allergens")]
+    public async Task<IActionResult> GetMyAllergens()
+    {
+        var allergens = await _customerService.GetMyAllergensAsync(User);
+        return Ok(allergens);
+    }
+
+    [HttpPut("my-allergens")]
+    public async Task<IActionResult> UpdateMyAllergens([FromBody] UpdateCustomerAllergensRequest request)
+    {
+        await _customerService.UpdateMyAllergensAsync(User, request);
+        return NoContent();
+
     }
 }

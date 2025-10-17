@@ -40,7 +40,8 @@ namespace Delivery.Application.Services
                 Email = user.Email,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                Roles = roles.ToList()
+                Roles = roles.ToList(),
+                ProfilePictureUrl = user.ProfilePictureUrl
             };
 
             return response;

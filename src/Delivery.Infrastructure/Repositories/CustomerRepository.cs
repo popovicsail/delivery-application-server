@@ -1,13 +1,23 @@
 ﻿using Delivery.Domain.Entities.UserEntities;
 using Delivery.Domain.Interfaces;
 using Delivery.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace Delivery.Infrastructure.Repositories;
 
 public class CustomerRepository : GenericRepository<Customer>, ICustomerRepository
 {
-    public CustomerRepository(ApplicationDbContext _dbContext) : base(_dbContext)
+    private readonly ApplicationDbContext _dbContext;
+    public CustomerRepository(ApplicationDbContext dbContext) : base(dbContext)
     {
-
+        _dbContext = dbContext;
     }
+
+    public async Task<Customer?> GetByUserIdAsync(Guid userId)
+    {
+        return await _dbContext.Customers
+            .Include(c => c.Addresses)
+            .FirstOrDefaultAsync(c => c.UserId == userId);
+    }
+
 }
