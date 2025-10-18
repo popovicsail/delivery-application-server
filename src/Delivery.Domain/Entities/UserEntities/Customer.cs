@@ -11,5 +11,6 @@ public class Customer
 
     public virtual ICollection<Address> Addresses { get; set; } = new HashSet<Address>();
     public virtual ICollection<Allergen> Allergens { get; set; } = new HashSet<Allergen>();
+    public virtual ICollection<Voucher> Vouchers { get; set; } = new HashSet<Voucher>();
 }
 

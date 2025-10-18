@@ -4,5 +4,5 @@ namespace Delivery.Domain.Interfaces;
 
 public interface ICustomerRepository : IGenericRepository<Customer>
 {
-    Task<Customer?> GetByUserIdAsync(Guid userId);
+    Task<Customer?> GetOneAsync(Guid userId);
 }

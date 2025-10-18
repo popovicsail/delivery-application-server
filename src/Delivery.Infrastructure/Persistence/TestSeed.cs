@@ -46,8 +46,9 @@ public static class TestSeed
         // --- Ostali Test Podaci ---
         var addressId = Guid.NewGuid();
         var restaurantId = Guid.NewGuid();
-        var menuId = Guid.Parse("55555555-5555-5555-5555-555555555555");
+        var menuId = Guid.NewGuid();
         var pizzaId = Guid.NewGuid();
+        var voucherId = Guid.NewGuid();
 
         var baseWorkSched = new BaseWorkSched
         {
@@ -62,9 +63,23 @@ public static class TestSeed
         };
         modelBuilder.Entity<BaseWorkSched>().HasData(baseWorkSched);
 
+        modelBuilder.Entity<Allergen>().HasData(
+            new Allergen { Id = Guid.NewGuid(), Name = "Kikiriki", Type = "Orašasti plodovi" },
+            new Allergen { Id = Guid.NewGuid(), Name = "Jagode", Type = "Voće" },
+            new Allergen { Id = Guid.NewGuid(), Name = "Banane", Type = "Voće" },
+            new Allergen { Id = Guid.NewGuid(), Name = "Kivi", Type = "Voće" },
+            new Allergen { Id = Guid.NewGuid(), Name = "Breskve", Type = "Voće" },
+            new Allergen { Id = Guid.NewGuid(), Name = "Paradajz", Type = "Povrće" },
+            new Allergen { Id = Guid.NewGuid(), Name = "Celer", Type = "Povrće" },
+            new Allergen { Id = Guid.NewGuid(), Name = "Gluten", Type = "Žitarice" },
+            new Allergen { Id = Guid.NewGuid(), Name = "Pšenica", Type = "Žitarice" },
+            new Allergen { Id = Guid.NewGuid(), Name = "Školjke", Type = "Morski plodovi" }
+            );            
+
         modelBuilder.Entity<Address>().HasData(new Address { Id = addressId, StreetAndNumber = "Knez Mihailova 12", City = "Beograd", PostalCode = "11000" });
         modelBuilder.Entity<Restaurant>().HasData(new Restaurant { Id = restaurantId, Name = "Pizzeria Roma", Description = "Autentična italijanska kuhinja.", PhoneNumber = "222", Image = "", AddressId = addressId, OwnerId = ownerProfileId, BaseWorkSchedId = baseWorkSchedId });
         modelBuilder.Entity<Menu>().HasData(new Menu { Id = menuId, Name = "Pizza Menu", RestaurantId = restaurantId });
         modelBuilder.Entity<Dish>().HasData(new Dish { Id = pizzaId, Name = "Capricciosa", Description = "Pica sa šunkom i sirom.", Price = 750, MenuId = menuId, Type = "Pizza" });
+        modelBuilder.Entity<Voucher>().HasData(new Voucher { Id = voucherId, Name = "Rođendanski Vaučer", DateIssued = DateTime.UtcNow, DiscountAmount = 1200, CustomerId = customerProfileId });
     }
 }

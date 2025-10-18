@@ -119,7 +119,7 @@ public class CustomerService : ICustomerService
         var user = await _userManager.GetUserAsync(principal);
         if (user == null) throw new UnauthorizedException("Korisnik mora biti ulogovan");
 
-        var customer = await _unitOfWork.Customers.GetByUserIdAsync(user.Id);
+        var customer = await _unitOfWork.Customers.GetOneAsync(user.Id);
         if (customer == null) throw new NotFoundException("Customer profil nije pronađen.");
 
         return customer.Addresses
@@ -132,7 +132,7 @@ public class CustomerService : ICustomerService
         var user = await _userManager.GetUserAsync(principal);
         if (user == null) throw new UnauthorizedException("Korisnik mora biti ulogovan");
 
-        var customer = await _unitOfWork.Customers.GetByUserIdAsync(user.Id);
+        var customer = await _unitOfWork.Customers.GetOneAsync(user.Id);
         if (customer == null) throw new NotFoundException("Customer profil nije pronađen.");
 
         var newAddress = _mapper.Map<Address>(request);
@@ -147,7 +147,7 @@ public class CustomerService : ICustomerService
         var user = await _userManager.GetUserAsync(principal);
         if (user == null) throw new UnauthorizedException("Korisnik mora biti ulogovan");
 
-        var customer = await _unitOfWork.Customers.GetByUserIdAsync(user.Id);
+        var customer = await _unitOfWork.Customers.GetOneAsync(user.Id);
         if (customer == null) throw new NotFoundException("Customer profil nije pronađen.");
 
         var address = customer.Addresses.FirstOrDefault(a => a.Id == addressId);
@@ -164,7 +164,7 @@ public class CustomerService : ICustomerService
         var user = await _userManager.GetUserAsync(principal);
         if (user == null) throw new UnauthorizedException("Korisnik mora biti ulogovan");
 
-        var customer = await _unitOfWork.Customers.GetByUserIdAsync(user.Id);
+        var customer = await _unitOfWork.Customers.GetOneAsync(user.Id);
         if (customer == null) throw new NotFoundException("Customer profil nije pronađen.");
 
         var address = customer.Addresses.FirstOrDefault(a => a.Id == addressId);
@@ -182,7 +182,7 @@ public class CustomerService : ICustomerService
         var user = await _userManager.GetUserAsync(principal);
         if (user == null) throw new UnauthorizedException("Korisnik mora biti ulogovan");
 
-        var customer = await _unitOfWork.Customers.GetByUserIdAsync(user.Id);
+        var customer = await _unitOfWork.Customers.GetOneAsync(user.Id);
         if (customer == null) throw new NotFoundException("Customer profil nije pronađen.");
 
         var allergenIds = customer.Allergens.Select(a => a.Id).ToList();
@@ -196,7 +196,7 @@ public class CustomerService : ICustomerService
         if (user == null)
             throw new UnauthorizedException("Korisnik mora biti ulogovan");
 
-        var customer = await _unitOfWork.Customers.GetByUserIdAsync(user.Id);
+        var customer = await _unitOfWork.Customers.GetOneAsync(user.Id);
         if (customer == null)
             throw new NotFoundException("Customer profil nije pronađen.");
 

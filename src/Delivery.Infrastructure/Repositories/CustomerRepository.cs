@@ -13,11 +13,13 @@ public class CustomerRepository : GenericRepository<Customer>, ICustomerReposito
         _dbContext = dbContext;
     }
 
-    public async Task<Customer?> GetByUserIdAsync(Guid userId)
+    public new async Task<Customer?> GetOneAsync(Guid userId)
     {
         return await _dbContext.Customers
+            .Include(c => c.User)
             .Include(c => c.Addresses)
             .Include(c => c.Allergens)
+            .Include(c => c.Vouchers)
             .FirstOrDefaultAsync(c => c.UserId == userId);
     }
 
