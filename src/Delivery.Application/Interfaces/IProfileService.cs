@@ -1,4 +1,5 @@
-﻿using Delivery.Application.Dtos.Users.ProfileDtos.Requests;
+﻿using System.Security.Claims;
+using Delivery.Application.Dtos.Users.ProfileDtos.Requests;
 using Delivery.Application.Dtos.Users.ProfileDtos.Responses;
 
 namespace Delivery.Application.Interfaces;
@@ -6,5 +7,5 @@ namespace Delivery.Application.Interfaces;
 public interface IProfileService
 {
     Task<ProfileResponseDto> GetOneAsync(Guid id);
-    Task<ProfileResponseDto> UpdateAsync(Guid id, ProfileUpdateRequestDto request);
+    Task<ProfileResponseDto> UpdateAsync(ClaimsPrincipal principal, ProfileUpdateRequestDto request);
 }

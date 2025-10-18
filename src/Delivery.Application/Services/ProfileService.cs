@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
 using Delivery.Application.Dtos.Users.ProfileDtos.Requests;
 using Delivery.Application.Dtos.Users.ProfileDtos.Responses;
 using Delivery.Application.Exceptions;
@@ -47,28 +48,46 @@ namespace Delivery.Application.Services
             return response;
         }
 
-        public async Task<ProfileResponseDto> UpdateAsync(Guid userId, ProfileUpdateRequestDto request)
+        public async Task<ProfileResponseDto> UpdateAsync(ClaimsPrincipal principal, ProfileUpdateRequestDto request)
         {
-            var user = await _userManager.FindByIdAsync(userId.ToString());
-            if (user == null)
-            {
-                throw new NotFoundException($"User with ID {userId} not found.");
-            }
+            var user = await _userManager.GetUserAsync(principal);
+            if (user == null) throw new NotFoundException("User not found");
 
             user.FirstName = request.FirstName;
             user.LastName = request.LastName;
+            user.Email = request.Email;
+
+            if (request.ProfilePictureUrl is { Length: > 0 })
+            {
+                var allowedMimeTypes = new[] { "image/png", "image/jpeg" };
+                var contentType = request.ProfilePictureUrl.ContentType.ToLower();
+
+                if (!allowedMimeTypes.Contains(contentType))
+                    throw new BadRequestException("Only PNG and JPEG images are allowed.");
+
+                await using var ms = new MemoryStream();
+                await request.ProfilePictureUrl.CopyToAsync(ms);
+                var fileBytes = ms.ToArray();
+
+                user.ProfilePictureUrl = $"data:{contentType};base64,{Convert.ToBase64String(fileBytes)}";
+            }
 
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
+                throw new BadRequestException("Update failed");
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            return new ProfileResponseDto
             {
-                throw new BadRequestException("ERROR: Profile response");
-            }
-
-            var response = _mapper.Map<ProfileResponseDto>(user);
-
-            response.Roles = await _userManager.GetRolesAsync(user);
-
-            return response;
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                ProfilePictureUrl = user.ProfilePictureUrl,
+                Roles = roles.ToList()
+            };
         }
     }
 }

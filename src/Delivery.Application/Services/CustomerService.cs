@@ -147,7 +147,7 @@ public class CustomerService : ICustomerService
         var user = await _userManager.GetUserAsync(principal);
         if (user == null) throw new UnauthorizedException("Korisnik mora biti ulogovan");
 
-        var customer = await _unitOfWork.Customers.GetOneAsync(user.Id);
+        var customer = await _unitOfWork.Customers.GetByUserIdAsync(user.Id);
         if (customer == null) throw new NotFoundException("Customer profil nije pronađen.");
 
         var address = customer.Addresses.FirstOrDefault(a => a.Id == addressId);
@@ -164,7 +164,7 @@ public class CustomerService : ICustomerService
         var user = await _userManager.GetUserAsync(principal);
         if (user == null) throw new UnauthorizedException("Korisnik mora biti ulogovan");
 
-        var customer = await _unitOfWork.Customers.GetOneAsync(user.Id);
+        var customer = await _unitOfWork.Customers.GetByUserIdAsync(user.Id);
         if (customer == null) throw new NotFoundException("Customer profil nije pronađen.");
 
         var address = customer.Addresses.FirstOrDefault(a => a.Id == addressId);
@@ -182,10 +182,12 @@ public class CustomerService : ICustomerService
         var user = await _userManager.GetUserAsync(principal);
         if (user == null) throw new UnauthorizedException("Korisnik mora biti ulogovan");
 
-        var customer = await _unitOfWork.Customers.GetOneAsync(user.Id);
+        var customer = await _unitOfWork.Customers.GetByUserIdAsync(user.Id);
         if (customer == null) throw new NotFoundException("Customer profil nije pronađen.");
 
-        return customer.Allergens.Select(a => a.Id).ToList();
+        var allergenIds = customer.Allergens.Select(a => a.Id).ToList();
+
+        return ( allergenIds );
     }
 
     public async Task UpdateMyAllergensAsync(ClaimsPrincipal principal, UpdateCustomerAllergensRequest request)
@@ -194,19 +196,27 @@ public class CustomerService : ICustomerService
         if (user == null)
             throw new UnauthorizedException("Korisnik mora biti ulogovan");
 
-        // Dohvati customera sa njegovim alergenima
-        var customer = await _unitOfWork.Customers.GetOneAsync(user.Id);
+        var customer = await _unitOfWork.Customers.GetByUserIdAsync(user.Id);
         if (customer == null)
             throw new NotFoundException("Customer profil nije pronađen.");
 
-        // Dohvati alergene po ID‑jevima iz requesta
-        var allergens = await _unitOfWork.Allergens.FindAsync(request.AllergenIds);
+        // Očisti postojeće veze
+        customer.Allergens.Clear();
 
-        // Zameni kolekciju
-        customer.Allergens = allergens.ToList();
+        // Ukloni duplikate iz requesta
+        var distinctIds = request.AllergenIds.Distinct().ToList();
 
-        // Update i commit
+        // Dohvati alergene po ID‑jevima
+        var allergens = await _unitOfWork.Allergens.FindAsync(distinctIds);
+
+        // Dodaj nove veze
+        foreach (var allergen in allergens)
+        {
+            customer.Allergens.Add(allergen);
+        }
+
         await _unitOfWork.Customers.UpdateAsync(customer.Id, customer);
         await _unitOfWork.CompleteAsync();
     }
+
 }

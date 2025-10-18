@@ -102,8 +102,8 @@ public class CustomersController : ControllerBase
     [HttpGet("my-allergens")]
     public async Task<IActionResult> GetMyAllergens()
     {
-        var allergens = await _customerService.GetMyAllergensAsync(User);
-        return Ok(allergens);
+        var allergenIds = await _customerService.GetMyAllergensAsync(User);
+        return Ok(allergenIds);
     }
 
     [HttpPut("my-allergens")]

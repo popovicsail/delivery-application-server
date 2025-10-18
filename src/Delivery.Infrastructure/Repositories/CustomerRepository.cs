@@ -17,6 +17,7 @@ public class CustomerRepository : GenericRepository<Customer>, ICustomerReposito
     {
         return await _dbContext.Customers
             .Include(c => c.Addresses)
+            .Include(c => c.Allergens)
             .FirstOrDefaultAsync(c => c.UserId == userId);
     }
 
