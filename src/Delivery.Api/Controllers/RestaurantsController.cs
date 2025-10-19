@@ -1,14 +1,24 @@
-﻿using Delivery.Application.Dtos.RestaurantDtos.Requests;
+﻿using Delivery.Application.Dtos.CommonDtos.AddressDtos;
+using Delivery.Application.Dtos.CommonDtos.BaseWordSchedDtos;
+using Delivery.Application.Dtos.DishDtos;
+using Delivery.Application.Dtos.RestaurantDtos;
+using Delivery.Application.Dtos.RestaurantDtos.Requests;
 using Delivery.Application.Dtos.RestaurantDtos.Responses;
+using Delivery.Application.Dtos.Users.WorkerDtos.Requests;
 using Delivery.Application.Interfaces;
+using Delivery.Domain.Entities.RestaurantEntities;
+using Delivery.Domain.Entities.UserEntities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Delivery.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
+
 public class RestaurantsController : ControllerBase
 {
     private readonly IRestaurantService _restaurantService;
@@ -18,7 +28,17 @@ public class RestaurantsController : ControllerBase
         _restaurantService = restaurantService;
     }
 
+    [HttpGet("paged")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetPagedAsync([FromQuery] RestaurantFiltersMix filters, int sort, int page)
+    {
+        var restaurants = await _restaurantService.GetPagedAsync(sort, filters, page);
+
+        return Ok(restaurants);
+    }
+
     [HttpGet]
+    [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> GetAllAsync()
     {
         var restaurants = await _restaurantService.GetAllAsync();
@@ -35,6 +55,7 @@ public class RestaurantsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Administrator")]
     public async Task<ActionResult<RestaurantDetailResponseDto>> CreateAsync(RestaurantCreateRequestDto request)
     {
         var restaurant = await _restaurantService.AddAsync(request);
@@ -43,18 +64,43 @@ public class RestaurantsController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateAsync([FromRoute] Guid id, RestaurantUpdateRequestDto request)
+    [Authorize(Roles = "Administrator, Owner")]
+    public async Task<ActionResult> UpdateAsync([FromForm] RestaurantUpdateRequestDto updateRequest, IFormFile? file, [FromRoute] Guid id)
     {
-        await _restaurantService.UpdateAsync(id, request);
+        await _restaurantService.UpdateAsync(id, updateRequest, file);
 
         return NoContent();
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Administrator, Owner")]
     public async Task<ActionResult> DeleteAsync([FromRoute] Guid id)
     {
         await _restaurantService.DeleteAsync(id);
 
         return NoContent();
+    }
+
+    [HttpGet("{id}/menu")]
+    public async Task<IActionResult> GetRestaurantMenuAsync([FromRoute] Guid id)
+    {
+        var response = await _restaurantService.GetRestaurantMenuAsync(id);
+        return Ok(response);
+    }
+
+    [HttpPost("{restaurantId}/workers")]
+    [Authorize(Roles = "Owner")]
+    public async Task<IActionResult> RegisterWorkerAsync(Guid restaurantId, [FromBody] WorkerCreateRequestDto request)
+    {
+        var worker = await _restaurantService.RegisterWorkerAsync(restaurantId, request, User);
+        return Ok();
+    }
+
+    [Authorize(Roles = "Owner")]
+    [HttpGet("my-restaurants")]
+    public async Task<IActionResult> GetMyRestaurantsAsync()
+    {
+        var restaurants = await _restaurantService.GetMyRestaurantsAsync(User);
+        return Ok(restaurants);
     }
 }

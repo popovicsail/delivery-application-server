@@ -4,5 +4,5 @@ namespace Delivery.Domain.Interfaces;
 
 public interface IOwnerRepository : IGenericRepository<Owner>
 {
-
+    Task<Owner?> GetByUserIdAsync(Guid userId);
 }
