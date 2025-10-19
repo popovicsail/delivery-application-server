@@ -24,20 +24,18 @@ public abstract class GenericRepository<T> : IGenericRepository<T> where T : cla
         return await _dbContext.Set<T>().FindAsync(id);
     }
 
-    public async Task AddAsync(T entity)
+    public async Task<T> AddAsync(T entity)
     {
-        _dbContext.Set<T>().Add(entity);
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.Set<T>().AddAsync(entity);
+        return entity;
     }
-    public async Task UpdateAsync(Guid id, T entity)
+    public void Update(T entity)
     {
         _dbContext.Set<T>().Update(entity);
-        await _dbContext.SaveChangesAsync();
     }
-    public async Task DeleteAsync(Guid id, T entity)
+    public void Delete(T entity)
     {
         _dbContext.Set<T>().Remove(entity);
-        await _dbContext.SaveChangesAsync();
     }
 
     public void Dispose()

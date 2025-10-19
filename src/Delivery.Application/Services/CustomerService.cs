@@ -29,14 +29,7 @@ public class CustomerService : ICustomerService
     public async Task<IEnumerable<CustomerSummaryResponseDto>> GetAllAsync()
     {
         IEnumerable<Customer> customers = await _unitOfWork.Customers.GetAllAsync();
-
-        var response = new List<CustomerSummaryResponseDto>();
-
-        foreach (var customer in customers)
-        {
-            response.Add(_mapper.Map<CustomerSummaryResponseDto>(customer));
-        }
-        return response;
+        return _mapper.Map<List<CustomerSummaryResponseDto>>(customers.ToList());
     }
 
     public async Task<CustomerDetailResponseDto?> GetOneAsync(Guid id)
@@ -48,9 +41,7 @@ public class CustomerService : ICustomerService
             throw new NotFoundException($"Customer with ID '{id}' was not found.");
         }
 
-        var customerDto = _mapper.Map<CustomerDetailResponseDto>(customer);
-
-        return customerDto;
+        return _mapper.Map<CustomerDetailResponseDto>(customer);
     }
 
     public async Task<CustomerDetailResponseDto> AddAsync(CustomerCreateRequestDto request)
@@ -91,11 +82,9 @@ public class CustomerService : ICustomerService
 
         _mapper.Map(customerDto, customer);
 
-        await _unitOfWork.Customers.UpdateAsync(id, customer);
+        _unitOfWork.Customers.Update(customer);
 
         await _unitOfWork.CompleteAsync();
-
-        return;
     }
 
     public async Task DeleteAsync(Guid id)
@@ -107,11 +96,9 @@ public class CustomerService : ICustomerService
             throw new NotFoundException($"Customer with ID '{id}' was not found.");
         }
 
-        await _unitOfWork.Customers.DeleteAsync(id, customer);
+        _unitOfWork.Customers.Update(customer);
 
         await _unitOfWork.CompleteAsync();
-
-        return;
     }
 
     public async Task<List<AddressDto>> GetMyAddressesAsync(ClaimsPrincipal principal)
@@ -138,7 +125,7 @@ public class CustomerService : ICustomerService
         var newAddress = _mapper.Map<Address>(request);
         customer.Addresses.Add(newAddress);
 
-        await _unitOfWork.Customers.UpdateAsync(customer.Id, customer);
+        _unitOfWork.Customers.Update(customer);
         await _unitOfWork.CompleteAsync();
     }
 
@@ -155,7 +142,7 @@ public class CustomerService : ICustomerService
 
         _mapper.Map(request, address);
 
-        await _unitOfWork.Customers.UpdateAsync(customer.Id, customer);
+        _unitOfWork.Customers.Update(customer);
         await _unitOfWork.CompleteAsync();
     }
 
@@ -172,7 +159,7 @@ public class CustomerService : ICustomerService
 
         customer.Addresses.Remove(address);
 
-        await _unitOfWork.Customers.UpdateAsync(customer.Id, customer);
+        _unitOfWork.Customers.Update(customer);
         await _unitOfWork.CompleteAsync();
     }
 
@@ -215,7 +202,7 @@ public class CustomerService : ICustomerService
             customer.Allergens.Add(allergen);
         }
 
-        await _unitOfWork.Customers.UpdateAsync(customer.Id, customer);
+        _unitOfWork.Customers.Update(customer);
         await _unitOfWork.CompleteAsync();
     }
 
