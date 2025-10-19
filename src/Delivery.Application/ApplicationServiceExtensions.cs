@@ -20,6 +20,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<IProfileService, ProfileService>();
         services.AddScoped<IRestaurantService, RestaurantService>();
         services.AddScoped<IDishService, DishService>();
+        services.AddScoped<IDishOptionGroupService, DishOptionGroupService>();
 
         return services;
     }

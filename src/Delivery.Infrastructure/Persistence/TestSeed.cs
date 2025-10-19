@@ -1,5 +1,4 @@
-﻿using Delivery.Api.Contracts.Auth;
-using Delivery.Domain.Entities.CommonEntities;
+﻿using Delivery.Domain.Entities.CommonEntities;
 using Delivery.Domain.Entities.DishEntities;
 using Delivery.Domain.Entities.RestaurantEntities;
 using Delivery.Domain.Entities.UserEntities;

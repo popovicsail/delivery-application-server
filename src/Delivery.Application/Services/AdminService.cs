@@ -1,5 +1,4 @@
-﻿using Delivery.Api.Contracts.Auth;
-using Delivery.Application.Dtos.Users.CourierDtos.Requests;
+﻿using Delivery.Application.Dtos.Users.CourierDtos.Requests;
 using Delivery.Application.Dtos.Users.OwnerDtos.Requests;
 using Delivery.Application.Exceptions;
 using Delivery.Application.Interfaces;

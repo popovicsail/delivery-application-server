@@ -16,6 +16,14 @@ public class DishMappings : Profile
 
         CreateMap<Dish, DishSummaryResponseDto>();
 
-        CreateMap<Dish, DishDetailResponseDto>();
+        CreateMap<Dish, DishDetailResponseDto>()
+            .ForMember(dest => dest.DishOptionGroups, opt => opt.MapFrom(src => src.DishOptionGroups));
+
+        CreateMap<DishOptionGroup, DishOptionGroupResponseDto>()
+            .ForMember(dest => dest.DishOptions, opt => opt.MapFrom(src => src.DishOptions));
+
+        CreateMap<DishOption, DishOptionResponseDto>();
+
+
     }
 }

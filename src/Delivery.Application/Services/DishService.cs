@@ -18,17 +18,10 @@ public class DishService : IDishService
         _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
-    public async Task<IEnumerable<DishSummaryResponseDto>> GetAllAsync()
+    public async Task<IEnumerable<DishDetailResponseDto>> GetAllAsync()
     {
-        IEnumerable<Dish> dishes = await _unitOfWork.Dishes.GetAllAsync();
-
-        var response = new List<DishSummaryResponseDto>();
-
-        foreach (var dish in dishes)
-        {
-            response.Add(_mapper.Map<DishSummaryResponseDto>(dish));
-        }
-        return response;
+        var dishes = await _unitOfWork.Dishes.GetAllAsync();
+        return _mapper.Map<IEnumerable<DishDetailResponseDto>>(dishes);
     }
 
     public async Task<DishDetailResponseDto?> GetOneAsync(Guid id)

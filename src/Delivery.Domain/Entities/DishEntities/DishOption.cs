@@ -1,6 +1,4 @@
-﻿namespace Delivery.Domain.Entities.DishEntities;
-
-public class DishOption
+﻿public class DishOption
 {
     public Guid Id { get; set; }
     public string Name { get; set; }

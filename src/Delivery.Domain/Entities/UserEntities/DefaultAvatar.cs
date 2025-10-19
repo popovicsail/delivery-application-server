@@ -1,4 +1,4 @@
-﻿namespace Delivery.Api.Contracts.Auth
+﻿namespace Delivery.Domain.Entities.UserEntities
 {
     public static class DefaultAvatar
     {
