@@ -1,4 +1,4 @@
-﻿public class DishOptionDto
+﻿public class DishOptionResponseDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; }

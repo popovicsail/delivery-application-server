@@ -1,4 +1,4 @@
-﻿namespace Delivery.Domain.Entities.DishEntities;
+﻿using Delivery.Domain.Entities.DishEntities;
 
 public class DishOptionGroup
 {

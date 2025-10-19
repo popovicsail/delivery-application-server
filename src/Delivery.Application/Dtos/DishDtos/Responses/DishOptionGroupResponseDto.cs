@@ -1,6 +1,4 @@
-﻿namespace Delivery.Application.Dtos.DishDtos.Responses;
-
-public class DishOptionGroupDto
+﻿public class DishOptionGroupResponseDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
