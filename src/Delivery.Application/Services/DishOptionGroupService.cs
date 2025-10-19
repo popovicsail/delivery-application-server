@@ -59,7 +59,7 @@ public class DishOptionGroupService : IDishOptionGroupService
             }
         }
 
-        await _unitOfWork.DishOptionGroups.UpdateAsync(id, group);
+        _unitOfWork.DishOptionGroups.Update(group);
         await _unitOfWork.CompleteAsync();
         return _mapper.Map<DishOptionGroupResponseDto>(group);
     }
@@ -69,7 +69,7 @@ public class DishOptionGroupService : IDishOptionGroupService
         var group = await _unitOfWork.DishOptionGroups.GetOneAsync(id);
         if (group == null) throw new NotFoundException($"DishOptionGroup {id} not found.");
 
-        await _unitOfWork.DishOptionGroups.DeleteAsync(id, group);
+        _unitOfWork.DishOptionGroups.Delete(group);
         await _unitOfWork.CompleteAsync();
     }
 }
