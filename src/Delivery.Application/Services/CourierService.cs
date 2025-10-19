@@ -85,7 +85,7 @@ public class CourierService : ICourierService
 
         _mapper.Map(courierDto, courier);
 
-        await _unitOfWork.Couriers.UpdateAsync(id, courier);
+        _unitOfWork.Couriers.Update(courier);
 
         await _unitOfWork.CompleteAsync();
 
@@ -101,7 +101,7 @@ public class CourierService : ICourierService
             throw new NotFoundException($"Courier with ID '{id}' was not found.");
         }
 
-        await _unitOfWork.Couriers.DeleteAsync(id, courier);
+        _unitOfWork.Couriers.Delete(courier);
 
         await _unitOfWork.CompleteAsync();
 

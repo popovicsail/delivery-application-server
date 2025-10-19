@@ -93,8 +93,6 @@ public class Program
                 app.UseSwaggerUI();
             }
 
-            app.UseCors("AllowReactApp");
-
             app.UseHttpsRedirection();
 
             app.UseCors();

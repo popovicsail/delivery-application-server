@@ -67,7 +67,7 @@ public class AllergenService : IAllergenService
 
         _mapper.Map(allergenDto, allergen);
 
-        await _unitOfWork.Allergens.UpdateAsync(id, allergen);
+        _unitOfWork.Allergens.Update(allergen);
 
         await _unitOfWork.CompleteAsync();
 
@@ -83,7 +83,7 @@ public class AllergenService : IAllergenService
             throw new NotFoundException($"Allergen with ID '{id}' was not found.");
         }
 
-        await _unitOfWork.Allergens.DeleteAsync(id, allergen);
+        _unitOfWork.Allergens.Update(allergen);
 
         await _unitOfWork.CompleteAsync();
 

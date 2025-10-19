@@ -67,7 +67,7 @@ public class RestaurantService : IRestaurantService
 
         _mapper.Map(request, restaurant);
 
-        await _unitOfWork.Restaurants.UpdateAsync(id, restaurant);
+        _unitOfWork.Restaurants.Update(restaurant);
 
         await _unitOfWork.CompleteAsync();
 
@@ -83,7 +83,7 @@ public class RestaurantService : IRestaurantService
             throw new NotFoundException($"Restaurant with ID '{id}' was not found.");
         }
 
-        await _unitOfWork.Restaurants.DeleteAsync(id, restaurant);
+        _unitOfWork.Restaurants.Delete(restaurant);
 
         await _unitOfWork.CompleteAsync();
 

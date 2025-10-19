@@ -86,7 +86,7 @@ public class OwnerService : IOwnerService
 
         _mapper.Map(ownerDto, owner);
 
-        await _unitOfWork.Owners.UpdateAsync(id, owner);
+        _unitOfWork.Owners.Update(owner);
 
         await _unitOfWork.CompleteAsync();
 
@@ -102,7 +102,7 @@ public class OwnerService : IOwnerService
             throw new NotFoundException($"Owner with ID '{id}' was not found.");
         }
 
-        await _unitOfWork.Owners.DeleteAsync(id, owner);
+        _unitOfWork.Owners.Delete(owner);
 
         await _unitOfWork.CompleteAsync();
 

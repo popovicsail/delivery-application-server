@@ -91,7 +91,7 @@ public class CustomerService : ICustomerService
 
         _mapper.Map(customerDto, customer);
 
-        await _unitOfWork.Customers.UpdateAsync(id, customer);
+        _unitOfWork.Customers.Update(customer);
 
         await _unitOfWork.CompleteAsync();
 
@@ -107,11 +107,43 @@ public class CustomerService : ICustomerService
             throw new NotFoundException($"Customer with ID '{id}' was not found.");
         }
 
-        await _unitOfWork.Customers.DeleteAsync(id, customer);
+        _unitOfWork.Customers.Delete(customer);
 
         await _unitOfWork.CompleteAsync();
 
         return;
+    }
+
+    public async Task BirthdayVoucherBackgroundJobAsync()
+    {
+        var birthdayCustomers = await _unitOfWork.Customers.GetBirthdayCustomersAsync();
+
+        if (birthdayCustomers == null || !birthdayCustomers.Any())
+        {
+            return;
+        }
+
+        foreach (var customer in birthdayCustomers)
+        {
+            var alreadyReceived = await _unitOfWork.Customers
+                .HasReceivedBirthdayVoucherInLastYearAsync(customer.Id);
+
+            if (alreadyReceived)
+            {
+                continue;
+            }
+
+            Voucher newVoucher = new Voucher
+            {
+                Name = "Birthday Voucher",
+                DiscountAmount = 2000,
+                CustomerId = customer.Id
+            };
+
+            await _unitOfWork.Vouchers.AddAsync(newVoucher);
+        }
+
+        await _unitOfWork.CompleteAsync();
     }
 
     public async Task<List<AddressDto>> GetMyAddressesAsync(ClaimsPrincipal principal)
@@ -138,7 +170,7 @@ public class CustomerService : ICustomerService
         var newAddress = _mapper.Map<Address>(request);
         customer.Addresses.Add(newAddress);
 
-        await _unitOfWork.Customers.UpdateAsync(customer.Id, customer);
+        _unitOfWork.Customers.Update(customer);
         await _unitOfWork.CompleteAsync();
     }
 
@@ -155,7 +187,7 @@ public class CustomerService : ICustomerService
 
         _mapper.Map(request, address);
 
-        await _unitOfWork.Customers.UpdateAsync(customer.Id, customer);
+        _unitOfWork.Customers.Update(customer);
         await _unitOfWork.CompleteAsync();
     }
 
@@ -172,7 +204,7 @@ public class CustomerService : ICustomerService
 
         customer.Addresses.Remove(address);
 
-        await _unitOfWork.Customers.UpdateAsync(customer.Id, customer);
+        _unitOfWork.Customers.Update(customer);
         await _unitOfWork.CompleteAsync();
     }
 
@@ -215,7 +247,8 @@ public class CustomerService : ICustomerService
             customer.Allergens.Add(allergen);
         }
 
-        await _unitOfWork.Customers.UpdateAsync(customer.Id, customer);
+        _unitOfWork.Customers.Update(customer);
+
         await _unitOfWork.CompleteAsync();
     }
 

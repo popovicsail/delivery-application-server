@@ -1,5 +1,6 @@
 ﻿using Delivery.Domain.Interfaces;
 using Delivery.Infrastructure.BackgroundServices.LoggingBackgroundJob;
+using Delivery.Infrastructure.BackgroundServices.BirthdayVoucherBackgroundJob;
 using Delivery.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -19,6 +20,7 @@ public static class InfrastructureServiceExtensions
         {
             options.WaitForJobsToComplete = true;
         });
+        services.ConfigureOptions<BirthdayVoucherBackgroundJobSetup>();
         services.ConfigureOptions<LoggingBackgroundJobSetup>();
 
         services.AddDbContext<ApplicationDbContext>(options =>

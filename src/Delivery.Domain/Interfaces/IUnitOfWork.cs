@@ -11,5 +11,6 @@ public interface IUnitOfWork : IDisposable
     ICourierRepository Couriers { get; }
     IWorkerRepository Workers { get; }
     IDishRepository Dishes { get; }
+    IVoucherRepository Vouchers { get; }
     Task<int> CompleteAsync();
 }

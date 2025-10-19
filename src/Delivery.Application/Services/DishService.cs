@@ -67,7 +67,7 @@ public class DishService : IDishService
 
         _mapper.Map(request, dish);
 
-        await _unitOfWork.Dishes.UpdateAsync(id, dish);
+        _unitOfWork.Dishes.Update(dish);
 
         await _unitOfWork.CompleteAsync();
 
@@ -83,7 +83,7 @@ public class DishService : IDishService
             throw new NotFoundException($"Dish with ID '{id}' was not found.");
         }
 
-        await _unitOfWork.Dishes.DeleteAsync(id, dish);
+        _unitOfWork.Dishes.Delete(dish);
 
         await _unitOfWork.CompleteAsync();
 

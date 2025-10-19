@@ -6,6 +6,8 @@ public class Customer
 {
     public Guid Id { get; set; }
 
+    public int LoyaltyPoints { get; set; } = 5;
+
     public Guid UserId { get; set; }
     public virtual User User { get; set; }
 

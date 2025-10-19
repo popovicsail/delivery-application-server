@@ -8,5 +8,5 @@ public class User : IdentityUser<Guid>
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public string? ProfilePictureUrl { get; set; } = DefaultAvatar.Base64;
-
+    public DateTime? DateOfBirth { get; set; }
 }

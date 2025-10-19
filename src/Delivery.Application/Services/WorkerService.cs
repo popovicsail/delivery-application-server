@@ -86,7 +86,7 @@ public class WorkerService : IWorkerService
 
         _mapper.Map(workerDto, worker);
 
-        await _unitOfWork.Workers.UpdateAsync(id, worker);
+        _unitOfWork.Workers.Delete(worker);
 
         await _unitOfWork.CompleteAsync();
 
@@ -102,7 +102,7 @@ public class WorkerService : IWorkerService
             throw new NotFoundException($"Worker with ID '{id}' was not found.");
         }
 
-        await _unitOfWork.Workers.DeleteAsync(id, worker);
+        _unitOfWork.Workers.Delete(worker);
 
         await _unitOfWork.CompleteAsync();
 

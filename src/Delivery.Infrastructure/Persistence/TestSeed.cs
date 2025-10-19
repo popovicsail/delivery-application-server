@@ -24,7 +24,7 @@ public static class TestSeed
         ownerUser.PasswordHash = passwordHasher.HashPassword(ownerUser, "OwnerPass1!");
 
         var customerUserId = Guid.Parse("22222222-2222-2222-2222-222222222222");
-        var customerUser = new User { Id = customerUserId, UserName = "customer1", NormalizedUserName = "CUSTOMER1", Email = "customer1@example.com", NormalizedEmail = "CUSTOMER1@EXAMPLE.COM", FirstName = "Marko", LastName = "Markovic", EmailConfirmed = true, SecurityStamp = Guid.NewGuid().ToString(), ProfilePictureUrl = DefaultAvatar.Base64 };
+        var customerUser = new User { Id = customerUserId, UserName = "customer1", DateOfBirth = DateTime.UtcNow, NormalizedUserName = "CUSTOMER1", Email = "customer1@example.com", NormalizedEmail = "CUSTOMER1@EXAMPLE.COM", FirstName = "Marko", LastName = "Markovic", EmailConfirmed = true, SecurityStamp = Guid.NewGuid().ToString(), ProfilePictureUrl = DefaultAvatar.Base64 };
         customerUser.PasswordHash = passwordHasher.HashPassword(customerUser, "CustomerPass1!");
 
         var baseWorkSchedId = Guid.NewGuid();
@@ -80,6 +80,6 @@ public static class TestSeed
         modelBuilder.Entity<Restaurant>().HasData(new Restaurant { Id = restaurantId, Name = "Pizzeria Roma", Description = "Autentična italijanska kuhinja.", PhoneNumber = "222", Image = "", AddressId = addressId, OwnerId = ownerProfileId, BaseWorkSchedId = baseWorkSchedId });
         modelBuilder.Entity<Menu>().HasData(new Menu { Id = menuId, Name = "Pizza Menu", RestaurantId = restaurantId });
         modelBuilder.Entity<Dish>().HasData(new Dish { Id = pizzaId, Name = "Capricciosa", Description = "Pica sa šunkom i sirom.", Price = 750, MenuId = menuId, Type = "Pizza" });
-        modelBuilder.Entity<Voucher>().HasData(new Voucher { Id = voucherId, Name = "Rođendanski Vaučer", DateIssued = DateTime.UtcNow, DiscountAmount = 1200, CustomerId = customerProfileId });
+        modelBuilder.Entity<Voucher>().HasData(new Voucher { Id = voucherId, Name = "TestVaučer", DateIssued = DateTime.UtcNow, DiscountAmount = 1200, CustomerId = customerProfileId });
     }
 }

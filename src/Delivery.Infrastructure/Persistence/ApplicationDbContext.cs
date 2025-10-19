@@ -31,6 +31,8 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
     public DbSet<Owner> Owners { get; set; }
     public DbSet<Worker> Workers { get; set; }
 
+    public DbSet<Voucher> Vouchers { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -90,6 +92,8 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
         builder.Entity<Dish>().HasMany(d => d.DishOptionGroups).WithOne(g => g.Dish).HasForeignKey(g => g.DishId);
         builder.Entity<Dish>().HasMany(d => d.Allergens).WithMany(a => a.Dishes);
 
+        builder.Entity<Customer>().HasMany(c => c.Vouchers).WithOne().HasForeignKey(v => v.CustomerId);
+        builder.Entity<Voucher>().HasIndex(v => v.Code).IsUnique();
 
         TestSeed.Seed(builder);
     }
