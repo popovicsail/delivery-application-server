@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36429.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Delivery.Api", "src\Delivery.Api\Delivery.Api.csproj", "{6FDEA10D-7D05-A1A1-9EFF-A5282FD9837D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Delivery.Api", "src\Delivery.Api\Delivery.Api.csproj", "{B2F2ED87-2A1C-47B0-A287-1EC55AC06BC4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Delivery.Application", "src\Delivery.Application\Delivery.Application.csproj", "{CA002D6B-3DB8-2449-646C-21B66429BF07}"
 EndProject
@@ -17,10 +17,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6FDEA10D-7D05-A1A1-9EFF-A5282FD9837D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6FDEA10D-7D05-A1A1-9EFF-A5282FD9837D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6FDEA10D-7D05-A1A1-9EFF-A5282FD9837D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6FDEA10D-7D05-A1A1-9EFF-A5282FD9837D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2F2ED87-2A1C-47B0-A287-1EC55AC06BC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2F2ED87-2A1C-47B0-A287-1EC55AC06BC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2F2ED87-2A1C-47B0-A287-1EC55AC06BC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2F2ED87-2A1C-47B0-A287-1EC55AC06BC4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CA002D6B-3DB8-2449-646C-21B66429BF07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CA002D6B-3DB8-2449-646C-21B66429BF07}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA002D6B-3DB8-2449-646C-21B66429BF07}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -38,6 +38,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {A479D282-BABB-46BF-8D39-93FBFB237779}
+		SolutionGuid = {FF2CB1F1-934B-4193-9B5B-3F07F5B1FD4E}
 	EndGlobalSection
 EndGlobal

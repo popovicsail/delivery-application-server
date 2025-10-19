@@ -1,21 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Delivery.Domain.Entities.HelperEntities;
+﻿using Delivery.Domain.Entities.CommonEntities;
 
-namespace Delivery.Domain.Entities.UserEntities
+namespace Delivery.Domain.Entities.UserEntities;
+
+public class Customer
 {
-    public class Customer
-    {
-        public Guid Id { get; set; }
+    public Guid Id { get; set; }
 
-        public Guid UserId { get; set; }
-        public virtual User User { get; set; }
+    public Guid UserId { get; set; }
+    public virtual User User { get; set; }
 
-        public virtual ICollection<Address> Addresses { get; set; } = new HashSet<Address>();
-        public virtual ICollection<Allergen> Allergens { get; set; } = new HashSet<Allergen>();
-    }
+    public virtual ICollection<Address> Addresses { get; set; } = new HashSet<Address>();
+    public virtual ICollection<Allergen> Allergens { get; set; } = new HashSet<Allergen>();
+    public virtual ICollection<Voucher> Vouchers { get; set; } = new HashSet<Voucher>();
 }
 

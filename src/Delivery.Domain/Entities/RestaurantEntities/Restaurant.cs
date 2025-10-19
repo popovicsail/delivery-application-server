@@ -1,34 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Delivery.Domain.Entities.HelperEntities;
+﻿using Delivery.Domain.Entities.CommonEntities;
 using Delivery.Domain.Entities.UserEntities;
 
-namespace Delivery.Domain.Entities.RestaurantEntities
+namespace Delivery.Domain.Entities.RestaurantEntities;
+
+public class Restaurant
 {
-    public class Restaurant
-    {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
+    public Guid Id { get; set; }
+    public string Name { get; set; }
+    public string Description { get; set; }
+    public string PhoneNumber { get; set; }
 
-        public Guid AddressId { get; set; }
-        public virtual Address Address { get; set; }
-        public string PhoneNumber { get; set; }
+    public Guid AddressId { get; set; }
+    public virtual Address Address { get; set; }  
 
-        public Guid OwnerId { get; set; }
-        public virtual Owner? Owner { get; set; }
+    public Guid OwnerId { get; set; }
+    public virtual Owner? Owner { get; set; }
 
-        public Guid? BaseWorkSchedId { get; set; }
-        public virtual BaseWorkSched? BaseWorkSched { get; set; }
+    public virtual BaseWorkSched? BaseWorkSched { get; set; }
 
-        public string Image { get; set; }
+    public string Image { get; set; }
 
-        public virtual ICollection<WorkSchedule> WorkSchedules { get; set; } = new HashSet<WorkSchedule>();
-        public virtual ICollection<Worker> Workers { get; set; } = new HashSet<Worker>();
-        public virtual ICollection<Menu> Menus { get; set; } = new HashSet<Menu>();
+    public virtual ICollection<WorkSchedule> WorkSchedules { get; set; } = new HashSet<WorkSchedule>();
+    public virtual ICollection<Worker> Workers { get; set; } = new HashSet<Worker>();
+    public virtual ICollection<Menu> Menus { get; set; } = new HashSet<Menu>();
 
-    }
 }

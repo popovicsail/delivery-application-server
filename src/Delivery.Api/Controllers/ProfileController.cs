@@ -1,9 +1,7 @@
-﻿using Delivery.Api.Contracts;
-using Delivery.Api.Contracts.Profile;
-using Delivery.Domain.Entities.UserEntities;
+﻿using System.Security.Claims;
+using Delivery.Application.Dtos.Users.ProfileDtos.Requests;
+using Delivery.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Delivery.Api.Controllers
@@ -13,88 +11,38 @@ namespace Delivery.Api.Controllers
     [Authorize]
     public class ProfileController : ControllerBase
     {
-        private readonly UserManager<User> _userManager;
+        private readonly IProfileService _profileService;
 
-        public ProfileController(UserManager<User> userManager)
+        public ProfileController(IProfileService profileService)
         {
-            _userManager = userManager;
+            _profileService = profileService;
         }
 
         [HttpGet("me")]
-        public async Task<IActionResult> GetById()
+        public async Task<IActionResult> GetOneAsync()
         {
-            var user = await _userManager.GetUserAsync(User);
-
-            if (user == null)
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
             {
-                return NotFound("User not found.");
+                return Unauthorized();
             }
 
-            var roles = await _userManager.GetRolesAsync(user);
+            var profile = await _profileService.GetOneAsync(Guid.Parse(userId));
 
-            var profileResponse = new ProfileResponse
-            {
-                Id = user.Id,
-                UserName = user.UserName,
-                Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                ProfilePictureBase64 = user.ProfilePictureBase64,
-                Roles = roles.ToList()
-            };
-
-
-            return Ok(profileResponse);
+            return Ok(profile);
         }
 
         [HttpPut("me")]
-        public async Task<IActionResult> Update([FromForm] ProfileUpdateRequest updateRequest)
+        public async Task<IActionResult> UpdateAsync([FromForm] ProfileUpdateRequestDto updateRequest)
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-                return NotFound("User not found.");
-
-            user.FirstName = updateRequest.FirstName;
-            user.LastName = updateRequest.LastName;
-            user.Email = updateRequest.Email;
-
-
-            if (updateRequest.ProfilePicture is { Length: > 0 })
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
             {
-                var allowedMimeTypes = new[] { "image/png", "image/jpeg" };
-                var contentType = updateRequest.ProfilePicture.ContentType.ToLower();
-
-                if (!allowedMimeTypes.Contains(contentType))
-                    return BadRequest("Only PNG and JPEG images are allowed.");
-
-                await using var ms = new MemoryStream();
-                await updateRequest.ProfilePicture.CopyToAsync(ms);
-                var fileBytes = ms.ToArray();
-
-
-                user.ProfilePictureBase64 = $"data:{contentType};base64,{Convert.ToBase64String(fileBytes)}";
+                return Unauthorized();
             }
 
-            var result = await _userManager.UpdateAsync(user);
-            if (!result.Succeeded)
-                return BadRequest(result.Errors);
-
-            var roles = await _userManager.GetRolesAsync(user);
-
-            var profileResponse = new ProfileResponse
-            {
-                Id = user.Id,
-                UserName = user.UserName,
-                Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                ProfilePictureBase64 = user.ProfilePictureBase64,
-                Roles = roles.ToList()
-            };
-
-            return Ok(profileResponse);
+            var updated = await _profileService.UpdateAsync(User, updateRequest);
+            return Ok(updated);
         }
-
-
     }
 }

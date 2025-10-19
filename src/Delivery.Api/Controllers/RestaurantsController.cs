@@ -1,399 +1,106 @@
-﻿using System.Security.Claims;
-using Delivery.Api.Contracts;
-using Delivery.Api.Contracts.Helper;
-using Delivery.Api.Contracts.Restaurants;
-using Delivery.Domain.Entities.HelperEntities;
+﻿using Delivery.Application.Dtos.CommonDtos.AddressDtos;
+using Delivery.Application.Dtos.CommonDtos.BaseWordSchedDtos;
+using Delivery.Application.Dtos.DishDtos;
+using Delivery.Application.Dtos.RestaurantDtos;
+using Delivery.Application.Dtos.RestaurantDtos.Requests;
+using Delivery.Application.Dtos.RestaurantDtos.Responses;
+using Delivery.Application.Dtos.Users.WorkerDtos.Requests;
+using Delivery.Application.Interfaces;
 using Delivery.Domain.Entities.RestaurantEntities;
 using Delivery.Domain.Entities.UserEntities;
-using Delivery.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+namespace Delivery.Api.Controllers;
 
-namespace Delivery.Api.Controllers
+[ApiController]
+[Route("api/[controller]")]
+[Authorize]
+
+public class RestaurantsController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    [Authorize]
-    public class RestaurantsController : ControllerBase
+    private readonly IRestaurantService _restaurantService;
+
+    public RestaurantsController(IRestaurantService restaurantService)
     {
-        private readonly ApplicationDbContext _dbContext;
-        private readonly UserManager<User> _userManager;
-
-        public RestaurantsController(ApplicationDbContext dbContext, UserManager<User> userManager)
-        {
-           _dbContext = dbContext;
-           _userManager = userManager;
-        }
-
-        [HttpGet("all")]
-        [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> GetAll()
-        {
-            var restaurants = await _dbContext.Restaurants
-                .Include(r => r.Owner)
-                    .ThenInclude(o => o.User)
-                .Include(r => r.Address)
-                .ToListAsync();
-
-            var response = restaurants.Select(r => new RestaurantSummaryResponse
-            {
-                Id = r.Id,
-                Name = r.Name,
-                Description = r.Description,
-                PhoneNumber = r.PhoneNumber,
-                Address = new AddressDto
-                {
-                    StreetAndNumber = r.Address.StreetAndNumber,
-                    City = r.Address.City,
-                    PostalCode = r.Address.PostalCode
-                },
-                Owner = new OwnerDto
-                {
-                    Id = r.Owner.Id,
-                    UserId = r.Owner.UserId,
-                    FirstName = r.Owner.User.FirstName,
-                    LastName = r.Owner.User.LastName
-                }
-            }).ToList();
-
-            if (!response.Any())
-            {
-                return Ok(response);
-            }
-
-            return Ok(response);
-        }
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById([FromRoute] Guid id)
-        {
-            var restaurant = await _dbContext.Restaurants
-                .Include(r => r.Owner)
-                    .ThenInclude(o => o.User)
-                .Include(r => r.Address)
-                .Include(r => r.BaseWorkSched)
-                .FirstOrDefaultAsync(r => r.Id == id);
-
-            if (restaurant == null)
-            {
-                return NotFound();
-            }
-
-
-
-            var response = new RestaurantDetailResponse()
-            {
-                Id = restaurant.Id,
-                Name = restaurant.Name,
-                Description = restaurant.Description,
-                PhoneNumber = restaurant.PhoneNumber,
-                Image = restaurant.Image,
-                Address = new AddressDto
-                {
-                    StreetAndNumber = restaurant.Address.StreetAndNumber,
-                    City = restaurant.Address.City,
-                    PostalCode = restaurant.Address.PostalCode
-                },
-                Owner = new OwnerDto
-                {
-                    Id = restaurant.Owner.Id,
-                    UserId = restaurant.Owner.UserId,
-                    FirstName = restaurant.Owner.User.FirstName,
-                    LastName = restaurant.Owner.User.LastName
-                },
-                BaseWorkSched = new BaseWorkSchedDto
-                {
-                    Id = restaurant.BaseWorkSched.Id,
-                    Saturday = restaurant.BaseWorkSched.Saturday,
-                    Sunday = restaurant.BaseWorkSched.Sunday,
-                    WorkDayStart = restaurant.BaseWorkSched.WorkDayStart,
-                    WorkDayEnd = restaurant.BaseWorkSched.WorkDayEnd,
-                    WeekendStart = restaurant.BaseWorkSched.WeekendStart,
-                    WeekendEnd = restaurant.BaseWorkSched.WeekendEnd
-                }
-            };
-
-            return Ok(response);
-        }
-
-
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] RestaurantCreateRequest createRequest)
-        {
-            var restaurant = new Restaurant()
-            {
-                Name = createRequest.Name,
-                Description = "Popuni",
-                PhoneNumber = "Popuni",
-                Image = "",
-                Address = new Address()
-                {
-                    StreetAndNumber = "Popuni",
-                    City = "Popuni",
-                    PostalCode = "Popuni"
-                },
-                OwnerId = createRequest.OwnerId,
-                BaseWorkSched = new BaseWorkSched()
-                {
-                    Saturday = true,
-                    Sunday = true,
-                    WorkDayStart = new TimeSpan(8, 0, 0),
-                    WorkDayEnd = new TimeSpan(17, 0, 0),
-                    WeekendStart = new TimeSpan(10, 0, 0),
-                    WeekendEnd = new TimeSpan(16, 0, 0)
-                }
-            };
-
-            _dbContext.Restaurants.Add(restaurant);
-
-            await _dbContext.SaveChangesAsync();
-
-            var restaurantUpdated = await _dbContext.Restaurants
-                .Include(r => r.Owner)
-                    .ThenInclude(o => o.User)
-                .Include(r => r.Address)
-                .FirstOrDefaultAsync(r => r.Id == restaurant.Id);
-
-            var response = new RestaurantDetailResponse()
-            {
-                Id = restaurantUpdated.Id,
-                Name = restaurantUpdated.Name,
-                Description = restaurantUpdated.Description,
-                PhoneNumber = restaurantUpdated.PhoneNumber,
-                Address = new AddressDto
-                {
-                    StreetAndNumber = restaurantUpdated.Address.StreetAndNumber,
-                    City = restaurantUpdated.Address.City,
-                    PostalCode = restaurantUpdated.Address.PostalCode
-                },
-                Owner = new OwnerDto
-                {
-                    Id = restaurantUpdated.Owner.Id,
-                    UserId = restaurantUpdated.Owner.UserId,
-                    FirstName = restaurantUpdated.Owner.User.FirstName,
-                    LastName = restaurantUpdated.Owner.User.LastName
-                }
-            };
-
-            return Ok(response);
-        }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update([FromForm] RestaurantUpdateRequest updateRequest, IFormFile? file, [FromRoute] Guid id)
-        {
-            var restaurant = await _dbContext.Restaurants
-                .Include(r => r.Owner)
-                    .ThenInclude(o => o.User)
-                .Include(r => r.Address)
-                .Include(r => r.BaseWorkSched)
-                .FirstOrDefaultAsync(r => r.Id == id);
-
-            if (restaurant == null)
-            {
-                return NotFound();
-            }
-
-            restaurant.Name = updateRequest.Name;
-            restaurant.Description = updateRequest.Description;
-            restaurant.PhoneNumber = updateRequest.PhoneNumber;
-            restaurant.Address.StreetAndNumber = updateRequest.Address.StreetAndNumber;
-            restaurant.Address.City = updateRequest.Address.City;
-            restaurant.Address.PostalCode = updateRequest.Address.PostalCode;
-            if (updateRequest.BaseWorkSched != null)
-            {
-                restaurant.BaseWorkSched.Saturday = updateRequest.BaseWorkSched.Saturday;
-                restaurant.BaseWorkSched.Sunday = updateRequest.BaseWorkSched.Sunday;
-                restaurant.BaseWorkSched.WorkDayStart = updateRequest.BaseWorkSched.WorkDayStart;
-                restaurant.BaseWorkSched.WorkDayEnd = updateRequest.BaseWorkSched.WorkDayEnd;
-                restaurant.BaseWorkSched.WeekendStart = updateRequest.BaseWorkSched.WeekendStart;
-                restaurant.BaseWorkSched.WeekendEnd = updateRequest.BaseWorkSched.WeekendEnd;
-            }
-
-
-            if (file != null && file.Length > 0)
-            {
-                using var ms = new MemoryStream();
-                await file.CopyToAsync(ms);
-                var fileBytes = ms.ToArray();
-
-                restaurant.Image = $"data:{file.ContentType};base64,{Convert.ToBase64String(fileBytes)}";
-            }
-
-            await _dbContext.SaveChangesAsync();
-
-            var response = new RestaurantDetailResponse()
-            {
-                Id = restaurant.Id,
-                Name = restaurant.Name,
-                Description = restaurant.Description,
-                PhoneNumber = restaurant.PhoneNumber,
-                Image = restaurant.Image,
-                Address = new AddressDto
-                {
-                    StreetAndNumber = restaurant.Address.StreetAndNumber,
-                    City = restaurant.Address.City,
-                    PostalCode = restaurant.Address.PostalCode
-                },
-                Owner = new OwnerDto
-                {
-                    Id = restaurant.Owner.Id,
-                    UserId = restaurant.Owner.UserId,
-                    FirstName = restaurant.Owner.User.FirstName,
-                    LastName = restaurant.Owner.User.LastName
-                },
-                BaseWorkSched = new BaseWorkSchedDto
-                {
-                    Id = restaurant.BaseWorkSched.Id,
-                    Saturday = restaurant.BaseWorkSched.Saturday,
-                    Sunday = restaurant.BaseWorkSched.Sunday,
-                    WorkDayStart = restaurant.BaseWorkSched.WorkDayStart,
-                    WorkDayEnd = restaurant.BaseWorkSched.WorkDayEnd,
-                    WeekendStart = restaurant.BaseWorkSched.WeekendStart,
-                    WeekendEnd = restaurant.BaseWorkSched.WeekendEnd
-                }
-            };
-
-            return Ok(response);
-
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete([FromRoute] Guid id)
-        {
-            var restaurant = await _dbContext.Restaurants.FindAsync(id);
-
-            if (restaurant == null)
-            {
-                return NotFound();
-            }
-
-             _dbContext.Restaurants.Remove(restaurant);
-            await _dbContext.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        [HttpGet("{id}/menu")]
-        public async Task<IActionResult> GetRestaurantMenu([FromRoute] Guid id)
-        {
-            var restaurant = await _dbContext.Restaurants
-                .Include(r => r.Menus)
-                    .ThenInclude(m => m.Dishes)
-                .FirstOrDefaultAsync(r => r.Id == id);
-
-            if (restaurant == null)
-            {
-                return NotFound();
-            }
-
-            var response = new RestaurantMenuResponse
-            {
-                Id = restaurant.Id,
-                Name = restaurant.Name,
-                Description = restaurant.Description,
-                PhoneNumber = restaurant.PhoneNumber,
-                Menus = restaurant.Menus.Select(m => new MenuDto
-                {
-                    Id = m.Id,
-                    Name = m.Name,
-                    Dishes = m.Dishes.Select(d => new DishDto
-                    {
-                        Id = d.Id,
-                        Name = d.Name,
-                        Description = d.Description,
-                        Price = d.Price
-                    }).ToList()
-                }).ToList()
-            };
-            return Ok(response);
-        }
-
-        [HttpPost("{restaurantId}/workers")]
-        [Authorize(Roles = "Owner")]
-        public async Task<IActionResult> RegisterWorker(Guid restaurantId, [FromBody] RegisterWorkerRequest request)
-        {
-
-            var restaurant = await _dbContext.Restaurants.FindAsync(restaurantId);
-
-            var user = await _userManager.GetUserAsync(User);
-
-            var owner = await _dbContext.Owners.FirstOrDefaultAsync(o => o.UserId == user.Id);
-
-            var newUser = new User
-            {
-                UserName = request.UserName,
-                Email = request.Email,
-                FirstName = request.FirstName,
-                LastName = request.LastName,
-            };
-
-            var result = await _userManager.CreateAsync(newUser, request.Password);
-
-            await _userManager.AddToRoleAsync(newUser, "Worker");
-
-            var workerProfile = new Worker
-            {
-                UserId = newUser.Id,
-                RestaurantId = restaurantId,
-                IsSuspended = false
-            };
-            _dbContext.Workers.Add(workerProfile);
-            await _dbContext.SaveChangesAsync();
-
-            return Ok();
-        }
-
-        [HttpGet("my-restaurants")]
-        public async Task<IActionResult> GetMyRestaurants()
-        {
-            var user = await _userManager.GetUserAsync(User);
-
-            var owner = await _dbContext.Owners
-                .FirstOrDefaultAsync(o => o.UserId == user.Id);
-
-            var restaurants = await _dbContext.Restaurants
-                .Include(r => r.Address)
-                .Include(r => r.BaseWorkSched)
-                .Where(r => r.OwnerId == owner.Id)
-                .Select(r => new RestaurantSummaryResponse
-                {
-                Id = r.Id,
-                Name = r.Name,
-                Description = r.Description,
-                PhoneNumber = r.PhoneNumber,
-                Image = r.Image,
-                Address = new AddressDto
-                {
-                    StreetAndNumber = r.Address.StreetAndNumber,
-                    City = r.Address.City,
-                    PostalCode = r.Address.PostalCode
-                },
-                Owner = new OwnerDto
-                {
-                    Id = owner.Id,
-                    UserId = owner.UserId,
-                    FirstName = owner.User.FirstName,
-                    LastName = owner.User.LastName
-                },
-                BaseWorkSched = new BaseWorkSchedDto
-                {
-                    Id = r.BaseWorkSched.Id,
-                    Saturday = r.BaseWorkSched.Saturday,
-                    Sunday = r.BaseWorkSched.Sunday,
-                    WorkDayStart = r.BaseWorkSched.WorkDayStart,
-                    WorkDayEnd = r.BaseWorkSched.WorkDayEnd,
-                    WeekendStart = r.BaseWorkSched.WeekendStart,
-                    WeekendEnd = r.BaseWorkSched.WeekendEnd
-                }
-                }).ToListAsync();
-
-            return Ok(restaurants);
-        }
+        _restaurantService = restaurantService;
     }
 
-}
+    [HttpGet("paged")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetPagedAsync([FromQuery] RestaurantFiltersMix filters, int sort, int page)
+    {
+        var restaurants = await _restaurantService.GetPagedAsync(sort, filters, page);
 
+        return Ok(restaurants);
+    }
+
+    [HttpGet]
+    [Authorize(Roles = "Administrator")]
+    public async Task<IActionResult> GetAllAsync()
+    {
+        var restaurants = await _restaurantService.GetAllAsync();
+
+        return Ok(restaurants);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<RestaurantDetailResponseDto>> GetOneAsync([FromRoute] Guid id)
+    {
+        var restaurant = await _restaurantService.GetOneAsync(id);
+
+        return Ok(restaurant);
+    }
+
+    [HttpPost]
+    [Authorize(Roles = "Administrator")]
+    public async Task<ActionResult<RestaurantDetailResponseDto>> CreateAsync(RestaurantCreateRequestDto request)
+    {
+        var restaurant = await _restaurantService.AddAsync(request);
+
+        return CreatedAtAction("GetOne", new { id = restaurant.Id }, restaurant);
+    }
+
+    [HttpPut("{id}")]
+    [Authorize(Roles = "Administrator, Owner")]
+    public async Task<ActionResult> UpdateAsync([FromForm] RestaurantUpdateRequestDto updateRequest, IFormFile? file, [FromRoute] Guid id)
+    {
+        await _restaurantService.UpdateAsync(id, updateRequest, file);
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "Administrator, Owner")]
+    public async Task<ActionResult> DeleteAsync([FromRoute] Guid id)
+    {
+        await _restaurantService.DeleteAsync(id);
+
+        return NoContent();
+    }
+
+    [HttpGet("{id}/menu")]
+    public async Task<IActionResult> GetRestaurantMenuAsync([FromRoute] Guid id)
+    {
+        var response = await _restaurantService.GetRestaurantMenuAsync(id);
+        return Ok(response);
+    }
+
+    [HttpPost("{restaurantId}/workers")]
+    [Authorize(Roles = "Owner")]
+    public async Task<IActionResult> RegisterWorkerAsync(Guid restaurantId, [FromBody] WorkerCreateRequestDto request)
+    {
+        var worker = await _restaurantService.RegisterWorkerAsync(restaurantId, request, User);
+        return Ok();
+    }
+
+    [Authorize(Roles = "Owner")]
+    [HttpGet("my-restaurants")]
+    public async Task<IActionResult> GetMyRestaurantsAsync()
+    {
+        var restaurants = await _restaurantService.GetMyRestaurantsAsync(User);
+        return Ok(restaurants);
+    }
+}
