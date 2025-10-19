@@ -16,7 +16,6 @@ public class Restaurant
     public Guid OwnerId { get; set; }
     public virtual Owner? Owner { get; set; }
 
-    public Guid? BaseWorkSchedId { get; set; }
     public virtual BaseWorkSched? BaseWorkSched { get; set; }
 
     public string Image { get; set; }

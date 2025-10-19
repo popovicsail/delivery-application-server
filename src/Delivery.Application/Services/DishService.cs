@@ -21,14 +21,7 @@ public class DishService : IDishService
     public async Task<IEnumerable<DishSummaryResponseDto>> GetAllAsync()
     {
         IEnumerable<Dish> dishes = await _unitOfWork.Dishes.GetAllAsync();
-
-        var response = new List<DishSummaryResponseDto>();
-
-        foreach (var dish in dishes)
-        {
-            response.Add(_mapper.Map<DishSummaryResponseDto>(dish));
-        }
-        return response;
+        return _mapper.Map<List<DishSummaryResponseDto>>(dishes.ToList());
     }
 
     public async Task<DishDetailResponseDto?> GetOneAsync(Guid id)
@@ -40,9 +33,7 @@ public class DishService : IDishService
             throw new NotFoundException($"Dish with ID '{id}' was not found.");
         }
 
-        var dishDto = _mapper.Map<DishDetailResponseDto>(dish);
-
-        return dishDto;
+        return _mapper.Map<DishDetailResponseDto>(dish);
     }
 
     public async Task<DishDetailResponseDto> AddAsync(DishCreateRequestDto request)
@@ -67,11 +58,9 @@ public class DishService : IDishService
 
         _mapper.Map(request, dish);
 
-        await _unitOfWork.Dishes.UpdateAsync(id, dish);
+        _unitOfWork.Dishes.Update(dish);
 
         await _unitOfWork.CompleteAsync();
-
-        return;
     }
 
     public async Task DeleteAsync(Guid id)
@@ -83,10 +72,8 @@ public class DishService : IDishService
             throw new NotFoundException($"Dish with ID '{id}' was not found.");
         }
 
-        await _unitOfWork.Dishes.DeleteAsync(id, dish);
+        _unitOfWork.Dishes.Delete(dish);
 
         await _unitOfWork.CompleteAsync();
-
-        return;
     }
 }

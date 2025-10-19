@@ -12,7 +12,10 @@ public class CommonMappings : Profile
 {
     public CommonMappings()
     {
-        CreateMap<BaseWorkSched, BaseWorkSchedDto>().ReverseMap();
+        CreateMap<BaseWorkSched, BaseWorkSchedDto>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ReverseMap()
+                .ForMember(dest => dest.Id, opt => opt.Ignore());
 
         CreateMap<AddressDto, Address>().ReverseMap();
 

@@ -17,6 +17,8 @@ public static class InfrastructureServiceExtensions
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")).UseSnakeCaseNamingConvention());
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IRestaurantRepository, Repositories.RestaurantRepository>();
+        services.AddScoped<IOwnerRepository, Repositories.OwnerRepository>();
 
         return services;
     }

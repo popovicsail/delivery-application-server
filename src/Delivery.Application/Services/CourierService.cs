@@ -23,14 +23,7 @@ public class CourierService : ICourierService
     public async Task<IEnumerable<CourierSummaryResponseDto>> GetAllAsync()
     {
         IEnumerable<Courier> couriers = await _unitOfWork.Couriers.GetAllAsync();
-
-        var response = new List<CourierSummaryResponseDto>();
-
-        foreach (var courier in couriers)
-        {
-            response.Add(_mapper.Map<CourierSummaryResponseDto>(courier));
-        }
-        return response;
+        return _mapper.Map<List<CourierSummaryResponseDto>>(couriers.ToList());
     }
 
     public async Task<CourierDetailResponseDto?> GetOneAsync(Guid id)
@@ -42,9 +35,7 @@ public class CourierService : ICourierService
             throw new NotFoundException($"Courier with ID '{id}' was not found.");
         }
 
-        var courierDto = _mapper.Map<CourierDetailResponseDto>(courier);
-
-        return courierDto;
+        return _mapper.Map<CourierDetailResponseDto>(courier);
     }
 
     public async Task<CourierDetailResponseDto> AddAsync(CourierCreateRequestDto request)
@@ -85,11 +76,9 @@ public class CourierService : ICourierService
 
         _mapper.Map(courierDto, courier);
 
-        await _unitOfWork.Couriers.UpdateAsync(id, courier);
+        _unitOfWork.Couriers.Update(courier);
 
         await _unitOfWork.CompleteAsync();
-
-        return;
     }
 
     public async Task DeleteAsync(Guid id)
@@ -101,10 +90,8 @@ public class CourierService : ICourierService
             throw new NotFoundException($"Courier with ID '{id}' was not found.");
         }
 
-        await _unitOfWork.Couriers.DeleteAsync(id, courier);
+        _unitOfWork.Couriers.Update(courier);
 
         await _unitOfWork.CompleteAsync();
-
-        return;
     }
 }
