@@ -33,7 +33,7 @@ namespace Delivery.Api.Controllers
         }
 
         [HttpPut("me")]
-        public async Task<IActionResult> UpdateAsync([FromBody] ProfileUpdateRequestDto updateRequest)
+        public async Task<IActionResult> UpdateAsync([FromForm] ProfileUpdateRequestDto updateRequest)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
@@ -41,9 +41,8 @@ namespace Delivery.Api.Controllers
                 return Unauthorized();
             }
 
-            var response = await _profileService.UpdateAsync(Guid.Parse(userId), updateRequest);
-
-            return Ok(response);
+            var updated = await _profileService.UpdateAsync(User, updateRequest);
+            return Ok(updated);
         }
     }
 }

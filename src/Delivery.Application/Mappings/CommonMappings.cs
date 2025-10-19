@@ -17,6 +17,10 @@ public class CommonMappings : Profile
             .ReverseMap()
                 .ForMember(dest => dest.Id, opt => opt.Ignore());
 
+        CreateMap<AddressCreateRequest, Address>();
+
+        CreateMap<AddressUpdateRequest, Address>();
+
         CreateMap<AddressDto, Address>().ReverseMap();
 
         CreateMap<AllergenCreateRequestDto, Allergen>();

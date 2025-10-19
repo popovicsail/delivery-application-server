@@ -3,6 +3,7 @@ using System;
 using Delivery.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Delivery.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251018223210_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -97,7 +100,7 @@ namespace Delivery.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("ad5c5c14-dbd0-4229-a8bf-3243de0d8e79"),
+                            Id = new Guid("aee8d08c-eced-40ee-a33a-cb64e8326103"),
                             City = "Beograd",
                             PostalCode = "11000",
                             StreetAndNumber = "Knez Mihailova 12"
@@ -236,8 +239,8 @@ namespace Delivery.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("12bc3d53-958e-423d-a9d7-965550ff2594"),
-                            RestaurantId = new Guid("2154035c-5fa1-4ae6-9cb1-994a40727efa"),
+                            Id = new Guid("2d3fb90b-e7b0-466d-b75d-62188baeba73"),
+                            RestaurantId = new Guid("5723690d-2abd-4726-86d8-a3a35d0de661"),
                             Saturday = true,
                             Sunday = true,
                             WeekendEnd = new TimeSpan(0, 21, 30, 0, 0),
@@ -339,9 +342,9 @@ namespace Delivery.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("b05d42e1-5cd3-467d-af2e-6ea77ae56f91"),
+                            Id = new Guid("02e1f759-93e4-4cb2-9f3b-eb39e105b4dd"),
                             Description = "Pica sa šunkom i sirom.",
-                            MenuId = new Guid("55555555-5555-5555-5555-555555555555"),
+                            MenuId = new Guid("6413cbf8-5268-44af-8712-4824b0552d12"),
                             Name = "Capricciosa",
                             Price = 750.0,
                             Type = "Pizza"
@@ -434,9 +437,9 @@ namespace Delivery.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("55555555-5555-5555-5555-555555555555"),
+                            Id = new Guid("6413cbf8-5268-44af-8712-4824b0552d12"),
                             Name = "Pizza Menu",
-                            RestaurantId = new Guid("2154035c-5fa1-4ae6-9cb1-994a40727efa")
+                            RestaurantId = new Guid("5723690d-2abd-4726-86d8-a3a35d0de661")
                         });
                 });
 
@@ -450,6 +453,10 @@ namespace Delivery.Infrastructure.Migrations
                     b.Property<Guid>("AddressId")
                         .HasColumnType("uuid")
                         .HasColumnName("address_id");
+
+                    b.Property<Guid?>("BaseWorkSchedId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("base_work_sched_id");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -490,8 +497,9 @@ namespace Delivery.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("2154035c-5fa1-4ae6-9cb1-994a40727efa"),
-                            AddressId = new Guid("ad5c5c14-dbd0-4229-a8bf-3243de0d8e79"),
+                            Id = new Guid("5723690d-2abd-4726-86d8-a3a35d0de661"),
+                            AddressId = new Guid("aee8d08c-eced-40ee-a33a-cb64e8326103"),
+                            BaseWorkSchedId = new Guid("2d3fb90b-e7b0-466d-b75d-62188baeba73"),
                             Description = "Autentična italijanska kuhinja.",
                             Image = "",
                             Name = "Pizzeria Roma",
@@ -702,7 +710,7 @@ namespace Delivery.Infrastructure.Migrations
                         {
                             Id = new Guid("b22698b8-42a2-4115-9631-1c2d1e2ac5f7"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "4143452c-7405-4e54-9d21-55ceebf83558",
+                            ConcurrencyStamp = "42b851a5-013e-440e-a530-a3ff0dbb1fdc",
                             Email = "admin1@example.com",
                             EmailConfirmed = true,
                             FirstName = "Main",
@@ -721,7 +729,7 @@ namespace Delivery.Infrastructure.Migrations
                         {
                             Id = new Guid("bfd2ac09-67d0-4caa-8042-c6241b4f4f7f"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "5b8091c8-4873-4516-9996-50aac8fb261a",
+                            ConcurrencyStamp = "59893f3e-2aa7-4da0-85ba-2aac094ecada",
                             Email = "admin2@example.com",
                             EmailConfirmed = true,
                             FirstName = "Second",
@@ -740,7 +748,7 @@ namespace Delivery.Infrastructure.Migrations
                         {
                             Id = new Guid("1ddc68db-bb87-4cef-bdf8-d369bc1d5334"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "b2c7f76f-d42f-4f47-a153-c8e000907579",
+                            ConcurrencyStamp = "37b29843-e108-4f6b-b64b-639709e2744a",
                             Email = "admin3@example.com",
                             EmailConfirmed = true,
                             FirstName = "Third",
@@ -759,7 +767,7 @@ namespace Delivery.Infrastructure.Migrations
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111111"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "5bcc759c-18fe-4ad4-b4b3-338173d7fe8b",
+                            ConcurrencyStamp = "b9438ae7-1dad-4bd6-8dbf-23d71b9f1d8f",
                             Email = "owner1@example.com",
                             EmailConfirmed = true,
                             FirstName = "Petar",
@@ -778,7 +786,7 @@ namespace Delivery.Infrastructure.Migrations
                         {
                             Id = new Guid("22222222-2222-2222-2222-222222222222"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "251d78e0-cbce-4e7e-abc0-5a3064a8b9f0",
+                            ConcurrencyStamp = "da29101a-2a9a-4d8b-9b9d-772fd229f77c",
                             Email = "customer1@example.com",
                             EmailConfirmed = true,
                             FirstName = "Marko",
