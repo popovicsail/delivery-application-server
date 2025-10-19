@@ -125,7 +125,7 @@ public class CustomerService : ICustomerService
         var newAddress = _mapper.Map<Address>(request);
         customer.Addresses.Add(newAddress);
 
-        await _unitOfWork.Customers.UpdateAsync(customer.Id, customer);
+        _unitOfWork.Customers.Update(customer);
         await _unitOfWork.CompleteAsync();
     }
 
@@ -142,7 +142,7 @@ public class CustomerService : ICustomerService
 
         _mapper.Map(request, address);
 
-        await _unitOfWork.Customers.UpdateAsync(customer.Id, customer);
+        _unitOfWork.Customers.Update(customer);
         await _unitOfWork.CompleteAsync();
     }
 
@@ -159,7 +159,7 @@ public class CustomerService : ICustomerService
 
         customer.Addresses.Remove(address);
 
-        await _unitOfWork.Customers.UpdateAsync(customer.Id, customer);
+        _unitOfWork.Customers.Update(customer);
         await _unitOfWork.CompleteAsync();
     }
 
@@ -202,7 +202,7 @@ public class CustomerService : ICustomerService
             customer.Allergens.Add(allergen);
         }
 
-        await _unitOfWork.Customers.UpdateAsync(customer.Id, customer);
+        _unitOfWork.Customers.Update(customer);
         await _unitOfWork.CompleteAsync();
     }
 
