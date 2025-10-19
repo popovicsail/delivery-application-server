@@ -29,14 +29,7 @@ public class CustomerService : ICustomerService
     public async Task<IEnumerable<CustomerSummaryResponseDto>> GetAllAsync()
     {
         IEnumerable<Customer> customers = await _unitOfWork.Customers.GetAllAsync();
-
-        var response = new List<CustomerSummaryResponseDto>();
-
-        foreach (var customer in customers)
-        {
-            response.Add(_mapper.Map<CustomerSummaryResponseDto>(customer));
-        }
-        return response;
+        return _mapper.Map<List<CustomerSummaryResponseDto>>(customers.ToList());
     }
 
     public async Task<CustomerDetailResponseDto?> GetOneAsync(Guid id)
@@ -48,9 +41,7 @@ public class CustomerService : ICustomerService
             throw new NotFoundException($"Customer with ID '{id}' was not found.");
         }
 
-        var customerDto = _mapper.Map<CustomerDetailResponseDto>(customer);
-
-        return customerDto;
+        return _mapper.Map<CustomerDetailResponseDto>(customer);
     }
 
     public async Task<CustomerDetailResponseDto> AddAsync(CustomerCreateRequestDto request)
@@ -94,8 +85,6 @@ public class CustomerService : ICustomerService
         _unitOfWork.Customers.Update(customer);
 
         await _unitOfWork.CompleteAsync();
-
-        return;
     }
 
     public async Task DeleteAsync(Guid id)
@@ -107,11 +96,13 @@ public class CustomerService : ICustomerService
             throw new NotFoundException($"Customer with ID '{id}' was not found.");
         }
 
+<<<<<<< HEAD
         _unitOfWork.Customers.Delete(customer);
+=======
+        _unitOfWork.Customers.Update(customer);
+>>>>>>> main
 
         await _unitOfWork.CompleteAsync();
-
-        return;
     }
 
     public async Task BirthdayVoucherBackgroundJobAsync()
@@ -248,7 +239,10 @@ public class CustomerService : ICustomerService
         }
 
         _unitOfWork.Customers.Update(customer);
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
         await _unitOfWork.CompleteAsync();
     }
 

@@ -10,6 +10,8 @@ using Delivery.Infrastructure.Persistence;
 using Delivery.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 
@@ -29,13 +31,15 @@ public class Program
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Host.UseSerilog();
+
             builder.Services.AddControllers().AddNewtonsoftJson();
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddCors(options =>
             {
-                options.AddDefaultPolicy(policy =>
+                options.AddPolicy("AllowReactApp", policy =>
                 {
                     policy.WithOrigins("https://localhost:5173", "http://localhost:5173")
                           .AllowAnyHeader()
@@ -75,13 +79,10 @@ public class Program
 
             builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 
-            using var serviceProvider = builder.Services.BuildServiceProvider();
-            var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
-            var configExpression = new MapperConfigurationExpression();
-            configExpression.AddMaps(typeof(RestaurantMappings).Assembly);
-            var mapperConfig = new MapperConfiguration(configExpression, loggerFactory);
-            IMapper mapper = mapperConfig.CreateMapper();
-            builder.Services.AddSingleton(mapper);
+            builder.Services.AddAutoMapper(cfg =>
+            {
+                cfg.AddMaps(typeof(RestaurantMappings).Assembly);
+            });
 
             var app = builder.Build();
 
@@ -95,7 +96,7 @@ public class Program
 
             app.UseHttpsRedirection();
 
-            app.UseCors();
+            app.UseCors("AllowReactApp");
 
             app.UseAuthentication();
             app.UseAuthorization();
@@ -106,6 +107,7 @@ public class Program
         catch (Exception ex)
         {
             Log.Fatal(ex, "ERROR: Fatal error");
+            throw;
         }
         finally
         {

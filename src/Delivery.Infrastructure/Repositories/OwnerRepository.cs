@@ -29,4 +29,12 @@ public class OwnerRepository : GenericRepository<Owner>, IOwnerRepository
 
         return owner;
     }
+
+    public async Task<Owner?> GetByUserIdAsync(Guid userId)
+    {
+        var owner = await _dbContext.Owners
+            .Include(o => o.User)
+            .FirstOrDefaultAsync(o => o.UserId == userId);
+        return owner;
+    }
 }

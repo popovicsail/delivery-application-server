@@ -21,14 +21,7 @@ public class AllergenService : IAllergenService
     public async Task<IEnumerable<AllergenSummaryResponseDto>> GetAllAsync()
     {
         IEnumerable<Allergen> allergens = await _unitOfWork.Allergens.GetAllAsync();
-
-        var response = new List<AllergenSummaryResponseDto>();
-
-        foreach (var allergen in allergens)
-        {
-            response.Add(_mapper.Map<AllergenSummaryResponseDto>(allergen));
-        }
-        return response;
+        return _mapper.Map<List<AllergenSummaryResponseDto>>(allergens.ToList());
     }
 
     public async Task<AllergenDetailResponseDto?> GetOneAsync(Guid id)
@@ -40,9 +33,7 @@ public class AllergenService : IAllergenService
             throw new NotFoundException($"Allergen with ID '{id}' was not found.");
         }
 
-        var allergenDto = _mapper.Map<AllergenDetailResponseDto>(allergen);
-
-        return allergenDto;
+        return _mapper.Map<AllergenDetailResponseDto>(allergen);
     }
 
     public async Task<AllergenDetailResponseDto> AddAsync(AllergenCreateRequestDto allergenDto)
@@ -70,8 +61,6 @@ public class AllergenService : IAllergenService
         _unitOfWork.Allergens.Update(allergen);
 
         await _unitOfWork.CompleteAsync();
-
-        return;
     }
 
     public async Task DeleteAsync(Guid id)
@@ -86,7 +75,5 @@ public class AllergenService : IAllergenService
         _unitOfWork.Allergens.Update(allergen);
 
         await _unitOfWork.CompleteAsync();
-
-        return;
     }
 }

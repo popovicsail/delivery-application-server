@@ -24,14 +24,7 @@ public class OwnerService : IOwnerService
     public async Task<IEnumerable<OwnerSummaryResponseDto>> GetAllAsync()
     {
         IEnumerable<Owner> owners = await _unitOfWork.Owners.GetAllAsync();
-
-        var response = new List<OwnerSummaryResponseDto>();
-
-        foreach (var owner in owners)
-        {
-            response.Add(_mapper.Map<OwnerSummaryResponseDto>(owner));
-        }
-        return response;
+        return _mapper.Map<List<OwnerSummaryResponseDto>>(owners.ToList());
     }
 
     public async Task<OwnerDetailResponseDto?> GetOneAsync(Guid id)
@@ -43,9 +36,7 @@ public class OwnerService : IOwnerService
             throw new NotFoundException($"Owner with ID '{id}' was not found.");
         }
 
-        var ownerDto = _mapper.Map<OwnerDetailResponseDto>(owner);
-
-        return ownerDto;
+        return _mapper.Map<OwnerDetailResponseDto>(owner);
     }
 
     public async Task<OwnerDetailResponseDto> AddAsync(OwnerCreateRequestDto request)
@@ -89,8 +80,6 @@ public class OwnerService : IOwnerService
         _unitOfWork.Owners.Update(owner);
 
         await _unitOfWork.CompleteAsync();
-
-        return;
     }
 
     public async Task DeleteAsync(Guid id)
@@ -102,10 +91,12 @@ public class OwnerService : IOwnerService
             throw new NotFoundException($"Owner with ID '{id}' was not found.");
         }
 
+<<<<<<< HEAD
         _unitOfWork.Owners.Delete(owner);
+=======
+        _unitOfWork.Owners.Update(owner);
+>>>>>>> main
 
         await _unitOfWork.CompleteAsync();
-
-        return;
     }
 }

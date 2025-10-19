@@ -1,5 +1,4 @@
-﻿using Delivery.Api.Contracts.Auth;
-using Delivery.Domain.Entities.CommonEntities;
+﻿using Delivery.Domain.Entities.CommonEntities;
 using Delivery.Domain.Entities.DishEntities;
 using Delivery.Domain.Entities.RestaurantEntities;
 using Delivery.Domain.Entities.UserEntities;
@@ -77,7 +76,7 @@ public static class TestSeed
             );            
 
         modelBuilder.Entity<Address>().HasData(new Address { Id = addressId, StreetAndNumber = "Knez Mihailova 12", City = "Beograd", PostalCode = "11000" });
-        modelBuilder.Entity<Restaurant>().HasData(new Restaurant { Id = restaurantId, Name = "Pizzeria Roma", Description = "Autentična italijanska kuhinja.", PhoneNumber = "222", Image = "", AddressId = addressId, OwnerId = ownerProfileId, BaseWorkSchedId = baseWorkSchedId });
+        modelBuilder.Entity<Restaurant>().HasData(new Restaurant { Id = restaurantId, Name = "Pizzeria Roma", Description = "Autentična italijanska kuhinja.", PhoneNumber = "222", Image = "", AddressId = addressId, OwnerId = ownerProfileId });
         modelBuilder.Entity<Menu>().HasData(new Menu { Id = menuId, Name = "Pizza Menu", RestaurantId = restaurantId });
         modelBuilder.Entity<Dish>().HasData(new Dish { Id = pizzaId, Name = "Capricciosa", Description = "Pica sa šunkom i sirom.", Price = 750, MenuId = menuId, Type = "Pizza" });
         modelBuilder.Entity<Voucher>().HasData(new Voucher { Id = voucherId, Name = "TestVaučer", DateIssued = DateTime.UtcNow, DiscountAmount = 1200, CustomerId = customerProfileId });

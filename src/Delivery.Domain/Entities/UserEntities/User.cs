@@ -1,5 +1,4 @@
-﻿using Delivery.Api.Contracts.Auth;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace Delivery.Domain.Entities.UserEntities;
 

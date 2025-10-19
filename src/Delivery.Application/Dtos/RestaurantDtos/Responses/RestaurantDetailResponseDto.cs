@@ -16,5 +16,6 @@ public class RestaurantDetailResponseDto
     public AddressDto Address { get; set; }
     public OwnerDetailResponseDto Owner { get; set; }
     public BaseWorkSchedDto BaseWorkSched { get; set; }
+    public List<MenuDto> Menus { get; set; }
 }
 

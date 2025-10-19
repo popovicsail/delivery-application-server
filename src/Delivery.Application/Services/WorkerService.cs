@@ -24,14 +24,7 @@ public class WorkerService : IWorkerService
     public async Task<IEnumerable<WorkerSummaryResponseDto>> GetAllAsync()
     {
         IEnumerable<Worker> workers = await _unitOfWork.Workers.GetAllAsync();
-
-        var response = new List<WorkerSummaryResponseDto>();
-
-        foreach (var worker in workers)
-        {
-            response.Add(_mapper.Map<WorkerSummaryResponseDto>(worker));
-        }
-        return response;
+        return _mapper.Map<List<WorkerSummaryResponseDto>>(workers.ToList());
     }
 
     public async Task<WorkerDetailResponseDto?> GetOneAsync(Guid id)
@@ -43,9 +36,7 @@ public class WorkerService : IWorkerService
             throw new NotFoundException($"Worker with ID '{id}' was not found.");
         }
 
-        var workerDto = _mapper.Map<WorkerDetailResponseDto>(worker);
-
-        return workerDto;
+        return _mapper.Map<WorkerDetailResponseDto>(worker);
     }
 
     public async Task<WorkerDetailResponseDto> AddAsync(WorkerCreateRequestDto request)
@@ -86,11 +77,9 @@ public class WorkerService : IWorkerService
 
         _mapper.Map(workerDto, worker);
 
-        _unitOfWork.Workers.Delete(worker);
+        _unitOfWork.Workers.Update(worker);
 
         await _unitOfWork.CompleteAsync();
-
-        return;
     }
 
     public async Task DeleteAsync(Guid id)
@@ -105,7 +94,5 @@ public class WorkerService : IWorkerService
         _unitOfWork.Workers.Delete(worker);
 
         await _unitOfWork.CompleteAsync();
-
-        return;
     }
 }
