@@ -3,6 +3,7 @@ using Delivery.Application.Dtos.CommonDtos.AddressDtos;
 using Delivery.Application.Dtos.CommonDtos.AllergenDtos.Requests;
 using Delivery.Application.Dtos.Users.CustomerDtos.Requests;
 using Delivery.Application.Dtos.Users.CustomerDtos.Responses;
+using Delivery.Domain.Entities.UserEntities;
 
 namespace Delivery.Application.Interfaces
 {
@@ -13,6 +14,8 @@ namespace Delivery.Application.Interfaces
         Task<CustomerDetailResponseDto> AddAsync(CustomerCreateRequestDto request);
         Task UpdateAsync(Guid id, CustomerUpdateRequestDto request);
         Task DeleteAsync(Guid id);
+
+        Task BirthdayVoucherBackgroundJobAsync();
 
         Task<List<AddressDto>> GetMyAddressesAsync(ClaimsPrincipal user);
         Task CreateAddressAsync(ClaimsPrincipal user, AddressCreateRequest request);

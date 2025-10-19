@@ -17,6 +17,7 @@ public class UnitOfWork : IUnitOfWork
     public IWorkerRepository Workers { get; private set; }
     public ICourierRepository Couriers { get; private set; }
     public IDishRepository Dishes { get; private set; }
+    public IVoucherRepository Vouchers { get; private set; }
 
     public UnitOfWork(ApplicationDbContext dbContext)
     {
@@ -30,6 +31,7 @@ public class UnitOfWork : IUnitOfWork
         Workers = new WorkerRepository(_dbContext);
         Couriers = new CourierRepository(_dbContext);
         Dishes = new DishRepository(_dbContext);
+        Vouchers = new VoucherRepository(_dbContext);
     }
 
     public Task<int> CompleteAsync()

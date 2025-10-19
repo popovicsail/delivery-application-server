@@ -23,7 +23,7 @@ public static class TestSeed
         ownerUser.PasswordHash = passwordHasher.HashPassword(ownerUser, "OwnerPass1!");
 
         var customerUserId = Guid.Parse("22222222-2222-2222-2222-222222222222");
-        var customerUser = new User { Id = customerUserId, UserName = "customer1", NormalizedUserName = "CUSTOMER1", Email = "customer1@example.com", NormalizedEmail = "CUSTOMER1@EXAMPLE.COM", FirstName = "Marko", LastName = "Markovic", EmailConfirmed = true, SecurityStamp = Guid.NewGuid().ToString(), ProfilePictureUrl = DefaultAvatar.Base64 };
+        var customerUser = new User { Id = customerUserId, UserName = "customer1", DateOfBirth = DateTime.UtcNow, NormalizedUserName = "CUSTOMER1", Email = "customer1@example.com", NormalizedEmail = "CUSTOMER1@EXAMPLE.COM", FirstName = "Marko", LastName = "Markovic", EmailConfirmed = true, SecurityStamp = Guid.NewGuid().ToString(), ProfilePictureUrl = DefaultAvatar.Base64 };
         customerUser.PasswordHash = passwordHasher.HashPassword(customerUser, "CustomerPass1!");
 
         var baseWorkSchedId = Guid.NewGuid();
@@ -45,7 +45,7 @@ public static class TestSeed
         // --- Ostali Test Podaci ---
         var addressId = Guid.NewGuid();
         var restaurantId = Guid.NewGuid();
-        var menuId = Guid.NewGuid();
+        var menuId = Guid.Parse("55555555-5555-5555-5555-555555555555");
         var pizzaId = Guid.NewGuid();
         var voucherId = Guid.NewGuid();
 
@@ -73,12 +73,12 @@ public static class TestSeed
             new Allergen { Id = Guid.NewGuid(), Name = "Gluten", Type = "Žitarice" },
             new Allergen { Id = Guid.NewGuid(), Name = "Pšenica", Type = "Žitarice" },
             new Allergen { Id = Guid.NewGuid(), Name = "Školjke", Type = "Morski plodovi" }
-            );            
+            );
 
         modelBuilder.Entity<Address>().HasData(new Address { Id = addressId, StreetAndNumber = "Knez Mihailova 12", City = "Beograd", PostalCode = "11000" });
         modelBuilder.Entity<Restaurant>().HasData(new Restaurant { Id = restaurantId, Name = "Pizzeria Roma", Description = "Autentična italijanska kuhinja.", PhoneNumber = "222", Image = "", AddressId = addressId, OwnerId = ownerProfileId });
         modelBuilder.Entity<Menu>().HasData(new Menu { Id = menuId, Name = "Pizza Menu", RestaurantId = restaurantId });
         modelBuilder.Entity<Dish>().HasData(new Dish { Id = pizzaId, Name = "Capricciosa", Description = "Pica sa šunkom i sirom.", Price = 750, MenuId = menuId, Type = "Pizza" });
-        modelBuilder.Entity<Voucher>().HasData(new Voucher { Id = voucherId, Name = "Rođendanski Vaučer", DateIssued = DateTime.UtcNow, DiscountAmount = 1200, CustomerId = customerProfileId });
+        modelBuilder.Entity<Voucher>().HasData(new Voucher { Id = voucherId, Name = "TestVaučer", DateIssued = DateTime.UtcNow, DiscountAmount = 1200, CustomerId = customerProfileId });
     }
 }

@@ -1,8 +1,5 @@
 ﻿using System.Security.Claims;
 using AutoMapper;
-using Delivery.Application.Dtos.CommonDtos.AddressDtos;
-using Delivery.Application.Dtos.CommonDtos.BaseWordSchedDtos;
-using Delivery.Application.Dtos.DishDtos;
 using Delivery.Application.Dtos.RestaurantDtos;
 using Delivery.Application.Dtos.RestaurantDtos.Requests;
 using Delivery.Application.Dtos.RestaurantDtos.Responses;
@@ -17,7 +14,6 @@ using Delivery.Domain.Entities.UserEntities;
 using Delivery.Domain.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 
 namespace Delivery.Application.Services;

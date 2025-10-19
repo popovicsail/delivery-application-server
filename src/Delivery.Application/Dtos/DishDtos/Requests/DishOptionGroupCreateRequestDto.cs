@@ -1,6 +1,4 @@
-﻿using Delivery.Application.Dtos.DishDtos.Requests;
-
-public class DishOptionGroupCreateRequestDto
+﻿public class DishOptionGroupCreateRequestDto
 {
     public string Name { get; set; }
     public Guid DishId { get; set; }

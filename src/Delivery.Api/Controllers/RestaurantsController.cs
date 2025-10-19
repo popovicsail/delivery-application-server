@@ -1,17 +1,10 @@
-﻿using Delivery.Application.Dtos.CommonDtos.AddressDtos;
-using Delivery.Application.Dtos.CommonDtos.BaseWordSchedDtos;
-using Delivery.Application.Dtos.DishDtos;
-using Delivery.Application.Dtos.RestaurantDtos;
-using Delivery.Application.Dtos.RestaurantDtos.Requests;
+﻿using Delivery.Application.Dtos.RestaurantDtos.Requests;
 using Delivery.Application.Dtos.RestaurantDtos.Responses;
 using Delivery.Application.Dtos.Users.WorkerDtos.Requests;
 using Delivery.Application.Interfaces;
 using Delivery.Domain.Entities.RestaurantEntities;
-using Delivery.Domain.Entities.UserEntities;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Delivery.Api.Controllers;
 

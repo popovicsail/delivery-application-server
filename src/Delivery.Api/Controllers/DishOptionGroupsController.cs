@@ -1,6 +1,4 @@
-﻿using Delivery.Application.Dtos.DishDtos.Requests;
-using Delivery.Application.Dtos.DishDtos.Responses;
-using Delivery.Application.Interfaces;
+﻿using Delivery.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 [Route("api/[controller]")]

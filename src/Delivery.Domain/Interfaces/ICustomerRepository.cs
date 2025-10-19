@@ -4,5 +4,6 @@ namespace Delivery.Domain.Interfaces;
 
 public interface ICustomerRepository : IGenericRepository<Customer>
 {
-    Task<Customer?> GetOneAsync(Guid userId);
+    Task<IEnumerable<Customer?>> GetBirthdayCustomersAsync();
+    public Task<bool> HasReceivedBirthdayVoucherInLastYearAsync(Guid customerId);
 }

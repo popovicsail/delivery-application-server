@@ -1,7 +1,4 @@
-﻿using Delivery.Application.Dtos.DishDtos.Requests;
-using Delivery.Application.Dtos.DishDtos.Responses;
-
-namespace Delivery.Application.Interfaces;
+﻿namespace Delivery.Application.Interfaces;
 
 public interface IDishOptionGroupService
 {

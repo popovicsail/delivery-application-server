@@ -1,5 +1,4 @@
 using System.Text;
-using AutoMapper;
 using Delivery.Api.Middleware;
 using Delivery.Application;
 using Delivery.Application.Interfaces;
@@ -10,8 +9,6 @@ using Delivery.Infrastructure.Persistence;
 using Delivery.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Delivery.Application.Dtos.Users.AdministratorDtos.Responses
+﻿namespace Delivery.Application.Dtos.Users.AdministratorDtos.Responses
 {
     public class UserDeletedResponseDto
     {

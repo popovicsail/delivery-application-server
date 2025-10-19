@@ -1,5 +1,4 @@
-﻿using System.IO.Compression;
-using AutoMapper;
+﻿using AutoMapper;
 using Delivery.Application.Dtos.RestaurantDtos.Requests;
 using Delivery.Application.Dtos.RestaurantDtos.Responses;
 using Delivery.Domain.Entities.RestaurantEntities;

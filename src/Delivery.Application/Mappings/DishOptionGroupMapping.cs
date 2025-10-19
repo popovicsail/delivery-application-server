@@ -1,7 +1,4 @@
 ﻿using AutoMapper;
-using Delivery.Application.Dtos.DishDtos.Requests;
-using Delivery.Application.Dtos.DishDtos.Responses;
-using Delivery.Domain.Entities.DishEntities;
 
 public class DishOptionGroupMapping : Profile
 {

@@ -101,6 +101,38 @@ public class CustomerService : ICustomerService
         await _unitOfWork.CompleteAsync();
     }
 
+    public async Task BirthdayVoucherBackgroundJobAsync()
+    {
+        var birthdayCustomers = await _unitOfWork.Customers.GetBirthdayCustomersAsync();
+
+        if (birthdayCustomers == null || !birthdayCustomers.Any())
+        {
+            return;
+        }
+
+        foreach (var customer in birthdayCustomers)
+        {
+            var alreadyReceived = await _unitOfWork.Customers
+                .HasReceivedBirthdayVoucherInLastYearAsync(customer.Id);
+
+            if (alreadyReceived)
+            {
+                continue;
+            }
+
+            Voucher newVoucher = new Voucher
+            {
+                Name = "Birthday Voucher",
+                DiscountAmount = 2000,
+                CustomerId = customer.Id
+            };
+
+            await _unitOfWork.Vouchers.AddAsync(newVoucher);
+        }
+
+        await _unitOfWork.CompleteAsync();
+    }
+
     public async Task<List<AddressDto>> GetMyAddressesAsync(ClaimsPrincipal principal)
     {
         var user = await _userManager.GetUserAsync(principal);

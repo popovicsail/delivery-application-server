@@ -23,4 +23,33 @@ public class CustomerRepository : GenericRepository<Customer>, ICustomerReposito
             .FirstOrDefaultAsync(c => c.UserId == userId);
     }
 
+    public async Task<IEnumerable<Customer>> GetBirthdayCustomersAsync()
+    {
+        var today = DateTime.UtcNow;
+
+        IQueryable<Customer> query = _dbContext.Customers;
+
+        query = query
+                .Include(c => c.User);
+
+        query = query
+                .Where(c => c.User != null &&
+                            c.User.DateOfBirth.HasValue &&
+                            c.User.DateOfBirth.Value.Day == today.Day &&
+                            c.User.DateOfBirth.Value.Month == today.Month);
+
+        return await query.ToListAsync();
+    }
+
+    public async Task<bool> HasReceivedBirthdayVoucherInLastYearAsync(Guid customerId)
+    {
+        var oneYearAgo = DateTime.UtcNow.AddYears(-1);
+
+        return await _dbContext.Vouchers.AnyAsync(v =>
+            v.CustomerId == customerId &&
+            v.Name == "Birthday Voucher" &&
+            v.DateIssued >= oneYearAgo
+        );
+    }
+
 }
