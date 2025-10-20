@@ -1,7 +1,7 @@
 ﻿namespace Delivery.Application.Exceptions;
 public class NotFoundException : Exception
 {
-    public NotFoundException(string message) : base("NotFoundTest")
+    public NotFoundException(string message) : base(message)
     {
 
     }

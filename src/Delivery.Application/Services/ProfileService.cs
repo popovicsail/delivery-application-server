@@ -45,8 +45,19 @@ namespace Delivery.Application.Services
                 ProfilePictureUrl = user.ProfilePictureUrl
             };
 
+            // Ako je kurir, povuci i status
+            if (roles.Contains("Courier"))
+            {
+                var courier = await _unitOfWork.Couriers.GetOneWithUserAsync(user.Id);
+                if (courier != null)
+                {
+                    response.Status = courier.WorkStatus;
+                }
+            }
+
             return response;
         }
+
 
         public async Task<ProfileResponseDto> UpdateAsync(ClaimsPrincipal principal, ProfileUpdateRequestDto request)
         {

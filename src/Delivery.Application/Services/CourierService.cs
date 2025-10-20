@@ -1,11 +1,12 @@
 ﻿using AutoMapper;
+using Delivery.Application.Dtos.Users.CourierDtos.Requests;
+using Delivery.Application.Dtos.Users.CourierDtos.Responses;
 using Delivery.Application.Exceptions;
 using Delivery.Application.Interfaces;
+using Delivery.Domain.Entities.CommonEntities;
 using Delivery.Domain.Entities.UserEntities;
 using Delivery.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
-using Delivery.Application.Dtos.Users.CourierDtos.Requests;
-using Delivery.Application.Dtos.Users.CourierDtos.Responses;
 
 namespace Delivery.Application.Services;
 
@@ -28,7 +29,7 @@ public class CourierService : ICourierService
 
     public async Task<CourierDetailResponseDto?> GetOneAsync(Guid id)
     {
-        var courier = await _unitOfWork.Couriers.GetOneAsync(id);
+        var courier = await _unitOfWork.Couriers.GetOneWithUserAsync(id);
 
         if (courier == null)
         {
@@ -93,5 +94,98 @@ public class CourierService : ICourierService
         _unitOfWork.Couriers.Update(courier);
 
         await _unitOfWork.CompleteAsync();
+    }
+
+    public async Task UpdateWorkSchedulesAsync(Guid courierId, CourierWorkSchedulesUpdateRequestDto request)
+    {
+        var courier = await _unitOfWork.Couriers.GetOneWithUserAsync(courierId);
+        if (courier == null)
+            throw new NotFoundException($"Courier with ID '{courierId}' was not found.");
+
+        // ✅ Validacija dnevnog limita (≤10h)
+        foreach (var s in request.Schedules)
+        {
+            var dailyHours = (s.WorkEnd - s.WorkStart).TotalHours;
+            if (dailyHours > 10)
+                throw new BadRequestException("Radno vreme ne može biti duže od 10h dnevno.");
+        }
+
+        // ✅ Validacija nedeljnog limita (≤40h)
+        var totalHours = request.Schedules.Sum(s => (s.WorkEnd - s.WorkStart).TotalHours);
+        if (totalHours > 40)
+            throw new BadRequestException("Ukupno radno vreme ne može biti duže od 40h nedeljno.");
+
+        // Očisti stare rasporede
+        courier.WorkSchedules.Clear();
+
+        // Mapiraj nove rasporede pomoću AutoMapper-a
+        var newSchedules = _mapper.Map<List<WorkSchedule>>(request.Schedules);
+        foreach (var schedule in newSchedules)
+        {
+            courier.WorkSchedules.Add(schedule);
+        }
+
+        _unitOfWork.Couriers.Update(courier);
+        await _unitOfWork.CompleteAsync();
+    }
+
+
+    public async Task UpdateAllCouriersStatusAsync()
+    {
+        var couriers = await _unitOfWork.Couriers.GetAllWithSchedulesAsync();
+        var now = DateTime.Now;
+        var today = now.DayOfWeek.ToString();
+        var yesterday = now.AddDays(-1).DayOfWeek.ToString();
+
+        foreach (var courier in couriers)
+        {
+            var isActive = courier.WorkSchedules
+                .Where(ws =>
+                    ws.WeekDay.Equals(today, StringComparison.OrdinalIgnoreCase) ||
+                    ws.WeekDay.Equals(yesterday, StringComparison.OrdinalIgnoreCase)
+                )
+                .Any(ws => InShift(now.TimeOfDay, ws.WorkStart, ws.WorkEnd));
+
+            courier.WorkStatus = isActive ? "AKTIVAN" : "NEAKTIVAN";
+            _unitOfWork.Couriers.Update(courier);
+        }
+
+        await _unitOfWork.CompleteAsync();
+    }
+
+    public async Task<CourierStatusResponseDto> GetCourierStatusAsync(Guid courierId)
+    {
+        var courier = await _unitOfWork.Couriers.GetOneWithUserAsync(courierId);
+        if (courier == null)
+            throw new NotFoundException($"Courier with ID '{courierId}' was not found.");
+
+        return new CourierStatusResponseDto
+        {
+            Status = courier.WorkStatus
+        };
+    }
+
+    public async Task<IEnumerable<WorkSchedule>> GetMyWorkSchedulesAsync(Guid courierId)
+    {
+        var courier = await _unitOfWork.Couriers.GetOneWithUserAsync(courierId);
+
+        if (courier == null)
+            throw new NotFoundException("Kurir nije pronađen.");
+
+        return courier.WorkSchedules;
+    }
+
+    private bool InShift(TimeSpan now, TimeSpan start, TimeSpan end)
+    {
+        if (start <= end)
+        {
+            // normalna smena u istom danu
+            return now >= start && now <= end;
+        }
+        else
+        {
+            // smena prelazi preko ponoći (npr. 22:00–02:00)
+            return now >= start || now <= end;
+        }
     }
 }

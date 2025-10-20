@@ -9,4 +9,5 @@ public class ProfileResponseDto
     public string LastName { get; set; }
     public string ProfilePictureUrl { get; set; }
     public IEnumerable<string> Roles { get; set; }
+    public string? Status { get; set; }
 }

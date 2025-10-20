@@ -18,19 +18,20 @@ namespace Delivery.Api.Controllers
             _profileService = profileService;
         }
 
-        [HttpGet("me")]
-        public async Task<IActionResult> GetOneAsync()
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
+[HttpGet("me")]
+public async Task<IActionResult> GetOneAsync()
+{
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (userId == null)
+    {
+        return Unauthorized();
+    }
 
-            var profile = await _profileService.GetOneAsync(Guid.Parse(userId));
+    var profile = await _profileService.GetOneAsync(Guid.Parse(userId));
 
-            return Ok(profile);
-        }
+
+    return Ok(profile);
+}
 
         [HttpPut("me")]
         public async Task<IActionResult> UpdateAsync([FromForm] ProfileUpdateRequestDto updateRequest)
