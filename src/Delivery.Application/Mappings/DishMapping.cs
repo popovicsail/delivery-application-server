@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Delivery.Application.Dtos.DishDtos;
 using Delivery.Application.Dtos.DishDtos.Requests;
 using Delivery.Application.Dtos.DishDtos.Responses;
 using Delivery.Application.Dtos.RestaurantDtos;
@@ -12,7 +13,8 @@ public class DishMappings : Profile
 {
     public DishMappings()
     {
-        CreateMap<Menu, MenuDto>();
+        CreateMap<Menu, MenuDto>().ReverseMap();
+        CreateMap<Dish, DishDto>().ReverseMap();
         CreateMap<DishCreateRequestDto, Dish>();
 
         CreateMap<DishUpdateRequestDto, Dish>();
