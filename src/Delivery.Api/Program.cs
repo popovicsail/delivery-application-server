@@ -1,6 +1,7 @@
 using System.Text;
 using Delivery.Api.Middleware;
 using Delivery.Application;
+using Delivery.Application.BackgroundServices;
 using Delivery.Application.Interfaces;
 using Delivery.Application.Mappings;
 using Delivery.Domain.Entities.UserEntities;
@@ -80,6 +81,8 @@ public class Program
             {
                 cfg.AddMaps(typeof(RestaurantMappings).Assembly);
             });
+
+            builder.Services.AddHostedService<CourierStatusUpdater>();
 
             var app = builder.Build();
 

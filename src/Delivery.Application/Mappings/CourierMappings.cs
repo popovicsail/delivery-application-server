@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
-using Delivery.Application.Dtos.Users.CourierDtos.Responses;
 using Delivery.Application.Dtos.Users.CourierDtos.Requests;
+using Delivery.Application.Dtos.Users.CourierDtos.Responses;
+using Delivery.Domain.Entities.CommonEntities;
 using Delivery.Domain.Entities.UserEntities;
 
 namespace Delivery.Application.Mappings;
@@ -24,5 +25,9 @@ public class CourierMappings : Profile
             opt => opt.MapFrom(src => src.User.FirstName))
             .ForMember(dest => dest.LastName,
             opt => opt.MapFrom(src => src.User.LastName));
+
+        CreateMap<WorkScheduleUpdateRequestDto, WorkSchedule>();
+        CreateMap<CourierWorkSchedulesUpdateRequestDto, Courier>()
+            .ForMember(dest => dest.WorkSchedules, opt => opt.MapFrom(src => src.Schedules));
     }
 }
