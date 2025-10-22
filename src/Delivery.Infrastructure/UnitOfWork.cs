@@ -3,6 +3,7 @@ using Delivery.Infrastructure.Persistence;
 using Delivery.Infrastructure.Repositories;
 
 
+
 namespace Delivery.Infrastructure;
 
 public class UnitOfWork : IUnitOfWork
@@ -18,6 +19,8 @@ public class UnitOfWork : IUnitOfWork
     public ICourierRepository Couriers { get; private set; }
     public IDishRepository Dishes { get; private set; }
     public IVoucherRepository Vouchers { get; private set; }
+    public IOrderItemsRepository OrderItems { get; private set; }
+    public IOrdersRepository Orders { get; private set; }
 
     public UnitOfWork(ApplicationDbContext dbContext)
     {
@@ -32,6 +35,8 @@ public class UnitOfWork : IUnitOfWork
         Couriers = new CourierRepository(_dbContext);
         Dishes = new DishRepository(_dbContext);
         Vouchers = new VoucherRepository(_dbContext);
+        OrderItems = new OrderItemsRepository(_dbContext);
+        Orders = new OrdersRepository(_dbContext);
     }
 
     public Task<int> CompleteAsync()
