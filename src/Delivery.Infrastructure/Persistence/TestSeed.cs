@@ -45,7 +45,7 @@ public static class TestSeed
         // --- Ostali Test Podaci ---
         var addressId = Guid.NewGuid();
         var restaurantId = Guid.NewGuid();
-        var menuId = Guid.Parse("55555555-5555-5555-5555-555555555555");
+        var menuId = Guid.NewGuid();
         var pizzaId = Guid.NewGuid();
         var voucherId = Guid.NewGuid();
 

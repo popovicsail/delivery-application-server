@@ -1,7 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
-using Delivery.Application.BackgroundServices;
 using Delivery.Application.Interfaces;
 using Delivery.Application.Services;
 using Delivery.Domain.Entities.CommonEntities;

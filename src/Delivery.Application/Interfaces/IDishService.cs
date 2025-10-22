@@ -2,7 +2,7 @@
 
 public interface IDishService
 {
-    Task<IEnumerable<DishDetailResponseDto>> GetAllAsync();  // promenjeno
+    Task<IEnumerable<DishDetailResponseDto>> GetAllAsync();
     Task<DishDetailResponseDto?> GetOneAsync(Guid id);
     Task<DishDetailResponseDto> AddAsync(DishCreateRequestDto request);
     Task UpdateAsync(Guid id, DishUpdateRequestDto request);

@@ -1,9 +1,11 @@
-﻿using System.Security.Claims;
+﻿using System.ComponentModel;
+using System.Security.Claims;
 using AutoMapper;
 using Delivery.Application.Dtos.CommonDtos.AddressDtos;
 using Delivery.Application.Dtos.CommonDtos.AllergenDtos.Requests;
 using Delivery.Application.Dtos.Users.CustomerDtos.Requests;
 using Delivery.Application.Dtos.Users.CustomerDtos.Responses;
+using Delivery.Application.Dtos.Users.CustomerDtos.VoucherDtos.Responses;
 using Delivery.Application.Exceptions;
 using Delivery.Application.Interfaces;
 using Delivery.Domain.Entities.CommonEntities;
@@ -238,4 +240,23 @@ public class CustomerService : ICustomerService
         await _unitOfWork.CompleteAsync();
     }
 
+    public async Task<IEnumerable<VoucherDetailResponseDto>> GetMyVouchersAsync(ClaimsPrincipal User)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            throw new UnauthorizedException("Korisnik mora biti ulogovan");
+        }
+
+        var customer = await _unitOfWork.Customers.GetOneAsync(user.Id);
+        if (customer == null)
+        {
+            throw new NotFoundException("Customer profil nije pronađen.");
+        }
+
+        var vouchers = await _unitOfWork.Vouchers.GetVouchersByCustomerId(customer.Id);
+
+        return _mapper.Map<IEnumerable<VoucherDetailResponseDto>>(vouchers);
+    }
 }
+
