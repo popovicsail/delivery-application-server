@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Delivery.Application.BackgroundServices
+namespace Delivery.Infrastructure.BackgroundServices.CourierStatusUpdater
 {
     /// <summary>
     /// BackgroundService koji periodično osvežava status svih kurira

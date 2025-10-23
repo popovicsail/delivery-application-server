@@ -113,4 +113,14 @@ public class CustomersController : ControllerBase
         return NoContent();
 
     }
+
+
+
+    [HttpGet("my-vouchers")]
+    public async Task<IActionResult> GetMyVouchers()
+    {
+        var Vouchers = await _customerService.GetMyVouchersAsync(User);
+
+        return Ok(Vouchers);
+    }
 }

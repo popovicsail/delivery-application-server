@@ -13,7 +13,7 @@ namespace Delivery.Infrastructure.BackgroundServices.LoggingBackgroundJob
                 .AddTrigger(trigger =>
                     trigger
                         .ForJob(jobKey)
-                        .WithSimpleSchedule(schedule => schedule.WithIntervalInSeconds(2).RepeatForever()));
+                        .WithSimpleSchedule(schedule => schedule.WithIntervalInSeconds(60).RepeatForever()));
         }
     }
 }

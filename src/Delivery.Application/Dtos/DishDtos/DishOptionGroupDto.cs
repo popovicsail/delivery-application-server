@@ -1,4 +1,4 @@
-﻿namespace Delivery.Application.Dtos.DishDtos.Responses;
+﻿namespace Delivery.Application.Dtos.DishDtos;
 
 public class DishOptionGroupDto
 {
