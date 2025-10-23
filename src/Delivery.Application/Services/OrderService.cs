@@ -74,7 +74,7 @@ namespace Delivery.Application.Services
 
             // 7. Primeni vaučer ako postoji
             var activeVoucher = customer.Vouchers
-                .Where(v => v.Active)
+                .Where(v => v.Status == "Active")
                 .OrderByDescending(v => v.DiscountAmount) // uzmi najveći popust
                 .FirstOrDefault();
 
@@ -90,7 +90,7 @@ namespace Delivery.Application.Services
                     order.TotalPrice = 0;
 
                 // Deaktiviraj vaučer nakon korišćenja
-                activeVoucher.Active = false;
+                activeVoucher.Status = "Inactive";
                 _unitOfWork.Vouchers.Update(activeVoucher);
             }
 
