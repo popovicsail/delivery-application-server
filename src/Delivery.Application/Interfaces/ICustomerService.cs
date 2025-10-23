@@ -24,5 +24,7 @@ namespace Delivery.Application.Interfaces
 
         Task<List<Guid>> GetMyAllergensAsync(ClaimsPrincipal user);
         Task UpdateMyAllergensAsync(ClaimsPrincipal user, UpdateCustomerAllergensRequest request);
+
+        
     }
 }

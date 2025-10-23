@@ -71,6 +71,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
         {
             entity.Property(e => e.WorkStart).HasColumnType("time");
             entity.Property(e => e.WorkEnd).HasColumnType("time");
+            entity.Property(e => e.Date).HasColumnName("date").HasColumnType("text").IsRequired();
         });
 
         builder.Entity<Customer>().HasOne(p => p.User).WithOne().HasForeignKey<Customer>(p => p.UserId).IsRequired();
