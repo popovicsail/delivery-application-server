@@ -6,7 +6,6 @@ public class DishOptionGroupMapping : Profile
     {
         CreateMap<DishOptionGroupCreateRequestDto, DishOptionGroup>();
         CreateMap<DishOptionGroupUpdateRequestDto, DishOptionGroup>();
-        CreateMap<DishOptionGroup, DishOptionGroupResponseDto>();
 
         CreateMap<DishOptionCreateDto, DishOption>();
         CreateMap<DishOptionUpdateRequestDto, DishOption>();

@@ -1,4 +1,5 @@
 ﻿using Delivery.Application.Dtos.DishDtos.Requests;
+using Delivery.Domain.Entities.DishEntities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,6 +15,14 @@ public class DishesController : ControllerBase
     public DishesController(IDishService dishService)
     {
         _dishService = dishService;
+    }
+
+    [HttpGet("paged")]
+    public async Task<IActionResult> GetPagedAsync([FromQuery] DishFiltersMix filters, int sort, int page = 1)
+    {
+        var restaurants = await _dishService.GetPagedAsync(sort, filters, page, User);
+
+        return Ok(restaurants);
     }
 
     [HttpGet]
@@ -54,5 +63,14 @@ public class DishesController : ControllerBase
         await _dishService.DeleteAsync(id);
 
         return NoContent();
+    }
+
+    [HttpGet("menu/{id}")]
+
+    public async Task<ActionResult<DishDetailResponseDto>> GetMenuAsync([FromRoute] Guid id)
+    {
+        var menu = await _dishService.GetMenuAsync(id);
+
+        return Ok(menu);
     }
 }
