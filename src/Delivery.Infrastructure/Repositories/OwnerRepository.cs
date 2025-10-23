@@ -1,4 +1,5 @@
-﻿using Delivery.Domain.Entities.UserEntities;
+﻿using System.Security.Claims;
+using Delivery.Domain.Entities.UserEntities;
 using Delivery.Domain.Interfaces;
 using Delivery.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -36,5 +37,18 @@ public class OwnerRepository : GenericRepository<Owner>, IOwnerRepository
             .Include(o => o.User)
             .FirstOrDefaultAsync(o => o.UserId == userId);
         return owner;
+    }
+
+    public async Task<bool> GetMenuPermissionAsync(User user, Guid menuId)
+    {
+        var ownerId = await _dbContext.Owners
+            .Include(o => o.User)
+            .Where(o => o.User.Id == user.Id)
+            .Select(o => o.Id)
+            .FirstOrDefaultAsync();
+
+        return await _dbContext.Restaurants
+            .Include(r => r.Menus)
+            .AnyAsync(r => r.OwnerId == ownerId && r.Menus.Any(m => m.Id == menuId));
     }
 }

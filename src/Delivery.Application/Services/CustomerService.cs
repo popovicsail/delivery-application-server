@@ -206,7 +206,7 @@ public class CustomerService : ICustomerService
 
         var allergenIds = customer.Allergens.Select(a => a.Id).ToList();
 
-        return ( allergenIds );
+        return allergenIds;
     }
 
     public async Task UpdateMyAllergensAsync(ClaimsPrincipal principal, UpdateCustomerAllergensRequest request)
