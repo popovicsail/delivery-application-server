@@ -23,7 +23,7 @@ public class RestaurantsController : ControllerBase
 
     [HttpGet("paged")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetPagedAsync([FromQuery] RestaurantFiltersMix filters, int sort, int page)
+    public async Task<IActionResult> GetPagedAsync([FromQuery] RestaurantFiltersMix filters, int sort, int page = 1)
     {
         var restaurants = await _restaurantService.GetPagedAsync(sort, filters, page);
 
@@ -75,6 +75,7 @@ public class RestaurantsController : ControllerBase
     }
 
     [HttpGet("{id}/menu")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetRestaurantMenuAsync([FromRoute] Guid id)
     {
         var response = await _restaurantService.GetRestaurantMenuAsync(id);

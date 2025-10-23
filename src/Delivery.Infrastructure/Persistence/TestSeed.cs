@@ -19,11 +19,11 @@ public static class TestSeed
 
         // --- Testni Korisnici (Users) ---
         var ownerUserId = Guid.Parse("11111111-1111-1111-1111-111111111111");
-        var ownerUser = new User { Id = ownerUserId, UserName = "owner1", NormalizedUserName = "OWNER1", Email = "owner1@example.com", NormalizedEmail = "OWNER1@EXAMPLE.COM", FirstName = "Petar", LastName = "Petrovic", EmailConfirmed = true, SecurityStamp = Guid.NewGuid().ToString(), ProfilePictureUrl = DefaultAvatar.Base64 };
+        var ownerUser = new User { Id = ownerUserId, UserName = "owner1", NormalizedUserName = "OWNER1", Email = "owner1@example.com", NormalizedEmail = "OWNER1@EXAMPLE.COM", FirstName = "Petar", LastName = "Petrovic", EmailConfirmed = true, SecurityStamp = Guid.NewGuid().ToString(), ProfilePictureBase64 = DefaultAvatar.Base64 };
         ownerUser.PasswordHash = passwordHasher.HashPassword(ownerUser, "OwnerPass1!");
 
         var customerUserId = Guid.Parse("22222222-2222-2222-2222-222222222222");
-        var customerUser = new User { Id = customerUserId, UserName = "customer1", DateOfBirth = DateTime.UtcNow, NormalizedUserName = "CUSTOMER1", Email = "customer1@example.com", NormalizedEmail = "CUSTOMER1@EXAMPLE.COM", FirstName = "Marko", LastName = "Markovic", EmailConfirmed = true, SecurityStamp = Guid.NewGuid().ToString(), ProfilePictureUrl = DefaultAvatar.Base64 };
+        var customerUser = new User { Id = customerUserId, UserName = "customer1", DateOfBirth = DateTime.UtcNow, NormalizedUserName = "CUSTOMER1", Email = "customer1@example.com", NormalizedEmail = "CUSTOMER1@EXAMPLE.COM", FirstName = "Marko", LastName = "Markovic", EmailConfirmed = true, SecurityStamp = Guid.NewGuid().ToString(), ProfilePictureBase64 = DefaultAvatar.Base64 };
         customerUser.PasswordHash = passwordHasher.HashPassword(customerUser, "CustomerPass1!");
 
         var baseWorkSchedId = Guid.NewGuid();
@@ -45,7 +45,7 @@ public static class TestSeed
         // --- Ostali Test Podaci ---
         var addressId = Guid.NewGuid();
         var restaurantId = Guid.NewGuid();
-        var menuId = Guid.Parse("55555555-5555-5555-5555-555555555555");
+        var menuId = Guid.NewGuid();
         var pizzaId = Guid.NewGuid();
         var voucherId = Guid.NewGuid();
 

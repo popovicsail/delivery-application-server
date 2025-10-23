@@ -1,11 +1,11 @@
 using System.Text;
 using Delivery.Api.Middleware;
 using Delivery.Application;
-using Delivery.Application.BackgroundServices;
 using Delivery.Application.Interfaces;
 using Delivery.Application.Mappings;
 using Delivery.Domain.Entities.UserEntities;
 using Delivery.Infrastructure;
+using Delivery.Infrastructure.BackgroundServices.CourierStatusUpdater;
 using Delivery.Infrastructure.Persistence;
 using Delivery.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

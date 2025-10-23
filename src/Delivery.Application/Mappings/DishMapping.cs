@@ -13,7 +13,6 @@ public class DishMappings : Profile
 {
     public DishMappings()
     {
-        CreateMap<Menu, MenuDto>().ReverseMap();
         CreateMap<Dish, DishDto>().ReverseMap();
         CreateMap<DishCreateRequestDto, Dish>();
 

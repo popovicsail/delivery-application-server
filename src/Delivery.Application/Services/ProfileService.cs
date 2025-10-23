@@ -42,7 +42,7 @@ namespace Delivery.Application.Services
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Roles = roles.ToList(),
-                ProfilePictureUrl = user.ProfilePictureUrl
+                ProfilePictureBase64 = user.ProfilePictureBase64
             };
 
             // Ako je kurir, povuci i status
@@ -68,19 +68,19 @@ namespace Delivery.Application.Services
             user.LastName = request.LastName;
             user.Email = request.Email;
 
-            if (request.ProfilePictureUrl is { Length: > 0 })
+            if (request.ProfilePictureBase64 is { Length: > 0 })
             {
                 var allowedMimeTypes = new[] { "image/png", "image/jpeg" };
-                var contentType = request.ProfilePictureUrl.ContentType.ToLower();
+                var contentType = request.ProfilePictureBase64.ContentType.ToLower();
 
                 if (!allowedMimeTypes.Contains(contentType))
                     throw new BadRequestException("Only PNG and JPEG images are allowed.");
 
                 await using var ms = new MemoryStream();
-                await request.ProfilePictureUrl.CopyToAsync(ms);
+                await request.ProfilePictureBase64.CopyToAsync(ms);
                 var fileBytes = ms.ToArray();
 
-                user.ProfilePictureUrl = $"data:{contentType};base64,{Convert.ToBase64String(fileBytes)}";
+                user.ProfilePictureBase64 = $"data:{contentType};base64,{Convert.ToBase64String(fileBytes)}";
             }
 
             var result = await _userManager.UpdateAsync(user);
@@ -96,7 +96,7 @@ namespace Delivery.Application.Services
                 Email = user.Email,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                ProfilePictureUrl = user.ProfilePictureUrl,
+                ProfilePictureBase64 = user.ProfilePictureBase64,
                 Roles = roles.ToList()
             };
         }

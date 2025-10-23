@@ -1,12 +1,13 @@
 ﻿using AutoMapper;
+using Delivery.Application.Dtos.DishDtos.Responses;
 
 public class DishOptionGroupMapping : Profile
 {
     public DishOptionGroupMapping()
     {
+        CreateMap<DishOptionGroup, DishOptionGroupDto>().ReverseMap();
         CreateMap<DishOptionGroupCreateRequestDto, DishOptionGroup>();
         CreateMap<DishOptionGroupUpdateRequestDto, DishOptionGroup>();
-        CreateMap<DishOptionGroup, DishOptionGroupResponseDto>();
 
         CreateMap<DishOptionCreateDto, DishOption>();
         CreateMap<DishOptionUpdateRequestDto, DishOption>();

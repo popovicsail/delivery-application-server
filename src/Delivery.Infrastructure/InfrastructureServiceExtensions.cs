@@ -20,15 +20,13 @@ public static class InfrastructureServiceExtensions
         {
             options.WaitForJobsToComplete = true;
         });
-        services.ConfigureOptions<BirthdayVoucherBackgroundJobSetup>();
+        services.ConfigureOptions<VoucherExpirationDateCheckerBackgroundJobSetup>();
         services.ConfigureOptions<LoggingBackgroundJobSetup>();
 
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")).UseSnakeCaseNamingConvention());
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddScoped<IRestaurantRepository, Repositories.RestaurantRepository>();
-        services.AddScoped<IOwnerRepository, Repositories.OwnerRepository>();
 
         return services;
     }

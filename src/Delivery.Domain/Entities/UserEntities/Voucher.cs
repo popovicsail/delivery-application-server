@@ -10,7 +10,7 @@ public class Voucher
     public DateTime DateIssued { get; set; }
     public DateTime ExpirationDate { get; set; }
     public double DiscountAmount { get; set; }
-    public bool Active { get; set; }
+    public string Status { get; set; } //Active, Used, Expired, Inactive
     public Guid CustomerId { get; set; }
 
     public Voucher()
@@ -18,7 +18,7 @@ public class Voucher
         Code = GenerateRandomCode(5);
         DateIssued = DateTime.UtcNow;
         ExpirationDate = DateIssued.AddHours(24);
-        Active = true;
+        Status = "Active";
     }
 
     private static string GenerateRandomCode(int length)

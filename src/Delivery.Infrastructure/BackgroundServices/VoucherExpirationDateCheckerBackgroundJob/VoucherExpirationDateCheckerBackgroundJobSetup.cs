@@ -3,13 +3,13 @@ using Quartz;
 
 namespace Delivery.Infrastructure.BackgroundServices.BirthdayVoucherBackgroundJob
 {
-    public class BirthdayVoucherBackgroundJobSetup : IConfigureOptions<QuartzOptions>
+    public class VoucherExpirationDateCheckerBackgroundJobSetup : IConfigureOptions<QuartzOptions>
     {
         public void Configure(QuartzOptions options)
         {
-            JobKey jobKey = JobKey.Create(nameof(BirthdayVoucherBackgroundJob));
+            JobKey jobKey = JobKey.Create(nameof(VoucherExpirationDateCheckerBackgroundJob));
             options
-                .AddJob<BirthdayVoucherBackgroundJob>(jobBuilder => jobBuilder.WithIdentity(jobKey))
+                .AddJob<VoucherExpirationDateCheckerBackgroundJob>(jobBuilder => jobBuilder.WithIdentity(jobKey))
                 .AddTrigger(trigger =>
                     trigger
                         .ForJob(jobKey)
