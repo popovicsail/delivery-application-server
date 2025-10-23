@@ -1,5 +1,6 @@
 ﻿using Delivery.Domain.Entities.CommonEntities;
 using Delivery.Domain.Entities.DishEntities;
+using Delivery.Domain.Entities.FeedbackEntities;
 using Delivery.Domain.Entities.RestaurantEntities;
 using Delivery.Domain.Entities.UserEntities;
 using Microsoft.AspNetCore.Identity;
@@ -31,6 +32,9 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
     public DbSet<Worker> Workers { get; set; }
 
     public DbSet<Voucher> Vouchers { get; set; }
+
+    public DbSet<FeedbackQuestion> FeedbackQuestions { get; set; }
+    public DbSet<FeedbackResponse> FeedbackResponses { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -93,6 +97,24 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
 
         builder.Entity<Customer>().HasMany(c => c.Vouchers).WithOne().HasForeignKey(v => v.CustomerId);
         builder.Entity<Voucher>().HasIndex(v => v.Code).IsUnique();
+
+        builder.Entity<FeedbackQuestion>(entity =>
+        {
+            entity.HasKey(q => q.Id);
+            entity.Property(q => q.Text).IsRequired();
+
+            entity.HasMany(q => q.Responses)
+                  .WithOne(r => r.Question)
+                  .HasForeignKey(r => r.QuestionId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<FeedbackResponse>(entity =>
+        {
+            entity.HasKey(r => r.Id);
+            entity.Property(r => r.Rating).IsRequired();
+            entity.Property(r => r.CreatedAt).HasDefaultValueSql("NOW()");
+        });
 
         TestSeed.Seed(builder);
     }

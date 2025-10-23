@@ -2,6 +2,7 @@
 using Delivery.Infrastructure.BackgroundServices.BirthdayVoucherBackgroundJob;
 using Delivery.Infrastructure.BackgroundServices.LoggingBackgroundJob;
 using Delivery.Infrastructure.Persistence;
+using Delivery.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,8 +28,10 @@ public static class InfrastructureServiceExtensions
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")).UseSnakeCaseNamingConvention());
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddScoped<IRestaurantRepository, Repositories.RestaurantRepository>();
-        services.AddScoped<IOwnerRepository, Repositories.OwnerRepository>();
+        services.AddScoped<IRestaurantRepository, RestaurantRepository>();
+        services.AddScoped<IOwnerRepository, OwnerRepository>();
+        services.AddScoped<IFeedbackQuestionRepository, FeedbackQuestionRepository>();
+        services.AddScoped<IFeedbackResponseRepository, FeedbackResponseRepository>();
 
         return services;
     }
