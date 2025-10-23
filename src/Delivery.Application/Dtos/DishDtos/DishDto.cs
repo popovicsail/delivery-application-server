@@ -1,4 +1,6 @@
-﻿namespace Delivery.Application.Dtos.DishDtos;
+﻿using Delivery.Application.Dtos.CommonDtos.AllergenDtos;
+
+namespace Delivery.Application.Dtos.DishDtos;
 
 public class DishDto
 {
@@ -8,4 +10,5 @@ public class DishDto
     public double Price { get; set; }
     public string Type { get; set; }
     public string PictureUrl { get; set; }
+    public List<AllergenDto>? Allergens { get; set; } = new List<AllergenDto>();
 }

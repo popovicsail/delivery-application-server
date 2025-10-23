@@ -7,7 +7,7 @@ public class ProfileResponseDto
     public string Email { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
-    public string ProfilePictureUrl { get; set; }
+    public string ProfilePictureBase64 { get; set; }
     public IEnumerable<string> Roles { get; set; }
     public string? Status { get; set; }
 }

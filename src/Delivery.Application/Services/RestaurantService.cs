@@ -22,21 +22,17 @@ public class RestaurantService : IRestaurantService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
-    private readonly IRestaurantRepository _restaurantRepository;
-    private readonly IOwnerRepository _ownerRepository;
     private readonly UserManager<User> _userManager;
-    public RestaurantService(IUnitOfWork unitOfWork, IMapper mapper, IRestaurantRepository restaurantRepository, IOwnerRepository ownerRepository, UserManager<User> userManager)
+    public RestaurantService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<User> userManager)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
-        _restaurantRepository = restaurantRepository;
-        _ownerRepository = ownerRepository;
         _userManager = userManager;
     }
 
     public async Task<IEnumerable<RestaurantSummaryResponseDto>> GetAllAsync()
     {
-        var restaurants = await _restaurantRepository.GetAllAsync();
+        var restaurants = await _unitOfWork.Restaurants.GetAllAsync();
         return _mapper.Map<List<RestaurantSummaryResponseDto>>(restaurants.ToList());
     }
 
@@ -46,10 +42,10 @@ public class RestaurantService : IRestaurantService
         {
             page = 1;
         }
-        var response = await _restaurantRepository.GetPagedAsync(sort, filters, page);
+        var response = await _unitOfWork.Restaurants.GetPagedAsync(sort, filters, page);
         if (response.Items == null)
         {
-            throw new Exception("No authors found");
+            throw new NotFoundException("No restaurants found");
         }
         var mappedRestaurants = _mapper.Map<List<RestaurantSummaryResponseDto>>(response.Items);
         PaginatedList<RestaurantSummaryResponseDto> result = new PaginatedList<RestaurantSummaryResponseDto>(mappedRestaurants, response.CurrentPage, 6, response.Count);
@@ -59,7 +55,7 @@ public class RestaurantService : IRestaurantService
 
     public async Task<RestaurantDetailResponseDto?> GetOneAsync(Guid id)
     {
-        var restaurant = await _restaurantRepository.GetOneAsync(id);
+        var restaurant = await _unitOfWork.Restaurants.GetOneAsync(id);
 
         if (restaurant == null)
         {
@@ -72,13 +68,13 @@ public class RestaurantService : IRestaurantService
     public async Task<IEnumerable<RestaurantSummaryResponseDto>> GetMyRestaurantsAsync(ClaimsPrincipal User)
     {
         var user = await _userManager.GetUserAsync(User);
-        var owner = await _ownerRepository.GetByUserIdAsync(user.Id);
+        var owner = await _unitOfWork.Owners.GetByUserIdAsync(user.Id);
         if (owner == null)
         {
             throw new NotFoundException($"Owner with User ID '{user.Id}' was not found.");
         }
 
-        var restaurants = await _restaurantRepository.GetMyAsync(owner.Id);
+        var restaurants = await _unitOfWork.Restaurants.GetMyAsync(owner.Id);
         return _mapper.Map<List<RestaurantSummaryResponseDto>>(restaurants);
     }
 
@@ -122,7 +118,7 @@ public class RestaurantService : IRestaurantService
 
     public async Task<RestaurantDetailResponseDto> UpdateAsync(Guid id, RestaurantUpdateRequestDto request, IFormFile? file)
     {
-        var restaurant = await _restaurantRepository.GetOneAsync(id);
+        var restaurant = await _unitOfWork.Restaurants.GetOneAsync(id);
 
         if (restaurant == null)
         {
@@ -212,12 +208,12 @@ public class RestaurantService : IRestaurantService
 
     public async Task<MenuDto> GetRestaurantMenuAsync(Guid restaurantId)
     {
-        var restaurant = await _restaurantRepository.GetOneAsync(restaurantId);
+        var restaurant = await _unitOfWork.Restaurants.GetOneAsync(restaurantId);
         if (restaurant == null)
         {
             throw new NotFoundException($"Restaurant with ID '{restaurantId}' was not found.");
         }
-        var menu = await _restaurantRepository.GetMenuAsync(restaurantId);
+        var menu = await _unitOfWork.Restaurants.GetMenuAsync(restaurantId);
         if (menu == null)
         {
             throw new NotFoundException($"Menu for Restaurant with ID '{restaurantId}' was not found.");
