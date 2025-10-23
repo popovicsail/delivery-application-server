@@ -42,17 +42,17 @@ public class DishesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<DishDetailResponseDto>> CreateAsync(DishCreateRequestDto request)
+    public async Task<ActionResult<DishDetailResponseDto>> CreateAsync([FromForm] DishCreateRequestDto request, IFormFile? file)
     {
-        var dish = await _dishService.AddAsync(request);
+        var dish = await _dishService.AddAsync(request, file);
 
         return CreatedAtAction("GetOne", new { id = dish.Id }, dish);
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateAsync([FromRoute] Guid id, DishUpdateRequestDto request)
+    public async Task<ActionResult> UpdateAsync([FromRoute] Guid id, [FromForm] DishUpdateRequestDto request, IFormFile? file)
     {
-        await _dishService.UpdateAsync(id, request);
+        await _dishService.UpdateAsync(id, request, file);
 
         return NoContent();
     }
@@ -66,7 +66,7 @@ public class DishesController : ControllerBase
     }
 
     [HttpGet("menu/{id}")]
-
+    [AllowAnonymous]
     public async Task<ActionResult<DishDetailResponseDto>> GetMenuAsync([FromRoute] Guid id)
     {
         var menu = await _dishService.GetMenuAsync(id);
