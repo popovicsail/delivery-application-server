@@ -92,4 +92,21 @@ public class VoucherService : IVoucherService
 
         return;
     }
+
+    public async Task VoucherExpirationDateCheckerBackgroundJobAsync()
+    {
+        var vouchers = await _unitOfWork.Vouchers.GetActiveVouchersAsync();
+
+        if (!vouchers.Any())
+        {
+            return;
+        }
+
+        foreach (var voucher in vouchers)
+        {
+            voucher.Status = "Inactive";
+        }
+
+        await _unitOfWork.CompleteAsync();
+    }
 }

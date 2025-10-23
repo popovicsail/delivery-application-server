@@ -17,7 +17,7 @@ namespace Delivery.Application.Interfaces
         Task DeleteAsync(Guid id);
 
         Task BirthdayVoucherBackgroundJobAsync();
-
+       
         Task<List<AddressDto>> GetMyAddressesAsync(ClaimsPrincipal user);
         Task CreateAddressAsync(ClaimsPrincipal user, AddressCreateRequest request);
         Task UpdateAddressAsync(ClaimsPrincipal user, Guid addressId, AddressUpdateRequest request);

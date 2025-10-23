@@ -23,4 +23,15 @@ public class VoucherRepository : GenericRepository<Voucher>, IVoucherRepository
 
         return await query.ToListAsync();
     }
+
+    public async Task<IEnumerable<Voucher>> GetActiveVouchersAsync()
+    {
+        IQueryable<Voucher> query = _dbContext.Vouchers;
+
+        query = query
+            .Where(v => v.Status == "Active")
+            .Where(v => v.ExpirationDate < DateTime.Now);
+
+        return await query.ToListAsync();
+    }
 }

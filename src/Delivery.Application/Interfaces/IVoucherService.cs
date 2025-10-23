@@ -14,4 +14,6 @@ public interface IVoucherService
     Task DeleteAsync(Guid id);
     Task UseVoucherAsync(Guid id, Guid userId);
 
+    Task VoucherExpirationDateCheckerBackgroundJobAsync();
+
 }
