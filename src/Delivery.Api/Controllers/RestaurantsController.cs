@@ -75,6 +75,7 @@ public class RestaurantsController : ControllerBase
     }
 
     [HttpGet("{id}/menu")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetRestaurantMenuAsync([FromRoute] Guid id)
     {
         var response = await _restaurantService.GetRestaurantMenuAsync(id);
