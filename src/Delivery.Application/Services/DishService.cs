@@ -8,7 +8,9 @@ using Delivery.Application.Exceptions;
 using Delivery.Application.Interfaces;
 using Delivery.Domain.Common;
 using Delivery.Domain.Entities.DishEntities;
+using Delivery.Domain.Entities.RestaurantEntities;
 using Delivery.Domain.Interfaces;
+using Microsoft.AspNetCore.Http;
 
 
 namespace Delivery.Application.Services;
@@ -66,9 +68,28 @@ public class DishService : IDishService
         return _mapper.Map<DishDetailResponseDto>(dish);
     }
 
-    public async Task<DishDetailResponseDto> AddAsync(DishCreateRequestDto request)
+    public async Task<DishDetailResponseDto> AddAsync(DishCreateRequestDto request, IFormFile? file)
     {
         var dish = _mapper.Map<Dish>(request);
+
+        const long maxFileSize = 5 * 1024 * 1024; // 5 MB
+
+        var allowedTypes = new[] { "image/png", "image/jpeg" };
+
+        //Picture conversion to base64
+        if (file != null && file.Length > 0)
+        {
+            if (file.Length > maxFileSize)
+            {
+                throw new Exception("File is too large. Maximum allowed size is 5 MB.");
+            }
+            if (!allowedTypes.Contains(file.ContentType))
+            {
+                throw new Exception("Invalid file type. Only PNG and JPEG are allowed.");
+            }
+
+            dish.Picture = await ConvertToBase64(file);
+        }
 
         await _unitOfWork.Dishes.AddAsync(dish);
 
@@ -77,7 +98,7 @@ public class DishService : IDishService
         return _mapper.Map<DishDetailResponseDto>(dish);
     }
 
-    public async Task UpdateAsync(Guid id, DishUpdateRequestDto request)
+    public async Task UpdateAsync(Guid id, DishUpdateRequestDto request, IFormFile? file)
     {
         var dish = await _unitOfWork.Dishes.GetOneAsync(id);
 
@@ -87,6 +108,25 @@ public class DishService : IDishService
         }
 
         _mapper.Map(request, dish);
+
+        const long maxFileSize = 5 * 1024 * 1024; // 5 MB
+
+        var allowedTypes = new[] { "image/png", "image/jpeg" };
+
+        //Picture conversion to base64
+        if (file != null && file.Length > 0)
+        {
+            if (file.Length > maxFileSize)
+            {
+                throw new Exception("File is too large. Maximum allowed size is 5 MB.");
+            }
+            if (!allowedTypes.Contains(file.ContentType))
+            {
+                throw new Exception("Invalid file type. Only PNG and JPEG are allowed.");
+            }
+
+            dish.Picture = await ConvertToBase64(file);
+        }
 
         _unitOfWork.Dishes.Update(dish);
 
@@ -117,5 +157,13 @@ public class DishService : IDishService
         }
 
         return _mapper.Map<MenuDto>(menu);
+    }
+
+    private static async Task<string> ConvertToBase64(IFormFile file)
+    {
+        using var ms = new MemoryStream();
+        await file.CopyToAsync(ms);
+        var fileBytes = ms.ToArray();
+        return $"data:{file.ContentType};base64,{Convert.ToBase64String(fileBytes)}";
     }
 }

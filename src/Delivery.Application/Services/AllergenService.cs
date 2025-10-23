@@ -72,7 +72,7 @@ public class AllergenService : IAllergenService
             throw new NotFoundException($"Allergen with ID '{id}' was not found.");
         }
 
-        _unitOfWork.Allergens.Update(allergen);
+        _unitOfWork.Allergens.Delete(allergen);
 
         await _unitOfWork.CompleteAsync();
     }
