@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
 using Delivery.Application.Dtos.Users.OwnerDtos.Requests;
 using Delivery.Application.Dtos.Users.OwnerDtos.Responses;
 using Delivery.Application.Exceptions;
@@ -94,5 +95,19 @@ public class OwnerService : IOwnerService
         _unitOfWork.Owners.Update(owner);
 
         await _unitOfWork.CompleteAsync();
+    }
+
+    public async Task<bool> GetMenuPermissionAsync(ClaimsPrincipal User, Guid menuId)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        bool permitGranted = await _unitOfWork.Owners.GetMenuPermissionAsync(user!, menuId);
+        if (permitGranted)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }

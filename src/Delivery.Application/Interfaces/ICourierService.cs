@@ -1,4 +1,5 @@
-﻿using Delivery.Application.Dtos.Users.CourierDtos.Requests;
+﻿using Delivery.Application.Dtos.CommonDtos.WorkScheduleDto;
+using Delivery.Application.Dtos.Users.CourierDtos.Requests;
 using Delivery.Application.Dtos.Users.CourierDtos.Responses;
 using Delivery.Domain.Entities.CommonEntities;
 
@@ -15,5 +16,5 @@ public interface ICourierService
     Task UpdateWorkSchedulesAsync(Guid courierId, CourierWorkSchedulesUpdateRequestDto request);
     Task<CourierStatusResponseDto> GetCourierStatusAsync(Guid courierId);
 
-    Task<IEnumerable<WorkSchedule>> GetMyWorkSchedulesAsync(Guid courierId);
+    Task<IEnumerable<WorkScheduleDto>> GetMyWorkSchedulesAsync(Guid courierId);
 }

@@ -13,7 +13,7 @@ namespace Delivery.Infrastructure.BackgroundServices.BirthdayVoucherBackgroundJo
                 .AddTrigger(trigger =>
                     trigger
                         .ForJob(jobKey)
-                        .WithCronSchedule("0 0 * * * ?"));
+                        .WithCronSchedule("0 0 0 * * ?"));
         }
     }
 }

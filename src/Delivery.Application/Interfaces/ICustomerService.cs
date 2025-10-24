@@ -3,6 +3,7 @@ using Delivery.Application.Dtos.CommonDtos.AddressDtos;
 using Delivery.Application.Dtos.CommonDtos.AllergenDtos.Requests;
 using Delivery.Application.Dtos.Users.CustomerDtos.Requests;
 using Delivery.Application.Dtos.Users.CustomerDtos.Responses;
+using Delivery.Application.Dtos.Users.CustomerDtos.VoucherDtos.Responses;
 using Delivery.Domain.Entities.UserEntities;
 
 namespace Delivery.Application.Interfaces
@@ -16,7 +17,7 @@ namespace Delivery.Application.Interfaces
         Task DeleteAsync(Guid id);
 
         Task BirthdayVoucherBackgroundJobAsync();
-
+       
         Task<List<AddressDto>> GetMyAddressesAsync(ClaimsPrincipal user);
         Task CreateAddressAsync(ClaimsPrincipal user, AddressCreateRequest request);
         Task UpdateAddressAsync(ClaimsPrincipal user, Guid addressId, AddressUpdateRequest request);
@@ -24,5 +25,6 @@ namespace Delivery.Application.Interfaces
 
         Task<List<Guid>> GetMyAllergensAsync(ClaimsPrincipal user);
         Task UpdateMyAllergensAsync(ClaimsPrincipal user, UpdateCustomerAllergensRequest request);
+        Task<IEnumerable<VoucherDetailResponseDto>> GetMyVouchersAsync(ClaimsPrincipal User);
     }
 }

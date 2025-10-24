@@ -25,7 +25,7 @@ public class AdminService : IAdminService
             Email = request.Email,
             FirstName = request.FirstName,
             LastName = request.LastName,
-            ProfilePictureUrl = DefaultAvatar.Base64
+            ProfilePictureBase64 = DefaultAvatar.Base64
         };
 
         var createResult = await _userManager.CreateAsync(user, request.Password);
@@ -53,7 +53,7 @@ public class AdminService : IAdminService
             Email = request.Email,
             FirstName = request.FirstName,
             LastName = request.LastName,
-            ProfilePictureUrl = DefaultAvatar.Base64
+            ProfilePictureBase64 = DefaultAvatar.Base64
         };
 
         var createResult = await _userManager.CreateAsync(user, request.Password);

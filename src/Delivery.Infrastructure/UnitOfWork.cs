@@ -3,6 +3,7 @@ using Delivery.Infrastructure.Persistence;
 using Delivery.Infrastructure.Repositories;
 
 
+
 namespace Delivery.Infrastructure;
 
 public class UnitOfWork : IUnitOfWork
@@ -20,6 +21,8 @@ public class UnitOfWork : IUnitOfWork
     public IVoucherRepository Vouchers { get; private set; }
     public IFeedbackQuestionRepository FeedbackQuestions { get; private set; }
     public IFeedbackResponseRepository FeedbackResponses { get; private set; }
+    public IOrderItemsRepository OrderItems { get; private set; }
+    public IOrdersRepository Orders { get; private set; }
 
     public UnitOfWork(ApplicationDbContext dbContext)
     {
@@ -36,6 +39,8 @@ public class UnitOfWork : IUnitOfWork
         Vouchers = new VoucherRepository(_dbContext);
         FeedbackQuestions = new FeedbackQuestionRepository(_dbContext);
         FeedbackResponses = new FeedbackResponseRepository(_dbContext);
+        OrderItems = new OrderItemsRepository(_dbContext);
+        Orders = new OrdersRepository(_dbContext);
     }
 
     public Task<int> CompleteAsync()

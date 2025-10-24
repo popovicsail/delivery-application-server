@@ -1,6 +1,7 @@
 ﻿using Delivery.Domain.Entities.CommonEntities;
 using Delivery.Domain.Entities.DishEntities;
 using Delivery.Domain.Entities.FeedbackEntities;
+using Delivery.Domain.Entities.OrderEntities;
 using Delivery.Domain.Entities.RestaurantEntities;
 using Delivery.Domain.Entities.UserEntities;
 using Microsoft.AspNetCore.Identity;
@@ -35,6 +36,8 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
 
     public DbSet<FeedbackQuestion> FeedbackQuestions { get; set; }
     public DbSet<FeedbackResponse> FeedbackResponses { get; set; }
+    public DbSet<Order> Orders { get; set; }
+    public DbSet<OrderItem> OrderItems { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -51,9 +54,9 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
             new IdentityRole<Guid> { Id = Guid.Parse("f09ece5a-1c11-4792-815b-4ef1bc6c6c20"), Name = "Worker", NormalizedName = "WORKER" }
         );
 
-        var adminUser1 = new User { Id = Guid.Parse("b22698b8-42a2-4115-9631-1c2d1e2ac5f7"), UserName = "admin1", NormalizedUserName = "ADMIN1", Email = "admin1@example.com", NormalizedEmail = "ADMIN1@EXAMPLE.COM", FirstName = "Main", LastName = "Admin", EmailConfirmed = true, SecurityStamp = Guid.NewGuid().ToString(),ProfilePictureUrl = DefaultAvatar.Base64 };
-        var adminUser2 = new User { Id = Guid.Parse("bfd2ac09-67d0-4caa-8042-c6241b4f4f7f"), UserName = "admin2", NormalizedUserName = "ADMIN2", Email = "admin2@example.com", NormalizedEmail = "ADMIN2@EXAMPLE.COM", FirstName = "Second", LastName = "Admin", EmailConfirmed = true, SecurityStamp = Guid.NewGuid().ToString(),ProfilePictureUrl = DefaultAvatar.Base64 };
-        var adminUser3 = new User { Id = Guid.Parse("1ddc68db-bb87-4cef-bdf8-d369bc1d5334"), UserName = "admin3", NormalizedUserName = "ADMIN3", Email = "admin3@example.com", NormalizedEmail = "ADMIN3@EXAMPLE.COM", FirstName = "Third", LastName = "Admin", EmailConfirmed = true, SecurityStamp = Guid.NewGuid().ToString(), ProfilePictureUrl = DefaultAvatar.Base64 };
+        var adminUser1 = new User { Id = Guid.Parse("b22698b8-42a2-4115-9631-1c2d1e2ac5f7"), UserName = "admin1", NormalizedUserName = "ADMIN1", Email = "admin1@example.com", NormalizedEmail = "ADMIN1@EXAMPLE.COM", FirstName = "Main", LastName = "Admin", EmailConfirmed = true, SecurityStamp = Guid.NewGuid().ToString(), ProfilePictureBase64 = DefaultAvatar.Base64 };
+        var adminUser2 = new User { Id = Guid.Parse("bfd2ac09-67d0-4caa-8042-c6241b4f4f7f"), UserName = "admin2", NormalizedUserName = "ADMIN2", Email = "admin2@example.com", NormalizedEmail = "ADMIN2@EXAMPLE.COM", FirstName = "Second", LastName = "Admin", EmailConfirmed = true, SecurityStamp = Guid.NewGuid().ToString(), ProfilePictureBase64 = DefaultAvatar.Base64 };
+        var adminUser3 = new User { Id = Guid.Parse("1ddc68db-bb87-4cef-bdf8-d369bc1d5334"), UserName = "admin3", NormalizedUserName = "ADMIN3", Email = "admin3@example.com", NormalizedEmail = "ADMIN3@EXAMPLE.COM", FirstName = "Third", LastName = "Admin", EmailConfirmed = true, SecurityStamp = Guid.NewGuid().ToString(), ProfilePictureBase64 = DefaultAvatar.Base64 };
 
         adminUser1.PasswordHash = passwordHasher.HashPassword(adminUser1, "AdminPass1!");
         adminUser2.PasswordHash = passwordHasher.HashPassword(adminUser2, "AdminPass2!");
@@ -71,6 +74,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
         {
             entity.Property(e => e.WorkStart).HasColumnType("time");
             entity.Property(e => e.WorkEnd).HasColumnType("time");
+            entity.Property(e => e.Date).HasColumnName("date").HasColumnType("text").IsRequired();
         });
 
         builder.Entity<Customer>().HasOne(p => p.User).WithOne().HasForeignKey<Customer>(p => p.UserId).IsRequired();
@@ -97,6 +101,16 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
 
         builder.Entity<Customer>().HasMany(c => c.Vouchers).WithOne().HasForeignKey(v => v.CustomerId);
         builder.Entity<Voucher>().HasIndex(v => v.Code).IsUnique();
+        builder.Entity<Order>().HasIndex(o => o.Id).IsUnique();
+        builder.Entity<Order>().HasOne(o => o.Customer).WithMany().HasForeignKey(o => o.CustomerId).OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<Order>().HasOne(o => o.Address).WithMany().HasForeignKey(o => o.AddressId).OnDelete(DeleteBehavior.Restrict);
+        builder.Entity<Order>().HasMany(o => o.Items).WithOne(i => i.Order).HasForeignKey(i => i.OrderId).OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<OrderItem>().HasIndex(o => o.Id).IsUnique();
+        builder.Entity<OrderItem>().HasOne(i => i.Order).WithMany(o => o.Items).HasForeignKey(i => i.OrderId).OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<OrderItem>().HasOne(i => i.Dish).WithMany().HasForeignKey(i => i.DishId).OnDelete(DeleteBehavior.Restrict);
+        builder.Entity<OrderItem>().Property(i => i.Quantity).IsRequired();
+        builder.Entity<OrderItem>().Property(i => i.Price).HasColumnType("decimal(18,2)");
+        builder.Entity<Order>().Property(o => o.TotalPrice).HasColumnType("decimal(18,2)");
 
         builder.Entity<FeedbackQuestion>(entity =>
         {

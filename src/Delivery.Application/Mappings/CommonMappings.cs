@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using Delivery.Application.Dtos.CommonDtos.AddressDtos;
+using Delivery.Application.Dtos.CommonDtos.AllergenDtos;
 using Delivery.Application.Dtos.CommonDtos.AllergenDtos.Requests;
 using Delivery.Application.Dtos.CommonDtos.AllergenDtos.Responses;
 using Delivery.Application.Dtos.CommonDtos.BaseWordSchedDtos;
+using Delivery.Application.Dtos.RestaurantDtos;
 using Delivery.Domain.Entities.CommonEntities;
+using Delivery.Domain.Entities.RestaurantEntities;
 
 
 namespace Delivery.Application.Mappings;
@@ -23,6 +26,8 @@ public class CommonMappings : Profile
 
         CreateMap<AddressDto, Address>().ReverseMap();
 
+        CreateMap<Allergen, AllergenDto>().ReverseMap();
+
         CreateMap<AllergenCreateRequestDto, Allergen>();
 
         CreateMap<AllergenUpdateRequestDto, Allergen>();
@@ -30,5 +35,8 @@ public class CommonMappings : Profile
         CreateMap<Allergen, AllergenSummaryResponseDto>();
 
         CreateMap<Allergen, AllergenDetailResponseDto>();
+
+        CreateMap<Menu, MenuDto>().ReverseMap();
+
     }
 }

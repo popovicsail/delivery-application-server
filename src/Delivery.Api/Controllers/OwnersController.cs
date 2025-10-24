@@ -1,6 +1,7 @@
 ﻿using Delivery.Application.Dtos.Users.OwnerDtos.Requests;
 using Delivery.Application.Dtos.Users.OwnerDtos.Responses;
 using Delivery.Application.Interfaces;
+using Delivery.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -56,5 +57,12 @@ public class OwnersController : ControllerBase
         await _ownerService.DeleteAsync(id);
 
         return NoContent();
+    }
+
+    [HttpGet("permit/menu/{menuId:guid}")]
+    public async Task<IActionResult> GetMenuPermissionAsync(Guid userId, Guid menuId)
+    {
+        var permit = await _ownerService.GetMenuPermissionAsync(User!, menuId);
+        return Ok(permit);
     }
 }

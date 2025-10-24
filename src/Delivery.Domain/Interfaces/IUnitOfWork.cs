@@ -14,5 +14,7 @@ public interface IUnitOfWork : IDisposable
     IVoucherRepository Vouchers { get; }
     IFeedbackQuestionRepository FeedbackQuestions { get; }
     IFeedbackResponseRepository FeedbackResponses { get; }
+    IOrdersRepository Orders { get;}
+    IOrderItemsRepository OrderItems { get; }
     Task<int> CompleteAsync();
 }

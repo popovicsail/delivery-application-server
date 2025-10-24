@@ -5,4 +5,5 @@ namespace Delivery.Domain.Interfaces;
 public interface IOwnerRepository : IGenericRepository<Owner>
 {
     Task<Owner?> GetByUserIdAsync(Guid userId);
+    Task<bool> GetMenuPermissionAsync(User user, Guid menuId);
 }

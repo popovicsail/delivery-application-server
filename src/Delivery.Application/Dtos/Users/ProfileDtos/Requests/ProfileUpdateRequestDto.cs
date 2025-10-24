@@ -7,6 +7,6 @@ public class ProfileUpdateRequestDto
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public string Email { get; set; }
-    public IFormFile? ProfilePictureUrl { get; set; }
+    public IFormFile? ProfilePictureBase64 { get; set; }
 }
 

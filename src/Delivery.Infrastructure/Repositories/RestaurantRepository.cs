@@ -78,6 +78,10 @@ public class RestaurantRepository : GenericRepository<Restaurant>, IRestaurantRe
         var menu = await _dbContext.Menus
             .Where(m => m.RestaurantId == id)
             .Include(m => m.Dishes)
+                .ThenInclude(d => d.DishOptionGroups)
+                    .ThenInclude(g => g.DishOptions)
+            .Include(m => m.Dishes)
+                .ThenInclude(d => d.Allergens)
             .FirstOrDefaultAsync();
         return menu!;
     }
@@ -86,8 +90,8 @@ public class RestaurantRepository : GenericRepository<Restaurant>, IRestaurantRe
     {
         return sort switch
         {
-            (int)RestaurantSortTypes.NAME_DESC => query.OrderByDescending(b => b.Name),
-            _ => query.OrderBy(b => b.Name)
+            (int)RestaurantSortTypes.NAME_DESC => query.OrderByDescending(r => r.Name),
+            _ => query.OrderBy(r => r.Name)
         };
     }
 

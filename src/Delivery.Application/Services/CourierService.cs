@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿using System.Globalization;
+using AutoMapper;
+using Delivery.Application.Dtos.CommonDtos.WorkScheduleDto;
 using Delivery.Application.Dtos.Users.CourierDtos.Requests;
 using Delivery.Application.Dtos.Users.CourierDtos.Responses;
 using Delivery.Application.Exceptions;
@@ -7,6 +9,7 @@ using Delivery.Domain.Entities.CommonEntities;
 using Delivery.Domain.Entities.UserEntities;
 using Delivery.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Delivery.Application.Services;
 
@@ -165,15 +168,17 @@ public class CourierService : ICourierService
         };
     }
 
-    public async Task<IEnumerable<WorkSchedule>> GetMyWorkSchedulesAsync(Guid courierId)
+    public async Task<IEnumerable<WorkScheduleDto>> GetMyWorkSchedulesAsync(Guid courierId)
     {
         var courier = await _unitOfWork.Couriers.GetOneWithUserAsync(courierId);
 
         if (courier == null)
             throw new NotFoundException("Kurir nije pronađen.");
 
-        return courier.WorkSchedules;
+        return _mapper.Map<IEnumerable<WorkScheduleDto>>(courier.WorkSchedules);
     }
+
+
 
     private bool InShift(TimeSpan now, TimeSpan start, TimeSpan end)
     {

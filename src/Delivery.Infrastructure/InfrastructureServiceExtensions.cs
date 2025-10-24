@@ -21,7 +21,7 @@ public static class InfrastructureServiceExtensions
         {
             options.WaitForJobsToComplete = true;
         });
-        services.ConfigureOptions<BirthdayVoucherBackgroundJobSetup>();
+        services.ConfigureOptions<VoucherExpirationDateCheckerBackgroundJobSetup>();
         services.ConfigureOptions<LoggingBackgroundJobSetup>();
 
         services.AddDbContext<ApplicationDbContext>(options =>
