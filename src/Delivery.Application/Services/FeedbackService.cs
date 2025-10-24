@@ -33,7 +33,7 @@ public class FeedbackService : IFeedbackService
     }
 
     // ✅ 3. Kreira ili ažurira feedback korisnika
-    public async Task SubmitFeedbackAsync(Guid userId, IEnumerable<FeedbackResponseDto> feedbackDtos)
+    public async Task SubmitFeedbackAsync(Guid userId, IEnumerable<FeedbackCreateRequestDto> feedbackDtos)
     {
         var questions = await _unitOfWork.FeedbackQuestions.GetAllAsync();
         var questionCount = questions.Count();

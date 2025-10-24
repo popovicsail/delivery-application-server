@@ -6,7 +6,6 @@ namespace Delivery.Application.Dtos.FeedbackDtos
     {
         public Guid QuestionId { get; set; }
         public Guid UserId { get; set; }
-        public virtual User? User { get; set; }
         public int Rating { get; set; }
         public string? Comment { get; set; }
     }

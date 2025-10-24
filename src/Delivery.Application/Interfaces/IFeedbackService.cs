@@ -11,7 +11,7 @@ namespace Delivery.Application.Interfaces
         Task<IEnumerable<FeedbackResponseDto>?> GetUserFeedbackAsync(Guid userId);
 
         // Kreiraj ili ažuriraj feedback (zavisi da li korisnik već ima)
-        Task SubmitFeedbackAsync(Guid userId, IEnumerable<FeedbackResponseDto> responses);
+        Task SubmitFeedbackAsync(Guid userId, IEnumerable<FeedbackCreateRequestDto> responses);
 
         // Statistika po pitanjima
         Task<IEnumerable<FeedbackStatsDto>> GetStatisticsAsync();

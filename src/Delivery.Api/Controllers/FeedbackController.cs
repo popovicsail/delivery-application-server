@@ -38,10 +38,10 @@ namespace Delivery.API.Controllers
         // POST: api/feedback
         // Kreira ili ažurira feedback korisnika
         [HttpPost]
-        public async Task<IActionResult> SubmitFeedback([FromBody] IEnumerable<FeedbackResponseDto> feedbackDtos)
+        public async Task<IActionResult> SubmitFeedback([FromBody] IEnumerable<FeedbackCreateRequestDto> feedbackRequestDto)
         {
             var userId = GetCurrentUserId();
-            await _feedbackService.SubmitFeedbackAsync(userId, feedbackDtos);
+            await _feedbackService.SubmitFeedbackAsync(userId, feedbackRequestDto);
             return Ok(new { Message = "Feedback submitted successfully." });
         }
 
