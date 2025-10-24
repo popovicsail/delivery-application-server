@@ -1,5 +1,6 @@
 ﻿using Delivery.Domain.Entities.CommonEntities;
 using Delivery.Domain.Entities.DishEntities;
+using Delivery.Domain.Entities.FeedbackEntities;
 using Delivery.Domain.Entities.OrderEntities;
 using Delivery.Domain.Entities.RestaurantEntities;
 using Delivery.Domain.Entities.UserEntities;
@@ -33,6 +34,8 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
 
     public DbSet<Voucher> Vouchers { get; set; }
 
+    public DbSet<FeedbackQuestion> FeedbackQuestions { get; set; }
+    public DbSet<FeedbackResponse> FeedbackResponses { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
 
@@ -108,6 +111,24 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
         builder.Entity<OrderItem>().Property(i => i.Quantity).IsRequired();
         builder.Entity<OrderItem>().Property(i => i.Price).HasColumnType("decimal(18,2)");
         builder.Entity<Order>().Property(o => o.TotalPrice).HasColumnType("decimal(18,2)");
+
+        builder.Entity<FeedbackQuestion>(entity =>
+        {
+            entity.HasKey(q => q.Id);
+            entity.Property(q => q.Text).IsRequired();
+
+            entity.HasMany(q => q.Responses)
+                  .WithOne(r => r.Question)
+                  .HasForeignKey(r => r.QuestionId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<FeedbackResponse>(entity =>
+        {
+            entity.HasKey(r => r.Id);
+            entity.Property(r => r.Rating).IsRequired();
+            entity.Property(r => r.CreatedAt).HasDefaultValueSql("NOW()");
+        });
 
         TestSeed.Seed(builder);
     }
