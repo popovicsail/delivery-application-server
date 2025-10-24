@@ -1,5 +1,6 @@
 ﻿using Delivery.Domain.Entities.CommonEntities;
 using Delivery.Domain.Entities.DishEntities;
+using Delivery.Domain.Entities.OrderEntities;
 using Delivery.Domain.Entities.RestaurantEntities;
 using Delivery.Domain.Entities.UserEntities;
 using Microsoft.AspNetCore.Identity;
@@ -31,6 +32,9 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
     public DbSet<Worker> Workers { get; set; }
 
     public DbSet<Voucher> Vouchers { get; set; }
+
+    public DbSet<Order> Orders { get; set; }
+    public DbSet<OrderItem> OrderItems { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -67,6 +71,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
         {
             entity.Property(e => e.WorkStart).HasColumnType("time");
             entity.Property(e => e.WorkEnd).HasColumnType("time");
+            entity.Property(e => e.Date).HasColumnName("date").HasColumnType("text").IsRequired();
         });
 
         builder.Entity<Customer>().HasOne(p => p.User).WithOne().HasForeignKey<Customer>(p => p.UserId).IsRequired();
@@ -93,6 +98,16 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
 
         builder.Entity<Customer>().HasMany(c => c.Vouchers).WithOne().HasForeignKey(v => v.CustomerId);
         builder.Entity<Voucher>().HasIndex(v => v.Code).IsUnique();
+        builder.Entity<Order>().HasIndex(o => o.Id).IsUnique();
+        builder.Entity<Order>().HasOne(o => o.Customer).WithMany().HasForeignKey(o => o.CustomerId).OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<Order>().HasOne(o => o.Address).WithMany().HasForeignKey(o => o.AddressId).OnDelete(DeleteBehavior.Restrict);
+        builder.Entity<Order>().HasMany(o => o.Items).WithOne(i => i.Order).HasForeignKey(i => i.OrderId).OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<OrderItem>().HasIndex(o => o.Id).IsUnique();
+        builder.Entity<OrderItem>().HasOne(i => i.Order).WithMany(o => o.Items).HasForeignKey(i => i.OrderId).OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<OrderItem>().HasOne(i => i.Dish).WithMany().HasForeignKey(i => i.DishId).OnDelete(DeleteBehavior.Restrict);
+        builder.Entity<OrderItem>().Property(i => i.Quantity).IsRequired();
+        builder.Entity<OrderItem>().Property(i => i.Price).HasColumnType("decimal(18,2)");
+        builder.Entity<Order>().Property(o => o.TotalPrice).HasColumnType("decimal(18,2)");
 
         TestSeed.Seed(builder);
     }

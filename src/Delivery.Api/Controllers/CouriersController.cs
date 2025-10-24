@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using Delivery.Application.Dtos.Users.CourierDtos.Requests;
 using Delivery.Application.Dtos.Users.CourierDtos.Responses;
+using Delivery.Application.Exceptions;
 using Delivery.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

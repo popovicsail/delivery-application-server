@@ -11,12 +11,20 @@ public class DishRepository : GenericRepository<Dish>, IDishRepository
 {
     public DishRepository(ApplicationDbContext dbContext) : base(dbContext) { }
 
+    public async Task<IEnumerable<Dish>> GetByIdsWithAllergensAsync(IEnumerable<Guid> dishIds)
+    {
+        return await _dbContext.Dishes
+            .Where(d => dishIds.Contains(d.Id))
+            .Include(d => d.Allergens)
+            .ToListAsync();
+    }
+
     public new async Task<IEnumerable<Dish>> GetAllAsync()
     {
         return await _dbContext.Dishes
             .Include(d => d.DishOptionGroups)
                 .ThenInclude(g => g.DishOptions) // Include sve dish options
-            //.Include(d => d.Allergens) // ako želiš i alergene
+            .Include(d => d.Allergens) // ako želiš i alergene
             .ToListAsync();
     }
 
@@ -44,7 +52,7 @@ public class DishRepository : GenericRepository<Dish>, IDishRepository
         return await _dbContext.Dishes
             .Include(d => d.DishOptionGroups)
                 .ThenInclude(g => g.DishOptions)
-           //.Include(d => d.Allergens)
+            .Include(d => d.Allergens)
             .FirstOrDefaultAsync(d => d.Id == id);
     }
 
