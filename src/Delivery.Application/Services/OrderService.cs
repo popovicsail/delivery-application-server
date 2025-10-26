@@ -73,26 +73,32 @@ namespace Delivery.Application.Services
             order.Status = "Pending";
 
             // 7. Primeni vaučer ako postoji
-            var activeVoucher = customer.Vouchers
-                .Where(v => v.Status == "Active")
-                .OrderByDescending(v => v.DiscountAmount) // uzmi najveći popust
-                .FirstOrDefault();
+            Voucher? selectedVoucher = null;
 
-            if (activeVoucher != null)
+            if (request.VoucherId.HasValue)
+            {
+                selectedVoucher = customer.Vouchers
+                    .FirstOrDefault(v => v.Id == request.VoucherId.Value && v.Status == "Active");
+
+                if (selectedVoucher == null)
+                    throw new BadRequestException("Selected voucher is invalid or inactive.");
+            }
+
+            if (selectedVoucher != null)
             {
                 // Ako je popust procenat (npr. 0.12 = 12%)
                 // order.TotalPrice -= order.TotalPrice * (decimal)activeVoucher.DiscountAmount;
 
                 // Ako je popust fiksan iznos (npr. 500 dinara), koristi ovo umesto:
-                order.TotalPrice -= (decimal)activeVoucher.DiscountAmount;
+                order.TotalPrice -= (decimal)selectedVoucher.DiscountAmount;
 
                 if (order.TotalPrice < 0)
                     order.TotalPrice = 0;
 
-                // Deaktiviraj vaučer nakon korišćenja
-                activeVoucher.Status = "Inactive";
-                _unitOfWork.Vouchers.Update(activeVoucher);
+                selectedVoucher.Status = "Inactive";
+                _unitOfWork.Vouchers.Update(selectedVoucher);
             }
+
 
             await _unitOfWork.Orders.AddAsync(order);
             try
