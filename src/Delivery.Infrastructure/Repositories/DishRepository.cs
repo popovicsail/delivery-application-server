@@ -61,6 +61,9 @@ public class DishRepository : GenericRepository<Dish>, IDishRepository
         return await _dbContext.Menus
             .Include(m => m.Dishes)
                 .ThenInclude(d => d.Allergens)
+            .Include(m => m.Dishes)
+                .ThenInclude(d => d.DishOptionGroups)
+                    .ThenInclude(g => g.DishOptions)
             .FirstOrDefaultAsync(m => m.Id == menuId);
     }
 

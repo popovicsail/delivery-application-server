@@ -484,4 +484,4 @@ $RECYCLE.BIN/
 *.swp
 
 # EFC Database Migrations Folder
-**/Migrations/
+**Migrations/
