@@ -7,8 +7,10 @@ using Delivery.Application.Dtos.RestaurantDtos.Responses;
 using Delivery.Application.Exceptions;
 using Delivery.Application.Interfaces;
 using Delivery.Domain.Common;
+using Delivery.Domain.Entities.CommonEntities;
 using Delivery.Domain.Entities.DishEntities;
 using Delivery.Domain.Entities.RestaurantEntities;
+using Delivery.Domain.Entities.UserEntities;
 using Delivery.Domain.Interfaces;
 using Microsoft.AspNetCore.Http;
 
@@ -126,6 +128,20 @@ public class DishService : IDishService
             }
 
             dish.Picture = await ConvertToBase64(file);
+        }
+        else
+        {
+            dish.Picture = null;
+        }
+
+        if (request.AllergenIds != null && request.AllergenIds.Count > 0)
+        {
+            var allergens = await _unitOfWork.Allergens.FindAsync(request.AllergenIds);
+            dish.Allergens.Clear();
+            foreach (var allergen in allergens)
+            {
+                dish.Allergens.Add(allergen);
+            }
         }
 
         _unitOfWork.Dishes.Update(dish);

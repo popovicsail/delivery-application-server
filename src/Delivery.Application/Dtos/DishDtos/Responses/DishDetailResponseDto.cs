@@ -1,4 +1,6 @@
-﻿public class DishDetailResponseDto
+﻿using Delivery.Application.Dtos.CommonDtos.AllergenDtos;
+
+public class DishDetailResponseDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
@@ -7,5 +9,6 @@
     public string Type { get; set; }
     public string? Picture { get; set; }
 
+    public List<AllergenDto> Allergens { get; set; } = new();
     public List<DishOptionGroupResponseDto> DishOptionGroups { get; set; } = new();
 }
