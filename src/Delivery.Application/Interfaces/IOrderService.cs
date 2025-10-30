@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Delivery.Application.Dtos.OrderDtos.Requests;
 using Delivery.Application.Dtos.OrderDtos.Responses;
+using Delivery.Domain.Entities.OrderEntities.Enums;
 using Delivery.Domain.Entities.RestaurantEntities;
 
 namespace Delivery.Application.Interfaces
@@ -14,6 +15,7 @@ namespace Delivery.Application.Interfaces
         Task<OrderResponseDto> CreateAsync(CreateOrderRequestDto request);
         Task<OrderResponseDto> GetOneAsync(Guid orderId);
         Task<IEnumerable<OrderResponseDto>> GetAllAsync();
-        Task UpdateStatusAsync(Guid orderId, string newStatus);
+        Task UpdateStatusAsync(Guid orderId, int newStatus);
+        Task<IEnumerable<OrderResponseDto>> GetByRestaurantAsync(Guid restaurantId);
     }
 }

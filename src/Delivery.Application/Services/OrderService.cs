@@ -4,6 +4,7 @@ using Delivery.Application.Dtos.OrderDtos.Responses;
 using Delivery.Application.Exceptions;
 using Delivery.Application.Interfaces;
 using Delivery.Domain.Entities.OrderEntities;
+using Delivery.Domain.Entities.OrderEntities.Enums;
 using Delivery.Domain.Entities.RestaurantEntities;
 using Delivery.Domain.Entities.UserEntities;
 using Delivery.Domain.Interfaces;
@@ -21,6 +22,13 @@ namespace Delivery.Application.Services
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+        }
+
+        public async Task<IEnumerable<OrderResponseDto>> GetByRestaurantAsync(Guid restaurantId)
+        {
+            var orders = await _unitOfWork.Orders.GetByRestaurant(restaurantId);
+
+            return _mapper.Map<IEnumerable<OrderResponseDto>>(orders);
         }
 
         public async Task<OrderResponseDto> CreateAsync(CreateOrderRequestDto request)
@@ -70,7 +78,8 @@ namespace Delivery.Application.Services
 
             order.TotalPrice = order.Items.Sum(i => i.Price);
             order.Customer = customer;
-            order.Status = "Pending";
+            order.Status = OrderStatus.NaCekanju.ToString();
+            order.RestaurantId = request.RestaurantId;
 
             // 7. Primeni vaučer ako postoji
             Voucher? selectedVoucher = null;
@@ -129,13 +138,15 @@ namespace Delivery.Application.Services
             return _mapper.Map<IEnumerable<OrderResponseDto>>(orders);
         }
 
-        public async Task UpdateStatusAsync(Guid orderId, string newStatus)
+        public async Task UpdateStatusAsync(Guid orderId, int newStatus)
         {
+            OrderStatus statusEnum = (OrderStatus)newStatus;
+
             var order = await _unitOfWork.Orders.GetOneWithItemsAsync(orderId);
             if (order == null)
                 throw new NotFoundException($"Order with ID '{orderId}' not found.");
 
-            order.Status = newStatus;
+            order.Status = statusEnum.ToString();
             _unitOfWork.Orders.Update(order);
             await _unitOfWork.CompleteAsync(); // 👈 opet koristi tvoj metod
         }

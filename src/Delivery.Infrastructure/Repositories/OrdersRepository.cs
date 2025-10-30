@@ -14,6 +14,18 @@ namespace Delivery.Infrastructure.Repositories
     {
         public OrdersRepository(ApplicationDbContext dbContext) : base(dbContext) { }
 
+        public async Task<IEnumerable<Order>> GetByRestaurant(Guid restaurantId)
+        {
+            return await _dbContext.Orders
+                .Where(o => o.RestaurantId == restaurantId)
+                .Include(o => o.Items)
+                    .ThenInclude(i => i.Dish)
+                .Include(o => o.Customer)
+                    .ThenInclude(c => c.User)
+                .Include(o => o.Address)
+                .ToListAsync();
+        }
+
         public async Task<Order?> GetOneWithItemsAsync(Guid orderId)
         {
             return await _dbContext.Orders

@@ -1,6 +1,7 @@
-﻿using Delivery.Application.Dtos.OrderDtos.Requests;
+﻿using System.Text.Json.Serialization;
+using Delivery.Application.Dtos.OrderDtos.Requests;
 using Delivery.Application.Interfaces;
-using Microsoft.AspNetCore.Http;
+using Delivery.Domain.Entities.OrderEntities.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Delivery.Api.Controllers
@@ -32,6 +33,13 @@ namespace Delivery.Api.Controllers
             return Ok(result);
         }
 
+        [HttpGet("restaurant/{restaurantId:guid}")]
+        public async Task<IActionResult> GetByRestaurant(Guid restaurantId)
+        {
+            var result = await _orderService.GetByRestaurantAsync(restaurantId);
+            return Ok(result);
+        }
+
         // GET: api/orders
         [HttpGet]
         public async Task<IActionResult> GetAll()
@@ -42,7 +50,7 @@ namespace Delivery.Api.Controllers
 
         // PUT: api/orders/{orderId}/status
         [HttpPut("{orderId:guid}/status")]
-        public async Task<IActionResult> UpdateStatus(Guid orderId, [FromQuery] string newStatus)
+        public async Task<IActionResult> UpdateStatus(Guid orderId, [FromBody] int newStatus)
         {
             await _orderService.UpdateStatusAsync(orderId, newStatus);
             return NoContent();
