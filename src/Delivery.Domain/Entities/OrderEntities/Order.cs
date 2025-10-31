@@ -14,16 +14,21 @@ namespace Delivery.Domain.Entities.OrderEntities
         public Guid Id { get; set; }
         public Guid CustomerId { get; set; }
         public Customer Customer { get; set; }
+        public Guid? CourierId { get; set; }
+        public Courier? Courier { get; set; }
+
         public Guid AddressId { get; set; }
         public Address Address { get; set; }
 
         public decimal TotalPrice { get; set; }
         public DateTime CreatedAt { get; set; }
+        public int? TimeToPrepare { get; set; }
         public string Status { get; set; } = "KREIRANA";
         public Guid? RestaurantId { get; set; }
         public Restaurant? Restaurant { get; set; }
 
         public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
+
     }
 }
 

@@ -13,6 +13,7 @@ namespace Delivery.Application.Dtos.OrderDtos.Requests
         public Guid CustomerId { get; set; }
         public Guid AddressId { get; set; }
         public Guid RestaurantId { get; set; }
+        public int EstimatedPreparationTimeInMinutes { get; set; }
         public List<OrderItemRequestDto> Items { get; set; } = new();
         public Guid? VoucherId { get; set; } 
     }

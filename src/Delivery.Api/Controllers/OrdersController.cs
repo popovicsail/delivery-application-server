@@ -50,9 +50,9 @@ namespace Delivery.Api.Controllers
 
         // PUT: api/orders/{orderId}/status
         [HttpPut("{orderId:guid}/status")]
-        public async Task<IActionResult> UpdateStatus(Guid orderId, [FromBody] int newStatus)
+        public async Task<IActionResult> UpdateStatus(Guid orderId, [FromBody] UpdateOrderStatusRequestDto request)
         {
-            await _orderService.UpdateStatusAsync(orderId, newStatus);
+            await _orderService.UpdateStatusAsync(orderId, request.NewStatus, request.PrepTime);
             return NoContent();
         }
     }

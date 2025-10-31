@@ -83,6 +83,7 @@ public class Program
             });
 
             builder.Services.AddHostedService<CourierStatusUpdater>();
+            builder.Services.AddHostedService<OrderAssignmentBackgroundService>();
 
             var app = builder.Build();
 

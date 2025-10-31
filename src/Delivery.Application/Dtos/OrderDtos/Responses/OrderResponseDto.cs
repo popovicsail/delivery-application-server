@@ -12,6 +12,7 @@ namespace Delivery.Application.Dtos.OrderDtos.Responses
         public string CustomerName { get; set; }
         public string DeliveryAddress { get; set; }
         public decimal TotalPrice { get; set; }
+        public int TimeToPrepare { get; set; }
         public List<OrderItemDto> Items { get; set; } = new();
         public string Status { get; set; } // npr. "KREIRANA"
     }

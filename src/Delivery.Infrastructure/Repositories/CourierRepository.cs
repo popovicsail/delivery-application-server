@@ -29,4 +29,12 @@ public class CourierRepository : GenericRepository<Courier>, ICourierRepository
             .Include(c => c.WorkSchedules)
             .ToListAsync();
     }
+
+    public async Task<IEnumerable<Courier>> GetAllWithOrdersAsync()
+    {
+        return await _dbContext.Couriers
+            .Include(c => c.Orders)
+            .ToListAsync();
+    }
+
 }

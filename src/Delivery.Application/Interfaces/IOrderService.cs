@@ -15,7 +15,8 @@ namespace Delivery.Application.Interfaces
         Task<OrderResponseDto> CreateAsync(CreateOrderRequestDto request);
         Task<OrderResponseDto> GetOneAsync(Guid orderId);
         Task<IEnumerable<OrderResponseDto>> GetAllAsync();
-        Task UpdateStatusAsync(Guid orderId, int newStatus);
+        Task UpdateStatusAsync(Guid orderId, int newStatus, int eta);
         Task<IEnumerable<OrderResponseDto>> GetByRestaurantAsync(Guid restaurantId);
+        Task AutoAssignOrdersAsync();
     }
 }

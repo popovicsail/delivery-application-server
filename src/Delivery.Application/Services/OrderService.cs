@@ -138,7 +138,7 @@ namespace Delivery.Application.Services
             return _mapper.Map<IEnumerable<OrderResponseDto>>(orders);
         }
 
-        public async Task UpdateStatusAsync(Guid orderId, int newStatus)
+        public async Task UpdateStatusAsync(Guid orderId, int newStatus ,int eta)
         {
             OrderStatus statusEnum = (OrderStatus)newStatus;
 
@@ -146,9 +146,45 @@ namespace Delivery.Application.Services
             if (order == null)
                 throw new NotFoundException($"Order with ID '{orderId}' not found.");
 
+            if (eta > 0)
+            {
+                order.TimeToPrepare = eta;
+            }
+
             order.Status = statusEnum.ToString();
             _unitOfWork.Orders.Update(order);
             await _unitOfWork.CompleteAsync(); // 👈 opet koristi tvoj metod
+        }
+
+        public async Task AutoAssignOrdersAsync()
+        {
+            // 1. Učitaj sve porudžbine koje čekaju preuzimanje i nemaju kurira
+            var pendingOrders = (await _unitOfWork.Orders.GetAllAsync())
+                .Where(o => o.Status == OrderStatus.CekaSePreuzimanje.ToString() && o.CourierId == null)
+                .ToList();
+
+            // 2. Učitaj sve kurire sa njihovim porudžbinama
+            var couriers = await _unitOfWork.Couriers.GetAllWithOrdersAsync();
+
+            foreach (var order in pendingOrders)
+            {
+                // 3. Nađi prvog slobodnog kurira sa manje od 2 aktivne dostave
+                var courier = couriers.FirstOrDefault(c =>
+                    c.WorkStatus == "AKTIVAN" &&
+                    ((c.Orders?.Count(o => o.Status != OrderStatus.Zavrsena.ToString() &&
+                                 o.Status != OrderStatus.Odbijena.ToString())) ?? 0) < 2);
+
+                if (courier != null)
+                {
+                    // 4. Dodeli porudžbinu
+                    order.CourierId = courier.Id;
+                    order.Status = OrderStatus.DostavaUToku.ToString();
+
+                    _unitOfWork.Orders.Update(order);
+                }
+            }
+
+            await _unitOfWork.CompleteAsync();
         }
     }
 }
