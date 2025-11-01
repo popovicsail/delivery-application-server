@@ -48,6 +48,13 @@ namespace Delivery.Api.Controllers
             return Ok(result);
         }
 
+        [HttpGet("courier/{courierId:guid}")]
+        public async Task<IActionResult> GetByCourier(Guid courierId)
+        {
+            var result = await _orderService.GetByCourierAsync(courierId);
+            return Ok(result);
+        }
+
         // PUT: api/orders/{orderId}/status
         [HttpPut("{orderId:guid}/status")]
         public async Task<IActionResult> UpdateStatus(Guid orderId, [FromBody] UpdateOrderStatusRequestDto request)
@@ -55,5 +62,7 @@ namespace Delivery.Api.Controllers
             await _orderService.UpdateStatusAsync(orderId, request.NewStatus, request.PrepTime);
             return NoContent();
         }
+
+
     }
 }

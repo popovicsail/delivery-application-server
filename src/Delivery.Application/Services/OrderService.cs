@@ -31,6 +31,12 @@ namespace Delivery.Application.Services
             return _mapper.Map<IEnumerable<OrderResponseDto>>(orders);
         }
 
+        public async Task<IEnumerable<OrderResponseDto>> GetByCourierAsync(Guid courierId)
+        {
+            var orders = await _unitOfWork.Orders.GetByCourier(courierId);
+            return _mapper.Map<IEnumerable<OrderResponseDto>>(orders);
+        }
+
         public async Task<OrderResponseDto> CreateAsync(CreateOrderRequestDto request)
         {
             // 1. Učitaj kupca sa adresama i alergenima
@@ -178,7 +184,6 @@ namespace Delivery.Application.Services
                 {
                     // 4. Dodeli porudžbinu
                     order.CourierId = courier.Id;
-                    order.Status = OrderStatus.DostavaUToku.ToString();
 
                     _unitOfWork.Orders.Update(order);
                 }

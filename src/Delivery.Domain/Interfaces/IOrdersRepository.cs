@@ -12,5 +12,6 @@ namespace Delivery.Domain.Interfaces
         Task<Order?> GetOneWithItemsAsync(Guid orderId);
         Task<IEnumerable<Order>> GetAllWithItemsAsync();
         Task<IEnumerable<Order>> GetByRestaurant(Guid restaurantId);
+        Task<IEnumerable<Order>> GetByCourier(Guid courierId);
     }
 }

@@ -26,6 +26,20 @@ namespace Delivery.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Order>> GetByCourier(Guid courierId)
+        {
+            return await _dbContext.Orders
+                .Where(o => o.CourierId == courierId)
+                .Include(o => o.Items)
+                    .ThenInclude(i => i.Dish)
+                .Include(o => o.Customer)
+                    .ThenInclude(c => c.User)
+                .Include(o => o.Address)
+                .Include(o => o.Restaurant)
+                    .ThenInclude(r => r.Address)
+                .ToListAsync();
+        }
+
         public async Task<Order?> GetOneWithItemsAsync(Guid orderId)
         {
             return await _dbContext.Orders

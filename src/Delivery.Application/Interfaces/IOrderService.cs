@@ -18,5 +18,7 @@ namespace Delivery.Application.Interfaces
         Task UpdateStatusAsync(Guid orderId, int newStatus, int eta);
         Task<IEnumerable<OrderResponseDto>> GetByRestaurantAsync(Guid restaurantId);
         Task AutoAssignOrdersAsync();
+
+        Task<IEnumerable<OrderResponseDto>> GetByCourierAsync(Guid courierId);
     }
 }
