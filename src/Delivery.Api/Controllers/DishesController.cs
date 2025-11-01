@@ -1,7 +1,9 @@
-﻿using Delivery.Application.Dtos.DishDtos.Requests;
+﻿using Delivery.Application.Dtos.CommonDtos.AllergenDtos;
+using Delivery.Application.Dtos.DishDtos.Requests;
 using Delivery.Domain.Entities.DishEntities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace Delivery.Api.Controllers;
 
@@ -52,6 +54,10 @@ public class DishesController : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateAsync([FromRoute] Guid id, [FromForm] DishUpdateRequestDto request, IFormFile? file)
     {
+        if (!string.IsNullOrEmpty(Request.Form["AllergenIds"]))
+        {
+            request.AllergenIds = JsonConvert.DeserializeObject<List<Guid>>(Request.Form["AllergenIds"]);
+        }
         await _dishService.UpdateAsync(id, request, file);
 
         return NoContent();
