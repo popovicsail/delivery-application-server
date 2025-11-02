@@ -4,6 +4,7 @@ using Delivery.Application.Dtos.OrderDtos.Responses;
 using Delivery.Application.Exceptions;
 using Delivery.Application.Interfaces;
 using Delivery.Domain.Entities.OrderEntities;
+using Delivery.Domain.Entities.OrderEntities.Enums;
 using Delivery.Domain.Entities.RestaurantEntities;
 using Delivery.Domain.Entities.UserEntities;
 using Delivery.Domain.Interfaces;
@@ -21,6 +22,19 @@ namespace Delivery.Application.Services
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+        }
+
+        public async Task<IEnumerable<OrderResponseDto>> GetByRestaurantAsync(Guid restaurantId)
+        {
+            var orders = await _unitOfWork.Orders.GetByRestaurant(restaurantId);
+
+            return _mapper.Map<IEnumerable<OrderResponseDto>>(orders);
+        }
+
+        public async Task<IEnumerable<OrderResponseDto>> GetByCourierAsync(Guid courierId)
+        {
+            var orders = await _unitOfWork.Orders.GetByCourier(courierId);
+            return _mapper.Map<IEnumerable<OrderResponseDto>>(orders);
         }
 
         public async Task<OrderResponseDto> CreateAsync(CreateOrderRequestDto request)
@@ -70,29 +84,36 @@ namespace Delivery.Application.Services
 
             order.TotalPrice = order.Items.Sum(i => i.Price);
             order.Customer = customer;
-            order.Status = "Pending";
+            order.Status = OrderStatus.NaCekanju.ToString();
+            order.RestaurantId = request.RestaurantId;
 
             // 7. Primeni vaučer ako postoji
-            var activeVoucher = customer.Vouchers
-                .Where(v => v.Status == "Active")
-                .OrderByDescending(v => v.DiscountAmount) // uzmi najveći popust
-                .FirstOrDefault();
+            Voucher? selectedVoucher = null;
 
-            if (activeVoucher != null)
+            if (request.VoucherId.HasValue)
+            {
+                selectedVoucher = customer.Vouchers
+                    .FirstOrDefault(v => v.Id == request.VoucherId.Value && v.Status == "Active");
+
+                if (selectedVoucher == null)
+                    throw new BadRequestException("Selected voucher is invalid or inactive.");
+            }
+
+            if (selectedVoucher != null)
             {
                 // Ako je popust procenat (npr. 0.12 = 12%)
                 // order.TotalPrice -= order.TotalPrice * (decimal)activeVoucher.DiscountAmount;
 
                 // Ako je popust fiksan iznos (npr. 500 dinara), koristi ovo umesto:
-                order.TotalPrice -= (decimal)activeVoucher.DiscountAmount;
+                order.TotalPrice -= (decimal)selectedVoucher.DiscountAmount;
 
                 if (order.TotalPrice < 0)
                     order.TotalPrice = 0;
 
-                // Deaktiviraj vaučer nakon korišćenja
-                activeVoucher.Status = "Inactive";
-                _unitOfWork.Vouchers.Update(activeVoucher);
+                selectedVoucher.Status = "Inactive";
+                _unitOfWork.Vouchers.Update(selectedVoucher);
             }
+
 
             await _unitOfWork.Orders.AddAsync(order);
             try
@@ -123,15 +144,52 @@ namespace Delivery.Application.Services
             return _mapper.Map<IEnumerable<OrderResponseDto>>(orders);
         }
 
-        public async Task UpdateStatusAsync(Guid orderId, string newStatus)
+        public async Task UpdateStatusAsync(Guid orderId, int newStatus ,int eta)
         {
+            OrderStatus statusEnum = (OrderStatus)newStatus;
+
             var order = await _unitOfWork.Orders.GetOneWithItemsAsync(orderId);
             if (order == null)
                 throw new NotFoundException($"Order with ID '{orderId}' not found.");
 
-            order.Status = newStatus;
+            if (eta > 0)
+            {
+                order.TimeToPrepare = eta;
+            }
+
+            order.Status = statusEnum.ToString();
             _unitOfWork.Orders.Update(order);
             await _unitOfWork.CompleteAsync(); // 👈 opet koristi tvoj metod
+        }
+
+        public async Task AutoAssignOrdersAsync()
+        {
+            // 1. Učitaj sve porudžbine koje čekaju preuzimanje i nemaju kurira
+            var pendingOrders = (await _unitOfWork.Orders.GetAllAsync())
+                .Where(o => o.Status == OrderStatus.CekaSePreuzimanje.ToString() && o.CourierId == null)
+                .ToList();
+
+            // 2. Učitaj sve kurire sa njihovim porudžbinama
+            var couriers = await _unitOfWork.Couriers.GetAllWithOrdersAsync();
+
+            foreach (var order in pendingOrders)
+            {
+                // 3. Nađi prvog slobodnog kurira sa manje od 2 aktivne dostave
+                var courier = couriers.FirstOrDefault(c =>
+                    c.WorkStatus == "AKTIVAN" &&
+                    ((c.Orders?.Count(o => o.Status != OrderStatus.Zavrsena.ToString() &&
+                                 o.Status != OrderStatus.Odbijena.ToString())) ?? 0) < 2);
+
+                if (courier != null)
+                {
+                    // 4. Dodeli porudžbinu
+                    order.CourierId = courier.Id;
+
+                    _unitOfWork.Orders.Update(order);
+                }
+            }
+
+            await _unitOfWork.CompleteAsync();
         }
     }
 }

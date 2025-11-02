@@ -1,6 +1,7 @@
-﻿using Delivery.Application.Dtos.OrderDtos.Requests;
+﻿using System.Text.Json.Serialization;
+using Delivery.Application.Dtos.OrderDtos.Requests;
 using Delivery.Application.Interfaces;
-using Microsoft.AspNetCore.Http;
+using Delivery.Domain.Entities.OrderEntities.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Delivery.Api.Controllers
@@ -32,6 +33,13 @@ namespace Delivery.Api.Controllers
             return Ok(result);
         }
 
+        [HttpGet("restaurant/{restaurantId:guid}")]
+        public async Task<IActionResult> GetByRestaurant(Guid restaurantId)
+        {
+            var result = await _orderService.GetByRestaurantAsync(restaurantId);
+            return Ok(result);
+        }
+
         // GET: api/orders
         [HttpGet]
         public async Task<IActionResult> GetAll()
@@ -40,12 +48,21 @@ namespace Delivery.Api.Controllers
             return Ok(result);
         }
 
+        [HttpGet("courier/{courierId:guid}")]
+        public async Task<IActionResult> GetByCourier(Guid courierId)
+        {
+            var result = await _orderService.GetByCourierAsync(courierId);
+            return Ok(result);
+        }
+
         // PUT: api/orders/{orderId}/status
         [HttpPut("{orderId:guid}/status")]
-        public async Task<IActionResult> UpdateStatus(Guid orderId, [FromQuery] string newStatus)
+        public async Task<IActionResult> UpdateStatus(Guid orderId, [FromBody] UpdateOrderStatusRequestDto request)
         {
-            await _orderService.UpdateStatusAsync(orderId, newStatus);
+            await _orderService.UpdateStatusAsync(orderId, request.NewStatus, request.PrepTime);
             return NoContent();
         }
+
+
     }
 }

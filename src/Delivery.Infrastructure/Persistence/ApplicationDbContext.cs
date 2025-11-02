@@ -104,6 +104,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
         builder.Entity<Order>().HasIndex(o => o.Id).IsUnique();
         builder.Entity<Order>().HasOne(o => o.Customer).WithMany().HasForeignKey(o => o.CustomerId).OnDelete(DeleteBehavior.Cascade);
         builder.Entity<Order>().HasOne(o => o.Address).WithMany().HasForeignKey(o => o.AddressId).OnDelete(DeleteBehavior.Restrict);
+        builder.Entity<Order>().HasOne(o => o.Restaurant).WithMany().HasForeignKey(o => o.RestaurantId).OnDelete(DeleteBehavior.Cascade);
         builder.Entity<Order>().HasMany(o => o.Items).WithOne(i => i.Order).HasForeignKey(i => i.OrderId).OnDelete(DeleteBehavior.Cascade);
         builder.Entity<OrderItem>().HasIndex(o => o.Id).IsUnique();
         builder.Entity<OrderItem>().HasOne(i => i.Order).WithMany(o => o.Items).HasForeignKey(i => i.OrderId).OnDelete(DeleteBehavior.Cascade);
