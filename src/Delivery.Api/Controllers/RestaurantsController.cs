@@ -82,6 +82,14 @@ public class RestaurantsController : ControllerBase
         return Ok(response);
     }
 
+    [HttpGet("{restaurantId}/workers")]
+    [Authorize(Roles = "Owner")]
+    public async Task<IActionResult> GetWorkersAsync(Guid restaurantId)
+    {
+        var workers = await _restaurantService.GetWorkersAsync(restaurantId);
+        return Ok(workers);
+    }
+
     [HttpPost("{restaurantId}/workers")]
     [Authorize(Roles = "Owner")]
     public async Task<IActionResult> RegisterWorkerAsync(Guid restaurantId, [FromBody] WorkerCreateRequestDto request)

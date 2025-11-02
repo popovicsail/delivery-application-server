@@ -129,10 +129,6 @@ public class DishService : IDishService
 
             dish.Picture = await ConvertToBase64(file);
         }
-        else
-        {
-            dish.Picture = null;
-        }
 
         if (request.AllergenIds != null && request.AllergenIds.Count > 0)
         {

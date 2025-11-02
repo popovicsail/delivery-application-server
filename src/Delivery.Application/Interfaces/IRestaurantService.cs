@@ -20,5 +20,6 @@ public interface IRestaurantService
     Task<RestaurantDetailResponseDto> UpdateAsync(Guid id, RestaurantUpdateRequestDto request, IFormFile? file);
     Task DeleteAsync(Guid id);
     Task<WorkerDetailResponseDto> RegisterWorkerAsync(Guid restaurantId, WorkerCreateRequestDto request, ClaimsPrincipal User);
+    Task<IEnumerable<WorkerSummaryResponseDto>> GetWorkersAsync(Guid restaurantId);
     Task<MenuDto> GetRestaurantMenuAsync(Guid restaurantId);
 }
