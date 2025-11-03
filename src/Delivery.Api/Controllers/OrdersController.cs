@@ -17,12 +17,29 @@ namespace Delivery.Api.Controllers
             _orderService = orderService;
         }
 
-        // POST: api/orders
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateOrderRequestDto request)
+
+        // 1️⃣ Kreiranje porudžbine sa stavkama
+        [HttpPost("items")]
+        public async Task<ActionResult<Guid>> CreateOrderItems([FromBody] CreateOrderItemsDto request)
         {
-            var result = await _orderService.CreateAsync(request);
-            return CreatedAtAction(nameof(GetById), new { orderId = result.OrderId }, result);
+            var orderId = await _orderService.CreateItemsAsync(request);
+            return Ok(new { orderId });
+        }
+
+        // 2️⃣ Dopuna porudžbine sa adresom i vaučerom
+        [HttpPut("{orderId}/details")]
+        public async Task<IActionResult> UpdateOrderDetails(Guid orderId, [FromBody] UpdateOrderDetailsDto request)
+        {
+            await _orderService.UpdateDetailsAsync(orderId, request);
+            return NoContent();
+        }
+
+        // 3️⃣ Potvrda porudžbine
+        [HttpPost("{orderId}/confirm")]
+        public async Task<IActionResult> ConfirmOrder(Guid orderId)
+        {
+            await _orderService.ConfirmAsync(orderId);
+            return NoContent();
         }
 
         // GET: api/orders/{orderId}

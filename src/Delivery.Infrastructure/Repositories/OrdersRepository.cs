@@ -51,6 +51,19 @@ namespace Delivery.Infrastructure.Repositories
                 .FirstOrDefaultAsync(o => o.Id == orderId);
         }
 
+
+        public async Task<Order?> GetOneWithCustomerAsync(Guid orderId)
+        {
+            return await _dbContext.Orders
+                .Include(o => o.Items)
+                    .ThenInclude(i => i.Dish)
+                .Include(o => o.Customer)
+                    .ThenInclude(c => c.User)
+                .Include(o => o.Customer)
+                    .ThenInclude(c => c.Addresses)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+        }
+
         public async Task<IEnumerable<Order>> GetAllWithItemsAsync()
         {
             return await _dbContext.Orders

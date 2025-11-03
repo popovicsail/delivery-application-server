@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Delivery.Application.Dtos.DishDtos;
 
 namespace Delivery.Application.Dtos.OrderDtos.Responses
 {
@@ -12,5 +13,6 @@ namespace Delivery.Application.Dtos.OrderDtos.Responses
         public string DishName { get; set; }
         public decimal Price { get; set; }
         public int Quantity { get; set; }
+        public List<DishOptionGroupDto> DishOptionGroups { get; set; } = new();
     }
 }

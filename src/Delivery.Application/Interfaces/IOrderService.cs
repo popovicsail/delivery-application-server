@@ -12,7 +12,9 @@ namespace Delivery.Application.Interfaces
 {
     public interface IOrderService
     {
-        Task<OrderResponseDto> CreateAsync(CreateOrderRequestDto request);
+        Task ConfirmAsync(Guid orderId);
+        Task<Guid> CreateItemsAsync(CreateOrderItemsDto request);
+        Task UpdateDetailsAsync(Guid orderId, UpdateOrderDetailsDto request);
         Task<OrderResponseDto> GetOneAsync(Guid orderId);
         Task<IEnumerable<OrderResponseDto>> GetAllAsync();
         Task UpdateStatusAsync(Guid orderId, int newStatus, int eta);

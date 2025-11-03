@@ -4,17 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Delivery.Application.Dtos.CommonDtos.AddressDtos;
+using Delivery.Application.Dtos.OrderDtos.Responses;
 using Delivery.Domain.Entities.CommonEntities;
 
 namespace Delivery.Application.Dtos.OrderDtos.Requests
 {
-    public class CreateOrderRequestDto
+    public class CreateOrderItemsDto
     {
         public Guid CustomerId { get; set; }
-        public Guid AddressId { get; set; }
         public Guid RestaurantId { get; set; }
-        public int EstimatedPreparationTimeInMinutes { get; set; }
-        public List<OrderItemRequestDto> Items { get; set; } = new();
-        public Guid? VoucherId { get; set; } 
+        public List<OrderItemDto> Items { get; set; }
     }
 }

@@ -37,26 +37,20 @@ namespace Delivery.Application.Services
             return _mapper.Map<IEnumerable<OrderResponseDto>>(orders);
         }
 
-        public async Task<OrderResponseDto> CreateAsync(CreateOrderRequestDto request)
+        public async Task<Guid> CreateItemsAsync(CreateOrderItemsDto request)
         {
-            // 1. Učitaj kupca sa adresama i alergenima
-            var customer = await _unitOfWork.Customers.GetOneAsync(request.CustomerId);
+            // 1. Učitaj kupca
+            var customer = await _unitOfWork.Customers.GetOneAsync(request.CustomerId)
+                ?? throw new NotFoundException($"Customer with ID '{request.CustomerId}' not found.");
 
-            if (customer == null)
-                throw new NotFoundException($"Customer with ID '{request.CustomerId}' not found.");
-
-            // 2. Validacija adrese
-            if (!customer.Addresses.Any(a => a.Id == request.AddressId))
-                throw new BadRequestException("Invalid delivery address for this customer.");
-
-            // 3. Učitaj jela sa alergenima
+            // 2. Učitaj jela
             var dishIds = request.Items.Select(i => i.DishId).ToList();
             var dishes = await _unitOfWork.Dishes.GetByIdsWithAllergensAsync(dishIds);
 
             if (dishes.Count() != dishIds.Count)
                 throw new NotFoundException("One or more dishes not found.");
 
-            // 4. Validacija alergena
+            // 3. Validacija alergena
             var customerAllergens = customer.Allergens.Select(a => a.Name).ToHashSet();
             foreach (var dish in dishes)
             {
@@ -64,69 +58,73 @@ namespace Delivery.Application.Services
                     throw new BadRequestException($"Dish '{dish.Name}' contains allergens for this customer.");
             }
 
-            // 5. Kreiraj Order
-            var order = _mapper.Map<Order>(request);
-            order.CreatedAt = DateTime.UtcNow;
+            // 4. Mapiraj Order iz DTO
+            var order = _mapper.Map<Order>(request); // koristi CreateMap<CreateOrderItemsDto, Order>
 
-            // 6. Dodaj stavke i izračunaj cenu
-            foreach (var item in request.Items)
+            // 5. Mapiraj stavke i izračunaj cenu
+            foreach (var itemDto in request.Items)
             {
-                var dish = dishes.First(d => d.Id == item.DishId);
-
-                order.Items.Add(new OrderItem
-                {
-                    Id = Guid.NewGuid(),
-                    DishId = dish.Id,
-                    Quantity = item.Quantity,
-                    Price = (decimal)(dish.Price * item.Quantity)
-                });
+                var dish = dishes.First(d => d.Id == itemDto.DishId);
+                var item = _mapper.Map<OrderItem>(itemDto); // koristi CreateMap<OrderItemDto, OrderItem>
+                item.Price = (decimal)(dish.Price * itemDto.Quantity);
+                order.Items.Add(item);
             }
-
+            order.CustomerId = customer.Id;
             order.TotalPrice = order.Items.Sum(i => i.Price);
-            order.Customer = customer;
-            order.Status = OrderStatus.NaCekanju.ToString();
-            order.RestaurantId = request.RestaurantId;
 
-            // 7. Primeni vaučer ako postoji
-            Voucher? selectedVoucher = null;
+            // 6. Sačuvaj porudžbinu
+            await _unitOfWork.Orders.AddAsync(order);
+            await _unitOfWork.CompleteAsync();
+
+            return order.Id;
+        }
+
+
+        public async Task UpdateDetailsAsync(Guid orderId, UpdateOrderDetailsDto request)
+        {
+            var order = await _unitOfWork.Orders.GetOneWithCustomerAsync(orderId)
+                ?? throw new NotFoundException($"Order with ID '{orderId}' not found.");
+
+            var customer = order.Customer;
+
+            if (!customer.Addresses.Any(a => a.Id == request.AddressId))
+                throw new BadRequestException("Invalid delivery address for this customer.");
+
+            order.AddressId = request.AddressId;
 
             if (request.VoucherId.HasValue)
             {
-                selectedVoucher = customer.Vouchers
-                    .FirstOrDefault(v => v.Id == request.VoucherId.Value && v.Status == "Active");
+                var voucher = customer.Vouchers.FirstOrDefault(v =>
+                    v.Id == request.VoucherId.Value && v.Status == "Active");
 
-                if (selectedVoucher == null)
+                if (voucher == null)
                     throw new BadRequestException("Selected voucher is invalid or inactive.");
+
+                order.TotalPrice -= (decimal)voucher.DiscountAmount;
+                if (order.TotalPrice < 0) order.TotalPrice = 0;
+
+                voucher.Status = "Inactive";
+                _unitOfWork.Vouchers.Update(voucher);
+                order.VoucherId = voucher.Id;
             }
 
-            if (selectedVoucher != null)
-            {
-                // Ako je popust procenat (npr. 0.12 = 12%)
-                // order.TotalPrice -= order.TotalPrice * (decimal)activeVoucher.DiscountAmount;
-
-                // Ako je popust fiksan iznos (npr. 500 dinara), koristi ovo umesto:
-                order.TotalPrice -= (decimal)selectedVoucher.DiscountAmount;
-
-                if (order.TotalPrice < 0)
-                    order.TotalPrice = 0;
-
-                selectedVoucher.Status = "Inactive";
-                _unitOfWork.Vouchers.Update(selectedVoucher);
-            }
+            await _unitOfWork.CompleteAsync();
+        }
 
 
-            await _unitOfWork.Orders.AddAsync(order);
-            try
-            {
-                await _unitOfWork.CompleteAsync();
-            }
-            catch (DbUpdateException ex)
-            {
-                Console.WriteLine(ex.InnerException?.Message);
-                throw;
-            }
 
-            return _mapper.Map<OrderResponseDto>(order);
+        public async Task ConfirmAsync(Guid orderId)
+        {
+            var order = await _unitOfWork.Orders.GetOneAsync(orderId)
+                ?? throw new NotFoundException($"Order with ID '{orderId}' not found.");
+
+            if (order.Status != OrderStatus.Draft.ToString())
+                throw new BadRequestException("Order is not in a confirmable state.");
+
+            order.Status = OrderStatus.NaCekanju.ToString();
+            order.CreatedAt = DateTime.UtcNow;
+
+            await _unitOfWork.CompleteAsync();
         }
 
         public async Task<OrderResponseDto> GetOneAsync(Guid orderId)
