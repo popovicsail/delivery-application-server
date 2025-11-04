@@ -40,6 +40,18 @@ namespace Delivery.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        public async Task<Order?> GetDraftByCustomerAsync(Guid customerId)
+        {
+            return await _dbContext.Orders
+                .Where(o => o.CustomerId == customerId && (o.Status == "Draft"))
+                .Include(o => o.Items)
+                    .ThenInclude(i => i.Dish)
+                .Include(o => o.Customer)
+                    .ThenInclude(c => c.User)
+                .Include(o => o.Address)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<Order?> GetOneWithItemsAsync(Guid orderId)
         {
             return await _dbContext.Orders
@@ -61,6 +73,8 @@ namespace Delivery.Infrastructure.Repositories
                     .ThenInclude(c => c.User)
                 .Include(o => o.Customer)
                     .ThenInclude(c => c.Addresses)
+                .Include(o => o.Customer)
+                    .ThenInclude(c => c.Vouchers)
                 .FirstOrDefaultAsync(o => o.Id == orderId);
         }
 

@@ -31,6 +31,10 @@ namespace Delivery.Domain.Entities.OrderEntities
 
         public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
 
+        public void SetTotalPrice()
+        {
+            TotalPrice = (TotalPrice != 0) ? TotalPrice : (Items.Count > 0) ? Items.Sum(i => i.Price) : 0;
+        }
     }
 }
 

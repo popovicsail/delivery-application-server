@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Delivery.Application.Dtos.OrderDtos.Requests
 {
-    public class UpdateOrderDetailsDto
+    public class OrderUpdateDetailsDto
     {
         public Guid AddressId { get; set; }
         public Guid? VoucherId { get; set; }

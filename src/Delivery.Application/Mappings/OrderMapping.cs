@@ -12,7 +12,7 @@ namespace Delivery.Application.Mappings
         public OrderMapping()
         {
             // 🔹 3-step: CreateOrderItemsDto → Order
-            CreateMap<CreateOrderItemsDto, Order>()
+            CreateMap<OrderItemsCreateRequestDto, Order>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(_ => OrderStatus.Draft.ToString()))
@@ -23,8 +23,14 @@ namespace Delivery.Application.Mappings
             CreateMap<OrderItemDto, OrderItem>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
                 .ForMember(dest => dest.Price, opt => opt.Ignore()) // računa se ručno
-                .ForMember(dest => dest.DishId, opt => opt.MapFrom(src => src.DishId))
-                .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity));
+                .ForMember(dest => dest.DishId, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.DishOptions, opt => opt.Ignore())
+                .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity))
+                .ForMember(dest => dest.Name, opt =>
+                {
+                    opt.Condition(src => src.Name != null);
+                    opt.MapFrom(src => src.Name);
+                });
 
             // 🔹 Order → OrderResponseDto
             CreateMap<Order, OrderResponseDto>()
@@ -42,9 +48,14 @@ namespace Delivery.Application.Mappings
 
             // 🔹 OrderItem → OrderItemDto
             CreateMap<OrderItem, OrderItemDto>()
-                .ForMember(dest => dest.DishName, opt => opt.MapFrom(src => src.Dish.Name))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity))
                 .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price));
+
+            CreateMap<Order, OrderDraftResponseDto>()
+                .ForMember(dest => dest.TotalPrice, opt => opt.MapFrom(src => (src.TotalPrice != 0) ? src.TotalPrice : (src.Items.Count > 0) ? src.Items.Sum(i => i.Price) : 0));
+
+            CreateMap<OrderItem, OrderItemSummaryResponse>();
         }
     }
 }

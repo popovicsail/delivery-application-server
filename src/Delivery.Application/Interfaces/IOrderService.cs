@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Delivery.Application.Dtos.OrderDtos.Requests;
@@ -13,14 +14,17 @@ namespace Delivery.Application.Interfaces
     public interface IOrderService
     {
         Task ConfirmAsync(Guid orderId);
-        Task<Guid> CreateItemsAsync(CreateOrderItemsDto request);
-        Task UpdateDetailsAsync(Guid orderId, UpdateOrderDetailsDto request);
+        Task<Guid> CreateItemsAsync(OrderItemsCreateRequestDto request, ClaimsPrincipal User);
+        Task UpdateDetailsAsync(Guid orderId, OrderUpdateDetailsDto request);
         Task<OrderResponseDto> GetOneAsync(Guid orderId);
         Task<IEnumerable<OrderResponseDto>> GetAllAsync();
         Task UpdateStatusAsync(Guid orderId, int newStatus, int eta);
         Task<IEnumerable<OrderResponseDto>> GetByRestaurantAsync(Guid restaurantId);
+        Task DeleteItemAsync(Guid orderItemId);
+        Task DeleteAsync(Guid orderId);
         Task AutoAssignOrdersAsync();
 
         Task<IEnumerable<OrderResponseDto>> GetByCourierAsync(Guid courierId);
+        Task<OrderDraftResponseDto>? GetDraftByCustomerAsync(ClaimsPrincipal User);
     }
 }

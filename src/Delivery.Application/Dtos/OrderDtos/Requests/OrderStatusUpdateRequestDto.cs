@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Delivery.Application.Dtos.OrderDtos.Requests
 {
-    public class UpdateOrderStatusRequestDto
+    public class OrderStatusUpdateRequestDto
     {
         public int NewStatus { get; set; }
         public int PrepTime { get; set; }

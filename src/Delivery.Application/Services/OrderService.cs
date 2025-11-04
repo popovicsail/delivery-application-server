@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
 using Delivery.Application.Dtos.OrderDtos.Requests;
 using Delivery.Application.Dtos.OrderDtos.Responses;
 using Delivery.Application.Exceptions;
@@ -8,6 +9,7 @@ using Delivery.Domain.Entities.OrderEntities.Enums;
 using Delivery.Domain.Entities.RestaurantEntities;
 using Delivery.Domain.Entities.UserEntities;
 using Delivery.Domain.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -17,11 +19,13 @@ namespace Delivery.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly UserManager<User> _userManager;
 
-        public OrderService(IUnitOfWork unitOfWork, IMapper mapper)
+        public OrderService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<User> userManager)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _userManager = userManager;
         }
 
         public async Task<IEnumerable<OrderResponseDto>> GetByRestaurantAsync(Guid restaurantId)
@@ -37,18 +41,31 @@ namespace Delivery.Application.Services
             return _mapper.Map<IEnumerable<OrderResponseDto>>(orders);
         }
 
-        public async Task<Guid> CreateItemsAsync(CreateOrderItemsDto request)
+        public async Task<OrderDraftResponseDto>? GetDraftByCustomerAsync(ClaimsPrincipal User)
         {
+            var user = _userManager.GetUserAsync(User).Result
+                    ?? throw new Exception($"Not authorized");
+            var customer = await _unitOfWork.Customers.GetOneAsync(user.Id)
+                ?? throw new NotFoundException($"Customer with ID '{user.Id}' not found.");
+
+            var orders = await _unitOfWork.Orders.GetDraftByCustomerAsync(customer.Id);
+            return _mapper.Map<OrderDraftResponseDto>(orders);
+        }
+
+        public async Task<Guid> CreateItemsAsync(OrderItemsCreateRequestDto request, ClaimsPrincipal User)
+        {
+            var user = _userManager.GetUserAsync(User).Result
+                ?? throw new Exception($"Not authorized");
+
             // 1. Učitaj kupca
-            var customer = await _unitOfWork.Customers.GetOneAsync(request.CustomerId)
-                ?? throw new NotFoundException($"Customer with ID '{request.CustomerId}' not found.");
+            var customer = await _unitOfWork.Customers.GetOneAsync(user.Id)
+                ?? throw new NotFoundException($"Customer with ID '{user.Id}' not found.");
+
+            var draftOrder = await GetDraftByCustomerAsync(User);
 
             // 2. Učitaj jela
-            var dishIds = request.Items.Select(i => i.DishId).ToList();
+            var dishIds = request.Items.Select(i => i.Id).ToList();
             var dishes = await _unitOfWork.Dishes.GetByIdsWithAllergensAsync(dishIds);
-
-            if (dishes.Count() != dishIds.Count)
-                throw new NotFoundException("One or more dishes not found.");
 
             // 3. Validacija alergena
             var customerAllergens = customer.Allergens.Select(a => a.Name).ToHashSet();
@@ -64,23 +81,61 @@ namespace Delivery.Application.Services
             // 5. Mapiraj stavke i izračunaj cenu
             foreach (var itemDto in request.Items)
             {
-                var dish = dishes.First(d => d.Id == itemDto.DishId);
+                var dish = dishes.First(d => d.Id == itemDto.Id);
+                itemDto.Name = dish.Name;
                 var item = _mapper.Map<OrderItem>(itemDto); // koristi CreateMap<OrderItemDto, OrderItem>
-                item.Price = (decimal)(dish.Price * itemDto.Quantity);
+                item.Price = itemDto.Price * itemDto.Quantity;
+                //Izracunavanje cena za opcije
+                if (itemDto.DishOptionGroups != null && itemDto.DishOptionGroups.Count > 0)
+                {
+                    foreach (var optionGroupDto in itemDto.DishOptionGroups)
+                    {
+                        if (optionGroupDto.DishOptions != null && optionGroupDto.DishOptions.Count > 0)
+                        {
+                            foreach (var optionDto in optionGroupDto.DishOptions)
+                            {
+                                optionDto.Name = dish.DishOptionGroups
+                                    .First(og => og.Id == optionGroupDto.Id)
+                                    .DishOptions.First(o => o.Id == optionDto.Id).Name;
+                                if (optionDto != null)
+                                {
+                                    item.Price += (decimal)(optionDto.Price * itemDto.Quantity);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                var optionIds = itemDto.DishOptionGroups?
+                    .SelectMany(g => g.DishOptions)
+                    .Select(o => o.Id)
+                    .ToList() ?? new List<Guid>();
+
+                item.DishOptions = await _unitOfWork.Dishes.GetDishOptionsByIdsAsync(optionIds);
                 order.Items.Add(item);
             }
             order.CustomerId = customer.Id;
-            order.TotalPrice = order.Items.Sum(i => i.Price);
 
             // 6. Sačuvaj porudžbinu
-            await _unitOfWork.Orders.AddAsync(order);
+            if (draftOrder != null)
+            {
+                foreach(var newItem in order.Items)
+                {
+                    newItem.OrderId = draftOrder.Id;
+                    await _unitOfWork.OrderItems.AddAsync(newItem);
+                }
+            }
+            else
+            {
+                await _unitOfWork.Orders.AddAsync(order);
+            }
             await _unitOfWork.CompleteAsync();
 
             return order.Id;
         }
 
 
-        public async Task UpdateDetailsAsync(Guid orderId, UpdateOrderDetailsDto request)
+        public async Task UpdateDetailsAsync(Guid orderId, OrderUpdateDetailsDto request)
         {
             var order = await _unitOfWork.Orders.GetOneWithCustomerAsync(orderId)
                 ?? throw new NotFoundException($"Order with ID '{orderId}' not found.");
@@ -91,6 +146,7 @@ namespace Delivery.Application.Services
                 throw new BadRequestException("Invalid delivery address for this customer.");
 
             order.AddressId = request.AddressId;
+            order.SetTotalPrice();
 
             if (request.VoucherId.HasValue)
             {
@@ -107,6 +163,9 @@ namespace Delivery.Application.Services
                 _unitOfWork.Vouchers.Update(voucher);
                 order.VoucherId = voucher.Id;
             }
+
+            order.Status = OrderStatus.NaCekanju.ToString();
+            _unitOfWork.Orders.Update(order);
 
             await _unitOfWork.CompleteAsync();
         }
@@ -158,6 +217,24 @@ namespace Delivery.Application.Services
             order.Status = statusEnum.ToString();
             _unitOfWork.Orders.Update(order);
             await _unitOfWork.CompleteAsync(); // 👈 opet koristi tvoj metod
+        }
+
+        public async Task DeleteAsync(Guid orderId)
+        {
+            var order = await _unitOfWork.Orders.GetOneAsync(orderId);
+            if (order == null)
+                throw new NotFoundException($"Order with ID '{orderId}' not found.");
+            _unitOfWork.Orders.Delete(order);
+            await _unitOfWork.CompleteAsync();
+        }
+
+        public async Task DeleteItemAsync(Guid orderItemId)
+        {
+            var orderItem = await _unitOfWork.OrderItems.GetOneAsync(orderItemId);
+            if (orderItem == null)
+                throw new NotFoundException($"Order item with ID '{orderItemId}' not found.");
+            _unitOfWork.OrderItems.Delete(orderItem);
+            await _unitOfWork.CompleteAsync();
         }
 
         public async Task AutoAssignOrdersAsync()

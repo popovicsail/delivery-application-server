@@ -113,6 +113,13 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
         builder.Entity<OrderItem>().Property(i => i.Price).HasColumnType("decimal(18,2)");
         builder.Entity<Order>().Property(o => o.TotalPrice).HasColumnType("decimal(18,2)");
 
+        builder.Entity<OrderItem>().HasMany(oi => oi.DishOptions).WithMany()
+        .UsingEntity<Dictionary<string, object>>(
+            "OrderItemDishOption",
+            j => j.HasOne<DishOption>().WithMany().HasForeignKey("DishOptionId").OnDelete(DeleteBehavior.Cascade),
+            j => j.HasOne<OrderItem>().WithMany().HasForeignKey("OrderItemId").OnDelete(DeleteBehavior.Cascade)
+        );
+
         builder.Entity<FeedbackQuestion>(entity =>
         {
             entity.HasKey(q => q.Id);
