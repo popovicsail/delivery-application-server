@@ -186,24 +186,46 @@ public class RestaurantService : IRestaurantService
         {
             UserName = request.UserName,
             Email = request.Email,
+            PhoneNumber = request.PhoneNumber,
             FirstName = request.FirstName,
             LastName = request.LastName,
+            ProfilePictureBase64 = request.ProfilePictureBase64 ?? DefaultAvatar.Base64,
         };
 
         var result = await _userManager.CreateAsync(newUser, request.Password);
+        if (!result.Succeeded)
+        {
+            throw new BadRequestException("ERROR: Something went wrong while creating the account.");
+        }
+
         await _userManager.AddToRoleAsync(newUser, "Worker");
 
         var workerProfile = new Worker
         {
             UserId = newUser.Id,
             RestaurantId = restaurantId,
-            IsSuspended = false
+            IsSuspended = false,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow,
+            Job = request.Job
         };
 
         await _unitOfWork.Workers.AddAsync(workerProfile);
         await _unitOfWork.CompleteAsync();
 
         return _mapper.Map<WorkerDetailResponseDto>(workerProfile);
+    }
+
+    public async Task<IEnumerable<WorkerSummaryResponseDto>> GetWorkersAsync(Guid restaurantId)
+    {
+        var restaurant = await _unitOfWork.Restaurants.GetOneAsync(restaurantId);
+        if (restaurant == null)
+        {
+            throw new NotFoundException($"Restaurant with ID '{restaurantId}' was not found.");
+        }
+
+        var workers = await _unitOfWork.Restaurants.GetWorkersAsync(restaurantId);
+        return _mapper.Map<List<WorkerSummaryResponseDto>>(workers);
     }
 
     public async Task<MenuDto> GetRestaurantMenuAsync(Guid restaurantId)
@@ -220,7 +242,6 @@ public class RestaurantService : IRestaurantService
         }
 
         return _mapper.Map<MenuDto>(menu);
-
     }
 
     private static async Task<string> ConvertToBase64(IFormFile file)

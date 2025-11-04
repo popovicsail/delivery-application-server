@@ -10,4 +10,6 @@ public interface IWorkerService
     Task<WorkerDetailResponseDto> AddAsync(WorkerCreateRequestDto request);
     Task UpdateAsync(Guid id, WorkerUpdateRequestDto request);
     Task DeleteAsync(Guid id);
+    Task SuspendWorkerAsync(Guid id);
+    Task UnsuspendWorkerAsync(Guid id);
 }

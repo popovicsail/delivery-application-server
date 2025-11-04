@@ -1,5 +1,6 @@
 ﻿using Delivery.Domain.Common;
 using Delivery.Domain.Entities.RestaurantEntities;
+using Delivery.Domain.Entities.UserEntities;
 using Delivery.Domain.Interfaces;
 using Delivery.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -84,6 +85,15 @@ public class RestaurantRepository : GenericRepository<Restaurant>, IRestaurantRe
                 .ThenInclude(d => d.Allergens)
             .FirstOrDefaultAsync();
         return menu!;
+    }
+
+    public async Task<IEnumerable<Worker>> GetWorkersAsync(Guid restaurantId)
+    {
+        var workers = await _dbContext.Workers
+            .Include(w => w.User)
+            .Where(w => w.RestaurantId == restaurantId)
+            .ToListAsync();
+        return workers;
     }
 
     private static IQueryable<Restaurant> ApplySorting(IQueryable<Restaurant> query, int sort)
