@@ -82,7 +82,7 @@ public class CourierServiceTests
     public async Task UpdateAllCouriersStatusAsync_ShouldSetStatusToActive_WhenNowWithinSchedule()
     {
         // Arrange
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
         var courier = new Courier
         {
             Id = Guid.NewGuid(),

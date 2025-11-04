@@ -30,7 +30,7 @@ public class VoucherRepository : GenericRepository<Voucher>, IVoucherRepository
 
         query = query
             .Where(v => v.Status == "Active")
-            .Where(v => v.ExpirationDate < DateTime.Now);
+            .Where(v => v.ExpirationDate < DateTime.UtcNow);
 
         return await query.ToListAsync();
     }

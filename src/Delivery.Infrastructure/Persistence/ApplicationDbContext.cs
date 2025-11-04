@@ -135,7 +135,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
         {
             entity.HasKey(r => r.Id);
             entity.Property(r => r.Rating).IsRequired();
-            entity.Property(r => r.CreatedAt).HasDefaultValueSql("NOW()");
+            entity.Property(r => r.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
         });
 
         TestSeed.Seed(builder);

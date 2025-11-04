@@ -9,4 +9,6 @@ public class DishCreateRequestDto
     public string? Picture { get; set; }
 
     public Guid MenuId { get; set; }
+
+    public List<Guid>? AllergenIds { get; set; }
 }

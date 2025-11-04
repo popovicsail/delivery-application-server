@@ -29,8 +29,11 @@ public class CustomerMappings : Profile
 
         CreateMap<Voucher, VoucherDetailResponseDto>();
 
-        CreateMap<VoucherCreateRequestDto, Voucher>();
+        CreateMap<VoucherCreateRequestDto, Voucher>()
+            .ForMember(dest => dest.DateIssued, opt => opt.MapFrom(src => DateTime.SpecifyKind(src.DateIssued, DateTimeKind.Utc)))
+            .ForMember(dest => dest.ExpirationDate, opt => opt.MapFrom(src => DateTime.SpecifyKind(src.ExpirationDate, DateTimeKind.Utc)));
 
-        CreateMap<VoucherUpdateRequestDto, Voucher>();
+        CreateMap<VoucherUpdateRequestDto, Voucher>()
+            .ForMember(dest => dest.ExpirationDate, opt => opt.MapFrom(src => DateTime.SpecifyKind(src.ExpirationDate, DateTimeKind.Utc)));
     }
 }

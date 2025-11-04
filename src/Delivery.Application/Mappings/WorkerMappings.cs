@@ -9,7 +9,8 @@ public class WorkerMappings : Profile
 {
     public WorkerMappings()
     {
-        CreateMap<WorkerCreateRequestDto, Worker>();
+        CreateMap<WorkerCreateRequestDto, Worker>()
+            .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow));
 
         CreateMap<WorkerUpdateRequestDto, Worker>()
             .ForPath(dest => dest.User.FirstName,
@@ -38,6 +39,7 @@ public class WorkerMappings : Profile
             opt => opt.MapFrom(src => src.User.Email))
             .ForMember(dest => dest.ProfilePictureBase64,
             opt => opt.MapFrom(src => src.User.ProfilePictureBase64));
+
 
         CreateMap<Worker, WorkerDetailResponseDto>()
             .ForMember(dest => dest.FirstName,

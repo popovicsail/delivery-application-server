@@ -119,7 +119,7 @@ public class RestaurantRepository : GenericRepository<Restaurant>, IRestaurantRe
 
 
         bool fullDay = filterMix.OpeningTime <= TimeSpan.Zero && filterMix.ClosingTime >= new TimeSpan(23, 59, 0);
-        DateTime today = DateTime.Now;
+        DateTime today = DateTime.UtcNow;
 
         if (!fullDay || (fullDay && !filterMix.ClosedToo)) //Apply if user set "from" and "to" times or if user doesn't want closed restaurants in full day filter
         {

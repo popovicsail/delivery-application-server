@@ -18,7 +18,7 @@ public class CourierStatusUpdaterTests
     public async Task UpdateAllCouriersStatusAsync_ShouldSetActive_WhenNowWithinSchedule()
     {
         // Arrange
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
         var courier = new Courier
         {
             WorkSchedules = new List<WorkSchedule>
