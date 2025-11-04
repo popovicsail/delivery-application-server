@@ -1,6 +1,7 @@
-﻿using Delivery.Application.Dtos.OrderDtos.Requests;
+﻿using System.Text.Json.Serialization;
+using Delivery.Application.Dtos.OrderDtos.Requests;
 using Delivery.Application.Interfaces;
-using Microsoft.AspNetCore.Http;
+using Delivery.Domain.Entities.OrderEntities.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Delivery.Api.Controllers
@@ -16,12 +17,29 @@ namespace Delivery.Api.Controllers
             _orderService = orderService;
         }
 
-        // POST: api/orders
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateOrderRequestDto request)
+
+        // 1️⃣ Kreiranje porudžbine sa stavkama
+        [HttpPost("items")]
+        public async Task<ActionResult<Guid>> CreateOrderItems([FromBody] CreateOrderItemsDto request)
         {
-            var result = await _orderService.CreateAsync(request);
-            return CreatedAtAction(nameof(GetById), new { orderId = result.OrderId }, result);
+            var orderId = await _orderService.CreateItemsAsync(request);
+            return Ok(new { orderId });
+        }
+
+        // 2️⃣ Dopuna porudžbine sa adresom i vaučerom
+        [HttpPut("{orderId}/details")]
+        public async Task<IActionResult> UpdateOrderDetails(Guid orderId, [FromBody] UpdateOrderDetailsDto request)
+        {
+            await _orderService.UpdateDetailsAsync(orderId, request);
+            return NoContent();
+        }
+
+        // 3️⃣ Potvrda porudžbine
+        [HttpPost("{orderId}/confirm")]
+        public async Task<IActionResult> ConfirmOrder(Guid orderId)
+        {
+            await _orderService.ConfirmAsync(orderId);
+            return NoContent();
         }
 
         // GET: api/orders/{orderId}
@@ -29,6 +47,13 @@ namespace Delivery.Api.Controllers
         public async Task<IActionResult> GetById(Guid orderId)
         {
             var result = await _orderService.GetOneAsync(orderId);
+            return Ok(result);
+        }
+
+        [HttpGet("restaurant/{restaurantId:guid}")]
+        public async Task<IActionResult> GetByRestaurant(Guid restaurantId)
+        {
+            var result = await _orderService.GetByRestaurantAsync(restaurantId);
             return Ok(result);
         }
 
@@ -40,12 +65,21 @@ namespace Delivery.Api.Controllers
             return Ok(result);
         }
 
+        [HttpGet("courier/{courierId:guid}")]
+        public async Task<IActionResult> GetByCourier(Guid courierId)
+        {
+            var result = await _orderService.GetByCourierAsync(courierId);
+            return Ok(result);
+        }
+
         // PUT: api/orders/{orderId}/status
         [HttpPut("{orderId:guid}/status")]
-        public async Task<IActionResult> UpdateStatus(Guid orderId, [FromQuery] string newStatus)
+        public async Task<IActionResult> UpdateStatus(Guid orderId, [FromBody] UpdateOrderStatusRequestDto request)
         {
-            await _orderService.UpdateStatusAsync(orderId, newStatus);
+            await _orderService.UpdateStatusAsync(orderId, request.NewStatus, request.PrepTime);
             return NoContent();
         }
+
+
     }
 }

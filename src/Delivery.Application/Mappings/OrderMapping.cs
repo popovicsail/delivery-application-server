@@ -2,6 +2,7 @@
 using Delivery.Application.Dtos.OrderDtos.Requests;
 using Delivery.Application.Dtos.OrderDtos.Responses;
 using Delivery.Domain.Entities.OrderEntities;
+using Delivery.Domain.Entities.OrderEntities.Enums;
 using Delivery.Domain.Entities.UserEntities;
 
 namespace Delivery.Application.Mappings
@@ -10,26 +11,40 @@ namespace Delivery.Application.Mappings
     {
         public OrderMapping()
         {
-            // CreateOrderRequestDto -> Order
-            CreateMap<CreateOrderRequestDto, Order>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => "KREIRANA"))
-                .ForMember(dest => dest.TotalPrice, opt => opt.Ignore())
-                .ForMember(dest => dest.Items, opt => opt.Ignore()); // puni se ručno u servisu
+            // 🔹 3-step: CreateOrderItemsDto → Order
+            CreateMap<CreateOrderItemsDto, Order>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(_ => OrderStatus.Draft.ToString()))
+                .ForMember(dest => dest.Items, opt => opt.Ignore()) // puni se ručno
+                .ForMember(dest => dest.TotalPrice, opt => opt.Ignore());
 
-            // Order -> OrderResponseDto
+            // 🔹 OrderItemDto → OrderItem
+            CreateMap<OrderItemDto, OrderItem>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
+                .ForMember(dest => dest.Price, opt => opt.Ignore()) // računa se ručno
+                .ForMember(dest => dest.DishId, opt => opt.MapFrom(src => src.DishId))
+                .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity));
+
+            // 🔹 Order → OrderResponseDto
             CreateMap<Order, OrderResponseDto>()
                 .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.CustomerName,
                     opt => opt.MapFrom(src => src.Customer.User.FirstName + " " + src.Customer.User.LastName))
                 .ForMember(dest => dest.DeliveryAddress,
-                    opt => opt.MapFrom(src => src.Address.StreetAndNumber + ", " + src.Address.City))
-                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
+                    opt => opt.MapFrom(src => src.Address != null
+                        ? src.Address.StreetAndNumber + ", " + src.Address.City
+                        : ""))
+                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
+                .ForMember(dest => dest.TotalPrice, opt => opt.MapFrom(src => src.TotalPrice))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt));
 
-            // OrderItem -> OrderItemDto
+            // 🔹 OrderItem → OrderItemDto
             CreateMap<OrderItem, OrderItemDto>()
-                .ForMember(dest => dest.DishName, opt => opt.MapFrom(src => src.Dish.Name));
+                .ForMember(dest => dest.DishName, opt => opt.MapFrom(src => src.Dish.Name))
+                .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity))
+                .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price));
         }
     }
 }

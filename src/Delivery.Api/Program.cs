@@ -39,7 +39,7 @@ public class Program
             {
                 options.AddPolicy("AllowReactApp", policy =>
                 {
-                    policy.WithOrigins("https://localhost:5173", "http://localhost:5173")
+                    policy.WithOrigins("https://localhost:5173", "http://localhost:5174")
                           .AllowAnyHeader()
                           .AllowAnyMethod();
                 });
@@ -83,6 +83,7 @@ public class Program
             });
 
             builder.Services.AddHostedService<CourierStatusUpdater>();
+            builder.Services.AddHostedService<OrderAssignmentBackgroundService>();
 
             var app = builder.Build();
 

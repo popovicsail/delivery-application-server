@@ -475,9 +475,13 @@ namespace Delivery.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<Guid>("AddressId")
+                    b.Property<Guid?>("AddressId")
                         .HasColumnType("uuid")
                         .HasColumnName("address_id");
+
+                    b.Property<Guid?>("CourierId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("courier_id");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -487,14 +491,26 @@ namespace Delivery.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("customer_id");
 
+                    b.Property<Guid>("RestaurantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("restaurant_id");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("status");
 
+                    b.Property<int?>("TimeToPrepare")
+                        .HasColumnType("integer")
+                        .HasColumnName("time_to_prepare");
+
                     b.Property<decimal>("TotalPrice")
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("total_price");
+
+                    b.Property<Guid?>("VoucherId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("voucher_id");
 
                     b.HasKey("Id")
                         .HasName("pk_orders");
@@ -502,12 +518,21 @@ namespace Delivery.Infrastructure.Migrations
                     b.HasIndex("AddressId")
                         .HasDatabaseName("ix_orders_address_id");
 
+                    b.HasIndex("CourierId")
+                        .HasDatabaseName("ix_orders_courier_id");
+
                     b.HasIndex("CustomerId")
                         .HasDatabaseName("ix_orders_customer_id");
 
                     b.HasIndex("Id")
                         .IsUnique()
                         .HasDatabaseName("ix_orders_id");
+
+                    b.HasIndex("RestaurantId")
+                        .HasDatabaseName("ix_orders_restaurant_id");
+
+                    b.HasIndex("VoucherId")
+                        .HasDatabaseName("ix_orders_voucher_id");
 
                     b.ToTable("orders", (string)null);
                 });
@@ -1489,8 +1514,12 @@ namespace Delivery.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("AddressId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
                         .HasConstraintName("fk_orders_addresses_address_id");
+
+                    b.HasOne("Delivery.Domain.Entities.UserEntities.Courier", "Courier")
+                        .WithMany("Orders")
+                        .HasForeignKey("CourierId")
+                        .HasConstraintName("fk_orders_couriers_courier_id");
 
                     b.HasOne("Delivery.Domain.Entities.UserEntities.Customer", "Customer")
                         .WithMany()
@@ -1499,9 +1528,27 @@ namespace Delivery.Infrastructure.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_orders_customers_customer_id");
 
+                    b.HasOne("Delivery.Domain.Entities.RestaurantEntities.Restaurant", "Restaurant")
+                        .WithMany()
+                        .HasForeignKey("RestaurantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_orders_restaurants_restaurant_id");
+
+                    b.HasOne("Delivery.Domain.Entities.UserEntities.Voucher", "Voucher")
+                        .WithMany()
+                        .HasForeignKey("VoucherId")
+                        .HasConstraintName("fk_orders_vouchers_voucher_id");
+
                     b.Navigation("Address");
 
+                    b.Navigation("Courier");
+
                     b.Navigation("Customer");
+
+                    b.Navigation("Restaurant");
+
+                    b.Navigation("Voucher");
                 });
 
             modelBuilder.Entity("Delivery.Domain.Entities.OrderEntities.OrderItem", b =>
@@ -1746,6 +1793,8 @@ namespace Delivery.Infrastructure.Migrations
 
             modelBuilder.Entity("Delivery.Domain.Entities.UserEntities.Courier", b =>
                 {
+                    b.Navigation("Orders");
+
                     b.Navigation("WorkSchedules");
                 });
 

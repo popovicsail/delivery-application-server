@@ -51,6 +51,7 @@ namespace Delivery.Application.Services
                 var courier = await _unitOfWork.Couriers.GetOneWithUserAsync(user.Id);
                 if (courier != null)
                 {
+                    response.CourierId = courier.Id;
                     response.Status = courier.WorkStatus;
                 }
             }

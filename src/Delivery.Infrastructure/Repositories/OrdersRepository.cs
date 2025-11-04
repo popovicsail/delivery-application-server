@@ -14,6 +14,32 @@ namespace Delivery.Infrastructure.Repositories
     {
         public OrdersRepository(ApplicationDbContext dbContext) : base(dbContext) { }
 
+        public async Task<IEnumerable<Order>> GetByRestaurant(Guid restaurantId)
+        {
+            return await _dbContext.Orders
+                .Where(o => o.RestaurantId == restaurantId)
+                .Include(o => o.Items)
+                    .ThenInclude(i => i.Dish)
+                .Include(o => o.Customer)
+                    .ThenInclude(c => c.User)
+                .Include(o => o.Address)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Order>> GetByCourier(Guid courierId)
+        {
+            return await _dbContext.Orders
+                .Where(o => o.CourierId == courierId)
+                .Include(o => o.Items)
+                    .ThenInclude(i => i.Dish)
+                .Include(o => o.Customer)
+                    .ThenInclude(c => c.User)
+                .Include(o => o.Address)
+                .Include(o => o.Restaurant)
+                    .ThenInclude(r => r.Address)
+                .ToListAsync();
+        }
+
         public async Task<Order?> GetOneWithItemsAsync(Guid orderId)
         {
             return await _dbContext.Orders
@@ -22,6 +48,19 @@ namespace Delivery.Infrastructure.Repositories
                 .Include(o => o.Customer)
                     .ThenInclude(c => c.User)
                 .Include(o => o.Address)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+        }
+
+
+        public async Task<Order?> GetOneWithCustomerAsync(Guid orderId)
+        {
+            return await _dbContext.Orders
+                .Include(o => o.Items)
+                    .ThenInclude(i => i.Dish)
+                .Include(o => o.Customer)
+                    .ThenInclude(c => c.User)
+                .Include(o => o.Customer)
+                    .ThenInclude(c => c.Addresses)
                 .FirstOrDefaultAsync(o => o.Id == orderId);
         }
 
