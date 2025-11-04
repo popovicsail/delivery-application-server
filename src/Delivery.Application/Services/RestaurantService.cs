@@ -244,7 +244,7 @@ public class RestaurantService : IRestaurantService
         return _mapper.Map<MenuDto>(menu);
     }
 
-    private static async Task<string> ConvertToBase64(IFormFile file)
+    public static async Task<string> ConvertToBase64(IFormFile file)
     {
         using var ms = new MemoryStream();
         await file.CopyToAsync(ms);
