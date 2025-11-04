@@ -1,6 +1,7 @@
 ﻿using Delivery.Application.Dtos.Users.WorkerDtos.Requests;
 using Delivery.Application.Dtos.Users.WorkerDtos.Responses;
 using Delivery.Application.Interfaces;
+using Delivery.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -48,6 +49,22 @@ public class WorkersController : ControllerBase
         await _workerService.UpdateAsync(id, request);
 
         return NoContent();
+    }
+
+    [HttpPut("{id:guid}/suspend")]
+    [Authorize(Roles = "Owner")]
+    public async Task<IActionResult> SuspendWorkerAsync(Guid id)
+    {
+        await _workerService.SuspendWorkerAsync(id);
+        return Ok();
+    }
+
+    [HttpPut("{id:guid}/unsuspend")]
+    [Authorize(Roles = "Owner")]
+    public async Task<IActionResult> UnsuspendWorkerAsync(Guid id)
+    {
+        await _workerService.UnsuspendWorkerAsync(id);
+        return Ok();
     }
 
     [HttpDelete("{id:guid}")]

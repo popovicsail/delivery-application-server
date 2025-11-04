@@ -75,10 +75,43 @@ public class WorkerService : IWorkerService
             throw new NotFoundException($"Worker with ID '{id}' was not found.");
         }
 
+        var user = await _userManager.FindByIdAsync(worker.UserId.ToString());
+
+        if (user == null)
+        {
+            throw new NotFoundException($"User with ID '{worker.UserId}' was not found.");
+        }
+
+        worker.User = user;
+
         _mapper.Map(workerDto, worker);
 
         _unitOfWork.Workers.Update(worker);
 
+        await _unitOfWork.CompleteAsync();
+    }
+
+    public async Task SuspendWorkerAsync(Guid id)
+    {
+        var worker = await _unitOfWork.Workers.GetOneAsync(id);
+        if (worker == null)
+        {
+            throw new NotFoundException($"Worker with ID '{id}' was not found.");
+        }
+        worker.IsSuspended = true;
+        _unitOfWork.Workers.Update(worker);
+        await _unitOfWork.CompleteAsync();
+    }
+
+    public async Task UnsuspendWorkerAsync(Guid id)
+    {
+        var worker = await _unitOfWork.Workers.GetOneAsync(id);
+        if (worker == null)
+        {
+            throw new NotFoundException($"Worker with ID '{id}' was not found.");
+        }
+        worker.IsSuspended = false;
+        _unitOfWork.Workers.Update(worker);
         await _unitOfWork.CompleteAsync();
     }
 

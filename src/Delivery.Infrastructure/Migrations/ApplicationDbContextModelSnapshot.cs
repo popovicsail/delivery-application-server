@@ -1044,9 +1044,21 @@ namespace Delivery.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
                     b.Property<bool>("IsSuspended")
                         .HasColumnType("boolean")
                         .HasColumnName("is_suspended");
+
+                    b.Property<string>("Job")
+                        .HasColumnType("text")
+                        .HasColumnName("job");
 
                     b.Property<Guid>("RestaurantId")
                         .HasColumnType("uuid")
