@@ -93,6 +93,16 @@ public class DishService : IDishService
             dish.Picture = await ConvertToBase64(file);
         }
 
+        if (request.AllergenIds != null && request.AllergenIds.Count > 0)
+        {
+            var allergens = await _unitOfWork.Allergens.FindAsync(request.AllergenIds);
+            dish.Allergens.Clear();
+            foreach (var allergen in allergens)
+            {
+                dish.Allergens.Add(allergen);
+            }
+        }
+
         await _unitOfWork.Dishes.AddAsync(dish);
 
         await _unitOfWork.CompleteAsync();

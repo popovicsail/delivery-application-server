@@ -8,6 +8,7 @@ public class WorkerCreateRequestDto
     public string LastName { get; set; }
     public string? Email { get; set; }
     public string? PhoneNumber { get; set; }
+    public DateTime? CreatedAt { get; set; }
     public string Job { get; set; }
     public string? ProfilePictureBase64 { get; set; }
 }

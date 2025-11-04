@@ -46,6 +46,10 @@ public class DishesController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<DishDetailResponseDto>> CreateAsync([FromForm] DishCreateRequestDto request, IFormFile? file)
     {
+        if (!string.IsNullOrEmpty(Request.Form["AllergenIds"]))
+        {
+            request.AllergenIds = JsonConvert.DeserializeObject<List<Guid>>(Request.Form["AllergenIds"]);
+        }
         var dish = await _dishService.AddAsync(request, file);
 
         return CreatedAtAction("GetOne", new { id = dish.Id }, dish);
