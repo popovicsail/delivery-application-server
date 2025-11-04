@@ -14,8 +14,11 @@ public class DishRepository : GenericRepository<Dish>, IDishRepository
     public async Task<IEnumerable<Dish>> GetByIdsWithAllergensAsync(IEnumerable<Guid> dishIds)
     {
         return await _dbContext.Dishes
+            .AsNoTracking()
             .Where(d => dishIds.Contains(d.Id))
             .Include(d => d.Allergens)
+            .Include(d => d.DishOptionGroups)
+                .ThenInclude(g => g.DishOptions)
             .ToListAsync();
     }
 
@@ -56,7 +59,7 @@ public class DishRepository : GenericRepository<Dish>, IDishRepository
             .FirstOrDefaultAsync(d => d.Id == id);
     }
 
-    public new async Task<Menu?> GetMenuAsync(Guid menuId)
+    public async Task<Menu?> GetMenuAsync(Guid menuId)
     {
         return await _dbContext.Menus
             .Include(m => m.Dishes)
@@ -65,6 +68,13 @@ public class DishRepository : GenericRepository<Dish>, IDishRepository
                 .ThenInclude(d => d.DishOptionGroups)
                     .ThenInclude(g => g.DishOptions)
             .FirstOrDefaultAsync(m => m.Id == menuId);
+    }
+
+    public async Task<ICollection<DishOption>> GetDishOptionsByIdsAsync(IEnumerable<Guid> optionIds)
+    {
+        return await _dbContext.DishOptions
+            .Where(o => optionIds.Contains(o.Id))
+            .ToListAsync();
     }
 
     private IQueryable<Dish> ApplySorting(IQueryable<Dish> query, int sort)

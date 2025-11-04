@@ -12,6 +12,6 @@ public class DishOptionGroupMapping : Profile
 
         CreateMap<DishOptionCreateDto, DishOption>();
         CreateMap<DishOptionUpdateRequestDto, DishOption>();
-        CreateMap<DishOption, DishOptionDto>();
+        CreateMap<DishOption, DishOptionDto>().ReverseMap();
     }
 }

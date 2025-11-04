@@ -9,9 +9,8 @@ using Delivery.Domain.Entities.CommonEntities;
 
 namespace Delivery.Application.Dtos.OrderDtos.Requests
 {
-    public class CreateOrderItemsDto
+    public class OrderItemsCreateRequestDto
     {
-        public Guid CustomerId { get; set; }
         public Guid RestaurantId { get; set; }
         public List<OrderItemDto> Items { get; set; }
     }
