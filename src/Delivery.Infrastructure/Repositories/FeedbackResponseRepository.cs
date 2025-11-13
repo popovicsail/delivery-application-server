@@ -12,6 +12,7 @@ public class FeedbackResponseRepository : GenericRepository<FeedbackResponse>, I
     public async Task<IEnumerable<FeedbackResponse>> GetResponsesByPeriodAsync(Guid questionId, DateTime from, DateTime to)
     {
         return await _dbContext.FeedbackResponses
+            .Include(r => r.User)
             .Where(r => r.QuestionId == questionId && r.CreatedAt >= from && r.CreatedAt <= to)
             .ToListAsync();
     }
