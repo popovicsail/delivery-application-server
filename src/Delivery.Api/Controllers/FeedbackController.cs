@@ -8,7 +8,7 @@ namespace Delivery.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize] // samo prijavljeni korisnici mogu slati feedback
+    [Authorize]
     public class FeedbackController : ControllerBase
     {
         private readonly IFeedbackService _feedbackService;
@@ -18,7 +18,6 @@ namespace Delivery.API.Controllers
             _feedbackService = feedbackService;
         }
 
-        // GET: api/feedback/questions
         [HttpGet("questions")]
         public async Task<IActionResult> GetQuestions()
         {
@@ -26,41 +25,29 @@ namespace Delivery.API.Controllers
             return Ok(questions);
         }
 
-        // GET: api/feedback/user
         [HttpGet("user")]
         public async Task<IActionResult> GetUserFeedback()
         {
-            var userId = GetCurrentUserId();
-            var feedback = await _feedbackService.GetUserFeedbackAsync(userId);
-            return Ok(feedback);
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var responses = await _feedbackService.GetUserFeedbackAsync(userId);
+            return Ok(responses);
         }
 
-        // POST: api/feedback
-        // Kreira ili ažurira feedback korisnika
-        [HttpPost]
-        public async Task<IActionResult> SubmitFeedback([FromBody] IEnumerable<FeedbackCreateRequestDto> feedbackRequestDto)
+        [HttpPost("submit")]
+        public async Task<IActionResult> SubmitFeedback([FromBody] IEnumerable<FeedbackCreateRequestDto> feedbackDtos)
         {
-            var userId = GetCurrentUserId();
-            await _feedbackService.SubmitFeedbackAsync(userId, feedbackRequestDto);
-            return Ok(new { Message = "Feedback submitted successfully." });
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            await _feedbackService.SubmitFeedbackAsync(userId, feedbackDtos);
+            return Ok(new { message = "Feedback successfully submitted." });
         }
 
-        // GET: api/feedback/statistics
-        // Samo admin ili odgovarajuća uloga može pozvati
-        [HttpGet("statistics")]
+        [HttpPost("statistics")]
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> GetStatistics()
+        public async Task<IActionResult> GetStatistics([FromBody] FeedbackFilterRequestDto request)
         {
-            var stats = await _feedbackService.GetStatisticsAsync();
+            var stats = await _feedbackService.GetFilteredResponsesAsync(request);
             return Ok(stats);
         }
 
-        // 💡 Helper metoda za trenutno ulogovanog korisnika
-        private Guid GetCurrentUserId()
-        {
-            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-            if (userIdClaim == null) throw new UnauthorizedAccessException("User ID not found in token.");
-            return Guid.Parse(userIdClaim);
-        }
     }
 }
