@@ -11,6 +11,7 @@ using Delivery.Domain.Entities.UserEntities;
 using Delivery.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 
 namespace Delivery.Application.Services
@@ -35,11 +36,43 @@ namespace Delivery.Application.Services
             return _mapper.Map<IEnumerable<OrderResponseDto>>(orders);
         }
 
-        public async Task<IEnumerable<OrderResponseDto>> GetByCourierAsync(Guid courierId)
+        public async Task<(IEnumerable<OrderResponseDto> Items, int TotalCount)> GetByCourierAsync(
+         Guid courierId,
+         DateTime? from = null,
+         DateTime? to = null,
+         int page = 1,
+         int pageSize = 10)
         {
-            var orders = await _unitOfWork.Orders.GetByCourier(courierId);
-            return _mapper.Map<IEnumerable<OrderResponseDto>>(orders);
+            // povlačimo query iz repozitorijuma
+            var query = await _unitOfWork.Orders.GetByCourier(courierId, from, to);
+
+            // računamo total count
+            var totalCount = query.Count();
+
+
+            // mapiramo u DTO
+            var mapped = _mapper.Map<IEnumerable<OrderResponseDto>>(query);
+
+            // vraćamo tuple (Items, TotalCount)
+            return (mapped, totalCount);
         }
+
+        public async Task<(IEnumerable<OrderResponseDto> Items, int TotalCount)> GetByCustomerAsync(
+        Guid customerId,
+        int page = 1,
+        int pageSize = 10)
+        {
+
+            var orders = await _unitOfWork.Orders.GetByCustomer(customerId, page, pageSize);
+            var totalCount = orders.Count();
+            var mapped = _mapper.Map<IEnumerable<OrderResponseDto>>(orders);
+
+            return (mapped, totalCount);
+        }
+
+
+
+
 
         public async Task<OrderDraftResponseDto>? GetDraftByCustomerAsync(ClaimsPrincipal User)
         {
@@ -135,7 +168,8 @@ namespace Delivery.Application.Services
         }
 
 
-        public async Task UpdateDetailsAsync(Guid orderId, OrderUpdateDetailsDto request)
+
+        public async Task<OrderResponseDto> UpdateDetailsAsync(Guid orderId, OrderUpdateDetailsDto request)
         {
             var order = await _unitOfWork.Orders.GetOneWithCustomerAsync(orderId)
                 ?? throw new NotFoundException($"Order with ID '{orderId}' not found.");
@@ -168,6 +202,7 @@ namespace Delivery.Application.Services
             _unitOfWork.Orders.Update(order);
 
             await _unitOfWork.CompleteAsync();
+            return _mapper.Map<OrderResponseDto>(order);
         }
 
 

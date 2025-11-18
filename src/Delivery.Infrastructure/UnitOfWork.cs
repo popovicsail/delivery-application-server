@@ -23,7 +23,7 @@ public class UnitOfWork : IUnitOfWork
     public IFeedbackResponseRepository FeedbackResponses { get; private set; }
     public IOrderItemsRepository OrderItems { get; private set; }
     public IOrdersRepository Orders { get; private set; }
-
+    public IRatingRepository Rates { get; private set; }
     public UnitOfWork(ApplicationDbContext dbContext)
     {
         _dbContext = dbContext;
@@ -41,6 +41,7 @@ public class UnitOfWork : IUnitOfWork
         FeedbackResponses = new FeedbackResponseRepository(_dbContext);
         OrderItems = new OrderItemsRepository(_dbContext);
         Orders = new OrdersRepository(_dbContext);
+        Rates = new RatingRepository(_dbContext);
     }
 
     public Task<int> CompleteAsync()

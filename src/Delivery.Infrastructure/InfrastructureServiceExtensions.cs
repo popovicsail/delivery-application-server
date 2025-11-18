@@ -32,6 +32,7 @@ public static class InfrastructureServiceExtensions
         services.AddScoped<IOwnerRepository, OwnerRepository>();
         services.AddScoped<IFeedbackQuestionRepository, FeedbackQuestionRepository>();
         services.AddScoped<IFeedbackResponseRepository, FeedbackResponseRepository>();
+        services.AddScoped<IRatingRepository, RatingRepository>();
 
         return services;
     }

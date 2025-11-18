@@ -16,5 +16,6 @@ public interface IUnitOfWork : IDisposable
     IFeedbackResponseRepository FeedbackResponses { get; }
     IOrdersRepository Orders { get;}
     IOrderItemsRepository OrderItems { get; }
+    IRatingRepository Rates { get; }
     Task<int> CompleteAsync();
 }
