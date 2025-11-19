@@ -37,7 +37,6 @@ namespace Delivery.Api.Controllers
         [HttpPut("{orderId}/details")]
         public async Task<IActionResult> UpdateOrderDetails(Guid orderId, [FromBody] OrderUpdateDetailsDto request)
         {
-            
             return Ok(await _orderService.UpdateDetailsAsync(orderId, request));
         }
 
@@ -80,11 +79,31 @@ namespace Delivery.Api.Controllers
         }
 
         [HttpGet("courier/{courierId:guid}")]
-        public async Task<IActionResult> GetByCourier(Guid courierId)
+        public async Task<IActionResult> GetByCourier(Guid courierId, DateTime? from = null, DateTime? to = null, int page = 1, int pageSize = 10)
         {
-            var result = await _orderService.GetByCourierAsync(courierId);
+            // konverzija u UTC ako nisu null
+            if (from.HasValue && from.Value.Kind == DateTimeKind.Unspecified)
+                from = DateTime.SpecifyKind(from.Value, DateTimeKind.Utc);
+
+            if (to.HasValue && to.Value.Kind == DateTimeKind.Unspecified)
+                to = DateTime.SpecifyKind(to.Value, DateTimeKind.Utc);
+
+            var result = await _orderService.GetByCourierAsync(courierId, from, to, page, pageSize);
             return Ok(result);
         }
+
+
+        [HttpGet("customer/{customerId:guid}/deliveries-history")]
+        public async Task<IActionResult> GetByCustomer(Guid customerId, int page = 1, int pageSize = 10)
+        {
+            var result = await _orderService.GetByCustomerAsync(customerId, page, pageSize);
+
+            return Ok(new
+            {
+                items = result.Items,
+                totalCount = result.TotalCount
+            });
+         }
 
         // PUT: api/orders/{orderId}/status
         [HttpPut("{orderId:guid}/status")]

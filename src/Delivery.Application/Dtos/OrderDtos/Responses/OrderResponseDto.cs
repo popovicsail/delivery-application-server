@@ -10,6 +10,8 @@ namespace Delivery.Application.Dtos.OrderDtos.Responses
     public class OrderResponseDto
     {
         public Guid OrderId { get; set; }
+        public Guid CourierId { get; set; }
+        public Guid CustomerId { get; set; }
         public string CustomerName { get; set; }
         public string DeliveryAddress { get; set; }
         public decimal TotalPrice { get; set; }

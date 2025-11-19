@@ -38,6 +38,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
     public DbSet<FeedbackResponse> FeedbackResponses { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
+    public DbSet<Rating> Rating { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

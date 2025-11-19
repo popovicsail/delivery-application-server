@@ -26,7 +26,16 @@ namespace Delivery.Application.Interfaces
         Task DeleteAsync(Guid orderId);
         Task AutoAssignOrdersAsync();
 
-        Task<IEnumerable<OrderResponseDto>> GetByCourierAsync(Guid courierId);
+        Task<(IEnumerable<OrderResponseDto> Items, int TotalCount)> GetByCourierAsync(
+         Guid courierId,
+         DateTime? from = null,
+         DateTime? to = null,
+         int page = 1,
+         int pageSize = 10);
+        Task<(IEnumerable<OrderResponseDto> Items, int TotalCount)> GetByCustomerAsync(
+        Guid customerId,
+        int page = 1,
+        int pageSize = 10);
         Task<OrderDraftResponseDto>? GetDraftByCustomerAsync(ClaimsPrincipal User);
     }
 }

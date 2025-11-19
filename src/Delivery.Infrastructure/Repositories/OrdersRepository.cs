@@ -26,17 +26,50 @@ namespace Delivery.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Order>> GetByCourier(Guid courierId)
+        public async Task<IEnumerable<Order>> GetByCourier(
+        Guid courierId,
+        DateTime? from = null,
+        DateTime? to = null,
+        int page = 1,
+        int pageSize = 10)
         {
-            return await _dbContext.Orders
+            var query = _dbContext.Orders
                 .Where(o => o.CourierId == courierId)
-                .Include(o => o.Items)
-                    .ThenInclude(i => i.Dish)
-                .Include(o => o.Customer)
-                    .ThenInclude(c => c.User)
+                .Include(o => o.Items).ThenInclude(i => i.Dish)
+                .Include(o => o.Customer).ThenInclude(c => c.User)
                 .Include(o => o.Address)
-                .Include(o => o.Restaurant)
-                    .ThenInclude(r => r.Address)
+                .Include(o => o.Restaurant).ThenInclude(r => r.Address)
+                .AsQueryable();
+
+            if (from.HasValue)
+                query = query.Where(o => o.CreatedAt >= from.Value.ToUniversalTime());
+
+            if (to.HasValue)
+                query = query.Where(o => o.CreatedAt <= to.Value.ToUniversalTime());
+
+
+            return await query
+                .OrderByDescending(o => o.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Order>> GetByCustomer(
+        Guid customerId,
+        int page = 1,
+        int pageSize = 10)
+        {
+            var query = _dbContext.Orders
+                .Where(o => o.CustomerId == customerId)
+                .Include(o => o.Items).ThenInclude(i => i.Dish)
+                .Include(o => o.Restaurant).ThenInclude(r => r.Address)
+                .Include(o => o.Address)
+                .OrderByDescending(o => o.CreatedAt);
+
+            return await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
         }
 
@@ -72,6 +105,7 @@ namespace Delivery.Infrastructure.Repositories
                 .Include(o => o.Customer)
                     .ThenInclude(c => c.User)
                 .Include(o => o.Address)
+                .Include(o => o.Restaurant)
                 .FirstOrDefaultAsync(o => o.Id == orderId);
         }
 

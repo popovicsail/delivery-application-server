@@ -24,6 +24,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<IFeedbackService, FeedbackService>();
         services.AddScoped<IOrderService, OrderService>();
         services.AddScoped<IVoucherService, VoucherService>();
+        services.AddScoped<IRatingService, RatingService>();
 
         return services;
     }
