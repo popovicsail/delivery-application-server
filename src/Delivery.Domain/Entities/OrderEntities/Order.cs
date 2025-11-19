@@ -22,7 +22,7 @@ namespace Delivery.Domain.Entities.OrderEntities
         public Guid? AddressId { get; set; }
         public Address? Address { get; set; }
 
-        public decimal TotalPrice { get; set; }
+        public double TotalPrice { get; set; }
         public DateTime CreatedAt { get; set; }
         public int? TimeToPrepare { get; set; }
         public string Status { get; set; }
@@ -33,7 +33,11 @@ namespace Delivery.Domain.Entities.OrderEntities
 
         public void SetTotalPrice()
         {
-            TotalPrice = (TotalPrice != 0) ? TotalPrice : (Items.Count > 0) ? Items.Sum(i => i.Price) : 0;
+            TotalPrice = Items.Count > 0
+                ? Items.Sum(i => (i.DishPrice + i.OptionsPrice) * i.Quantity - (i.DiscountExpireAt != null && i.DiscountExpireAt > DateTime.UtcNow && i.DiscountRate != 0
+                ? i.DiscountRate * i.DishPrice * i.Quantity
+                : 0))
+                : 0;
         }
     }
 }

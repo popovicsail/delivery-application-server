@@ -41,6 +41,17 @@ namespace Delivery.Application.Services
             return _mapper.Map<IEnumerable<OrderResponseDto>>(orders);
         }
 
+        public async Task<OrderResponseDto> GetOneNotDraftAsync(ClaimsPrincipal User)
+        {
+            var user = _userManager.GetUserAsync(User).Result
+                    ?? throw new Exception($"Not authorized");
+            var customer = await _unitOfWork.Customers.GetOneAsync(user.Id)
+                ?? throw new NotFoundException($"Customer with ID '{user.Id}' not found.");
+
+            var orders = await _unitOfWork.Orders.GetOneNotDraftAsync(customer.Id);
+            return _mapper.Map<OrderResponseDto>(orders);
+        }
+
         public async Task<OrderDraftResponseDto>? GetDraftByCustomerAsync(ClaimsPrincipal User)
         {
             var user = _userManager.GetUserAsync(User).Result
@@ -83,8 +94,11 @@ namespace Delivery.Application.Services
             {
                 var dish = dishes.First(d => d.Id == itemDto.Id);
                 itemDto.Name = dish.Name;
+                itemDto.DiscountRate = dish.DiscountRate;
+                itemDto.DiscountExpireAt = dish.DiscountExpireAt;
                 var item = _mapper.Map<OrderItem>(itemDto); // koristi CreateMap<OrderItemDto, OrderItem>
-                item.Price = itemDto.Price * itemDto.Quantity;
+                item.DishPrice = dish.Price;
+
                 //Izracunavanje cena za opcije
                 if (itemDto.DishOptionGroups != null && itemDto.DishOptionGroups.Count > 0)
                 {
@@ -99,13 +113,12 @@ namespace Delivery.Application.Services
                                     .DishOptions.First(o => o.Id == optionDto.Id).Name;
                                 if (optionDto != null)
                                 {
-                                    item.Price += (decimal)(optionDto.Price * itemDto.Quantity);
+                                    item.OptionsPrice += optionDto.Price * itemDto.Quantity;
                                 }
                             }
                         }
                     }
                 }
-
                 var optionIds = itemDto.DishOptionGroups?
                     .SelectMany(g => g.DishOptions)
                     .Select(o => o.Id)
@@ -135,7 +148,7 @@ namespace Delivery.Application.Services
         }
 
 
-        public async Task UpdateDetailsAsync(Guid orderId, OrderUpdateDetailsDto request)
+        public async Task<OrderResponseDto> UpdateDetailsAsync(Guid orderId, OrderUpdateDetailsDto request)
         {
             var order = await _unitOfWork.Orders.GetOneWithCustomerAsync(orderId)
                 ?? throw new NotFoundException($"Order with ID '{orderId}' not found.");
@@ -156,7 +169,7 @@ namespace Delivery.Application.Services
                 if (voucher == null)
                     throw new BadRequestException("Selected voucher is invalid or inactive.");
 
-                order.TotalPrice -= (decimal)voucher.DiscountAmount;
+                order.TotalPrice -= voucher.DiscountAmount;
                 if (order.TotalPrice < 0) order.TotalPrice = 0;
 
                 voucher.Status = "Inactive";
@@ -168,6 +181,8 @@ namespace Delivery.Application.Services
             _unitOfWork.Orders.Update(order);
 
             await _unitOfWork.CompleteAsync();
+
+            return _mapper.Map<OrderResponseDto>(order);
         }
 
 

@@ -110,7 +110,8 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
         builder.Entity<OrderItem>().HasOne(i => i.Order).WithMany(o => o.Items).HasForeignKey(i => i.OrderId).OnDelete(DeleteBehavior.Cascade);
         builder.Entity<OrderItem>().HasOne(i => i.Dish).WithMany().HasForeignKey(i => i.DishId).OnDelete(DeleteBehavior.Restrict);
         builder.Entity<OrderItem>().Property(i => i.Quantity).IsRequired();
-        builder.Entity<OrderItem>().Property(i => i.Price).HasColumnType("decimal(18,2)");
+        builder.Entity<OrderItem>().Property(i => i.DishPrice).HasColumnType("decimal(18,2)");
+        builder.Entity<OrderItem>().Property(i => i.OptionsPrice).HasColumnType("decimal(18,2)");
         builder.Entity<Order>().Property(o => o.TotalPrice).HasColumnType("decimal(18,2)");
 
         builder.Entity<OrderItem>().HasMany(oi => oi.DishOptions).WithMany()

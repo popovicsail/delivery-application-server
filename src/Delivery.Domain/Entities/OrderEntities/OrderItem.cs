@@ -14,7 +14,10 @@ namespace Delivery.Domain.Entities.OrderEntities
         public Dish? Dish { get; set; }
         public string? Name { get; set; }
         public int Quantity { get; set; }
-        public decimal Price { get; set; }
+        public double DishPrice { get; set; }
+        public double OptionsPrice { get; set; }
+        public double DiscountRate { get; set; } = 0;
+        public DateTime? DiscountExpireAt { get; set; }
 
         public Guid OrderId { get; set; }
         public Order Order { get; set; }
