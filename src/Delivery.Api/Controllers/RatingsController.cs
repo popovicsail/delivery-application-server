@@ -19,7 +19,7 @@ namespace Delivery.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateRating([FromForm] CreateRatingRequestDto dto)
         {
-            var userId = GetUserIdFromClaims();
+            var userId = dto.CustomerId;
             var ratingId = await _ratingService.CreateRatingAsync(dto, userId);
             return Ok(new { ratingId });
         }
