@@ -54,99 +54,100 @@ public static class TestSeed
             new FeedbackQuestion
             {
                 Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-                Text = "Kako biste ocenili kvalitet hrane?"
+                Text = "Kako biste ocenili jednostavnost korišćenja platforme?"
             },
             new FeedbackQuestion
             {
                 Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                Text = "Da li je isporuka stigla na vreme?"
+                Text = "Da li ste zadovoljni brzinom rada aplikacije ili sajta?"
             },
             new FeedbackQuestion
             {
                 Id = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                Text = "Kako biste ocenili ljubaznost dostavljača?"
+                Text = "Koliko ste zadovoljni tačnošću prikazanih informacija o restoranima i jelima?"
             },
             new FeedbackQuestion
             {
                 Id = Guid.Parse("44444444-4444-4444-4444-444444444444"),
-                Text = "Kako biste ocenili kvalitet pakovanja hrane?"
+                Text = "Kako biste ocenili opšte korisničko iskustvo na našoj platformi?"
             }
         );
 
         modelBuilder.Entity<FeedbackResponse>().HasData(
-            new FeedbackResponse
-            {
-                Id = Guid.Parse("1a2b3c4d-5e6f-4789-9abc-def012345678"),
-                QuestionId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-                Rating = 5,
-                Comment = "Jednostavno!",
-                CreatedAt = DateTime.UtcNow,
-                UserId = Guid.Parse("11111111-1111-1111-1111-111111111111")
-            },
-            new FeedbackResponse
-            {
-                Id = Guid.Parse("2b3c4d5e-6f70-489a-abcd-ef0123456789"),
-                QuestionId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                Rating = 3,
-                Comment = "",
-                CreatedAt = DateTime.UtcNow,
-                UserId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-            },
-            new FeedbackResponse
-            {
-                Id = Guid.Parse("3c4d5e6f-7081-49ab-bcde-f01234567890"),
-                QuestionId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                Rating = 3,
-                Comment = "",
-                CreatedAt = DateTime.UtcNow,
-                UserId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-            },
-            new FeedbackResponse
-            {
-                Id = Guid.Parse("4d5e6f70-8192-4abc-cdef-012345678901"),
-                QuestionId = Guid.Parse("44444444-4444-4444-4444-444444444444"),
-                Rating = 4,
-                Comment = "",
-                CreatedAt = DateTime.UtcNow,
-                UserId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-            },
-            new FeedbackResponse
-            {
-                Id = Guid.Parse("5e6f7081-92a3-4bcd-def0-123456789012"),
-                QuestionId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-                Rating = 2,
-                Comment = "Isporuka je bila na vreme.",
-                CreatedAt = DateTime.UtcNow,
-                UserId = Guid.Parse("22222222-2222-2222-2222-222222222222")
-            },
-            new FeedbackResponse
-            {
-                Id = Guid.Parse("6f708192-a3b4-4cde-ef01-234567890123"),
-                QuestionId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                Rating = 5,
-                Comment = "Odlican!",
-                CreatedAt = DateTime.UtcNow,
-                UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-            },
-            new FeedbackResponse
-            {
-                Id = Guid.Parse("708192a3-b4c5-4def-f012-345678901234"),
-                QuestionId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                Rating = 4,
-                Comment = "Isporuka je bila na vreme.",
-                CreatedAt = DateTime.UtcNow,
-                UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-            },
-            new FeedbackResponse
-            {
-                Id = Guid.Parse("8192a3b4-c5d6-4ef0-0123-456789012345"),
-                QuestionId = Guid.Parse("44444444-4444-4444-4444-444444444444"),
-                Rating = 2,
-                Comment = "",
-                CreatedAt = DateTime.UtcNow,
-                UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-            }
-        );
+        new FeedbackResponse
+        {
+            Id = Guid.Parse("1a2b3c4d-5e6f-4789-9abc-def012345678"),
+            QuestionId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
+            Rating = 5,
+            Comment = "Veoma jednostavno za korišćenje!",
+            CreatedAt = DateTime.UtcNow,
+            UserId = Guid.Parse("11111111-1111-1111-1111-111111111111")
+        },
+        new FeedbackResponse
+        {
+            Id = Guid.Parse("2b3c4d5e-6f70-489a-abcd-ef0123456789"),
+            QuestionId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
+            Rating = 4,
+            Comment = "Brzo se učitava, bez zastajkivanja.",
+            CreatedAt = DateTime.UtcNow,
+            UserId = Guid.Parse("11111111-1111-1111-1111-111111111111")
+        },
+        new FeedbackResponse
+        {
+            Id = Guid.Parse("3c4d5e6f-7081-49ab-bcde-f01234567890"),
+            QuestionId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
+            Rating = 3,
+            Comment = "Nekad nisu tačne sve informacije o radnom vremenu.",
+            CreatedAt = DateTime.UtcNow,
+            UserId = Guid.Parse("11111111-1111-1111-1111-111111111111")
+        },
+        new FeedbackResponse
+        {
+            Id = Guid.Parse("4d5e6f70-8192-4abc-cdef-012345678901"),
+            QuestionId = Guid.Parse("44444444-4444-4444-4444-444444444444"),
+            Rating = 5,
+            Comment = "Generalno sjajno korisničko iskustvo!",
+            CreatedAt = DateTime.UtcNow,
+            UserId = Guid.Parse("11111111-1111-1111-1111-111111111111")
+        },
+
+        new FeedbackResponse
+        {
+            Id = Guid.Parse("5e6f7081-92a3-4bcd-def0-123456789012"),
+            QuestionId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
+            Rating = 4,
+            Comment = "Aplikacija je pregledna i laka za korišćenje.",
+            CreatedAt = DateTime.UtcNow.AddDays(-1),
+            UserId = Guid.Parse("22222222-2222-2222-2222-222222222222")
+        },
+        new FeedbackResponse
+        {
+            Id = Guid.Parse("6f708192-a3b4-4cde-ef01-234567890123"),
+            QuestionId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
+            Rating = 5,
+            Comment = "Radi glatko čak i na sporijem internetu.",
+            CreatedAt = DateTime.UtcNow.AddDays(-1),
+            UserId = Guid.Parse("22222222-2222-2222-2222-222222222222")
+        },
+        new FeedbackResponse
+        {
+            Id = Guid.Parse("708192a3-b4c5-4def-f012-345678901234"),
+            QuestionId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
+            Rating = 4,
+            Comment = "",
+            CreatedAt = DateTime.UtcNow.AddDays(-1),
+            UserId = Guid.Parse("22222222-2222-2222-2222-222222222222")
+        },
+        new FeedbackResponse
+        {
+            Id = Guid.Parse("8192a3b4-c5d6-4ef0-0123-456789012345"),
+            QuestionId = Guid.Parse("44444444-4444-4444-4444-444444444444"),
+            Rating = 3,
+            Comment = "Moglo bi biti intuitivnije u sekciji narudžbina.",
+            CreatedAt = DateTime.UtcNow.AddDays(-1),
+            UserId = Guid.Parse("22222222-2222-2222-2222-222222222222")
+        }
+    );
 
         var baseWorkSched = new BaseWorkSched
         {
