@@ -80,6 +80,7 @@ public class Program
             builder.Services.AddAutoMapper(cfg =>
             {
                 cfg.AddMaps(typeof(RestaurantMappings).Assembly);
+                cfg.AddMaps(typeof(RatingProfile).Assembly);
             });
 
             builder.Services.AddHostedService<CourierStatusUpdater>();
