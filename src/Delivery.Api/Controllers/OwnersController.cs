@@ -1,7 +1,6 @@
 ﻿using Delivery.Application.Dtos.Users.OwnerDtos.Requests;
 using Delivery.Application.Dtos.Users.OwnerDtos.Responses;
 using Delivery.Application.Interfaces;
-using Delivery.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

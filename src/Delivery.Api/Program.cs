@@ -1,13 +1,12 @@
 using System.Text;
 using Delivery.Api.Middleware;
 using Delivery.Application;
-using Delivery.Application.Interfaces;
 using Delivery.Application.Mappings;
 using Delivery.Domain.Entities.UserEntities;
+using Delivery.Domain.Interfaces;
 using Delivery.Infrastructure;
 using Delivery.Infrastructure.BackgroundServices.CourierStatusUpdater;
 using Delivery.Infrastructure.Persistence;
-using Delivery.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -41,15 +40,17 @@ public class Program
                 {
                     policy.WithOrigins("https://localhost:5173", "http://localhost:5173")
                           .AllowAnyHeader()
-                          .AllowAnyMethod();
+                          .AllowAnyMethod()
+                          .AllowCredentials();
                 });
             });
 
             builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
             {
-                options.SignIn.RequireConfirmedAccount = false;
+                options.SignIn.RequireConfirmedAccount = true;
             })
-            .AddEntityFrameworkStores<ApplicationDbContext>();
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
 
             builder.Services.AddAuthentication(options =>
             {
@@ -68,12 +69,26 @@ public class Program
                     ValidAudience = builder.Configuration["JwtSettings:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Secret"]))
                 };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) &&
+                            (path.StartsWithSegments("/support-chat")))
+                        {
+                            context.Token = accessToken;
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
             });
 
             builder.Services.AddApplicationServices();
             builder.Services.AddInfrastructureServices(builder.Configuration);
-
-            builder.Services.AddScoped<ITokenService, TokenService>();
 
             builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 
@@ -84,6 +99,8 @@ public class Program
 
             builder.Services.AddHostedService<CourierStatusUpdater>();
             builder.Services.AddHostedService<OrderAssignmentBackgroundService>();
+
+            builder.Services.AddSignalR();
 
             var app = builder.Build();
 
@@ -102,7 +119,10 @@ public class Program
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.MapHub<SupportChatHub>("/support-chat");
+
             app.MapControllers();
+
             app.Run();
         }
         catch (Exception ex)

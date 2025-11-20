@@ -4,27 +4,25 @@ using Delivery.Application.Dtos.CommonDtos.AllergenDtos.Requests;
 using Delivery.Application.Dtos.Users.CustomerDtos.Requests;
 using Delivery.Application.Dtos.Users.CustomerDtos.Responses;
 using Delivery.Application.Dtos.Users.CustomerDtos.VoucherDtos.Responses;
-using Delivery.Domain.Entities.UserEntities;
 
-namespace Delivery.Application.Interfaces
+namespace Delivery.Application.Interfaces;
+
+public interface ICustomerService
 {
-    public interface ICustomerService
-    {
-        Task<IEnumerable<CustomerSummaryResponseDto>> GetAllAsync();
-        Task<CustomerDetailResponseDto> GetOneAsync(Guid id);
-        Task<CustomerDetailResponseDto> AddAsync(CustomerCreateRequestDto request);
-        Task UpdateAsync(Guid id, CustomerUpdateRequestDto request);
-        Task DeleteAsync(Guid id);
+    Task<IEnumerable<CustomerSummaryResponseDto>> GetAllAsync();
+    Task<CustomerDetailResponseDto> GetOneAsync(Guid id);
+    Task<CustomerDetailResponseDto> AddAsync(CustomerCreateRequestDto request);
+    Task UpdateAsync(Guid id, CustomerUpdateRequestDto request);
+    Task DeleteAsync(Guid id);
 
-        Task BirthdayVoucherBackgroundJobAsync();
-       
-        Task<List<AddressDto>> GetMyAddressesAsync(ClaimsPrincipal user);
-        Task CreateAddressAsync(ClaimsPrincipal user, AddressCreateRequest request);
-        Task UpdateAddressAsync(ClaimsPrincipal user, Guid addressId, AddressUpdateRequest request);
-        Task DeleteAddressAsync(ClaimsPrincipal user, Guid addressId);
+    Task BirthdayVoucherBackgroundJobAsync();
+   
+    Task<List<AddressDto>> GetMyAddressesAsync(ClaimsPrincipal user);
+    Task CreateAddressAsync(ClaimsPrincipal user, AddressCreateRequest request);
+    Task UpdateAddressAsync(ClaimsPrincipal user, Guid addressId, AddressUpdateRequest request);
+    Task DeleteAddressAsync(ClaimsPrincipal user, Guid addressId);
 
-        Task<List<Guid>> GetMyAllergensAsync(ClaimsPrincipal user);
-        Task UpdateMyAllergensAsync(ClaimsPrincipal user, UpdateCustomerAllergensRequest request);
-        Task<IEnumerable<VoucherDetailResponseDto>> GetMyVouchersAsync(ClaimsPrincipal User);
-    }
+    Task<List<Guid>> GetMyAllergensAsync(ClaimsPrincipal user);
+    Task UpdateMyAllergensAsync(ClaimsPrincipal user, UpdateCustomerAllergensRequest request);
+    Task<IEnumerable<VoucherDetailResponseDto>> GetMyVouchersAsync(ClaimsPrincipal User);
 }

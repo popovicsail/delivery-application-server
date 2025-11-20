@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using AutoMapper;
 using Delivery.Application.Dtos.CommonDtos.AddressDtos;
 using Delivery.Application.Dtos.CommonDtos.AllergenDtos.Requests;

@@ -1,5 +1,4 @@
 ﻿using Delivery.Application.Dtos.CommonDtos.AllergenDtos;
-using Delivery.Application.Dtos.DishDtos.Responses;
 
 namespace Delivery.Application.Dtos.DishDtos;
 

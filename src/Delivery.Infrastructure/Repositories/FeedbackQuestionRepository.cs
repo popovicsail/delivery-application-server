@@ -1,5 +1,4 @@
-﻿using Delivery.Domain.Entities.FeedbackEntities;
-using Delivery.Domain.Interfaces;
+﻿using Delivery.Domain.Interfaces;
 using Delivery.Infrastructure.Persistence;
 
 namespace Delivery.Infrastructure.Repositories;

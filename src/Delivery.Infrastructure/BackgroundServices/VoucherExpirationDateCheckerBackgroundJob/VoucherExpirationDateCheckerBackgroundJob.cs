@@ -1,10 +1,9 @@
 ﻿using Delivery.Application.Interfaces;
-using Delivery.Application.Services;
 using Microsoft.Extensions.Logging;
 using Quartz;
 
 
-namespace Delivery.Infrastructure.BackgroundServices.BirthdayVoucherBackgroundJob;
+namespace Delivery.Infrastructure.BackgroundServices.VoucherExpirationDateCheckerBackgroundJob;
 
 [DisallowConcurrentExecution]
 public class VoucherExpirationDateCheckerBackgroundJob : IJob

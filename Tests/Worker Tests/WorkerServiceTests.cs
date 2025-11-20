@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit;
-using Moq;
+﻿using Moq;
 using Shouldly;
 using Delivery.Application.Services;
 using Delivery.Domain.Interfaces;
@@ -12,8 +6,6 @@ using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Delivery.Domain.Entities.UserEntities;
 using Delivery.Application.Exceptions;
-using Delivery.Domain.Entities.CommonEntities;
-using Microsoft.AspNetCore.Http;
 
 public class WorkerServiceTests
 {

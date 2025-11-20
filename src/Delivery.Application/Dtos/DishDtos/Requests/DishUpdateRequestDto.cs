@@ -1,6 +1,4 @@
-﻿using Delivery.Application.Dtos.CommonDtos.AllergenDtos;
-
-namespace Delivery.Application.Dtos.DishDtos.Requests;
+﻿namespace Delivery.Application.Dtos.DishDtos.Requests;
 
 public class DishUpdateRequestDto
 {
