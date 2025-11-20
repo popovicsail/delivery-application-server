@@ -76,7 +76,7 @@ namespace Delivery.Api.Controllers
         }
 
         [HttpGet("courier/{courierId:guid}")]
-        public async Task<IActionResult> GetByCourier(Guid courierId, DateTime? from = null, DateTime? to = null, int page = 1, int pageSize = 10)
+        public async Task<IActionResult> GetByCourier(Guid courierId, DateTime? from = null, DateTime? to = null, int page = 1, int pageSize = 5)
         {
             // konverzija u UTC ako nisu null
             if (from.HasValue && from.Value.Kind == DateTimeKind.Unspecified)
@@ -86,7 +86,11 @@ namespace Delivery.Api.Controllers
                 to = DateTime.SpecifyKind(to.Value, DateTimeKind.Utc);
 
             var result = await _orderService.GetByCourierAsync(courierId, from, to, page, pageSize);
-            return Ok(result);
+            return Ok(new
+            {
+                items = result.Items,
+                totalCount = result.TotalCount
+            });
         }
 
 

@@ -37,38 +37,49 @@ namespace Delivery.Application.Services
         }
 
         public async Task<(IEnumerable<OrderResponseDto> Items, int TotalCount)> GetByCourierAsync(
-         Guid courierId,
-         DateTime? from = null,
-         DateTime? to = null,
-         int page = 1,
-         int pageSize = 10)
+        Guid courierId,
+        DateTime? from = null,
+        DateTime? to = null,
+        int page = 1,
+        int pageSize = 10)
         {
-            // povlačimo query iz repozitorijuma
-            var query = await _unitOfWork.Orders.GetByCourier(courierId, from, to);
+            var query = _unitOfWork.Orders.GetByCourier(courierId, from, to);
 
-            // računamo total count
-            var totalCount = query.Count();
+            var totalCount = await query.CountAsync(); // ukupan broj pre paginacije
 
+            var pageItems = await query
+                .OrderByDescending(o => o.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
 
-            // mapiramo u DTO
-            var mapped = _mapper.Map<IEnumerable<OrderResponseDto>>(query);
+            var mapped = _mapper.Map<IEnumerable<OrderResponseDto>>(pageItems);
 
-            // vraćamo tuple (Items, TotalCount)
             return (mapped, totalCount);
         }
+
+
+
 
         public async Task<(IEnumerable<OrderResponseDto> Items, int TotalCount)> GetByCustomerAsync(
         Guid customerId,
         int page = 1,
         int pageSize = 10)
         {
+            var query = _unitOfWork.Orders.GetByCustomer(customerId);
 
-            var orders = await _unitOfWork.Orders.GetByCustomer(customerId, page, pageSize);
-            var totalCount = orders.Count();
-            var mapped = _mapper.Map<IEnumerable<OrderResponseDto>>(orders);
+            var totalCount = await query.CountAsync(); // ukupan broj pre paginacije
+
+            var pageItems = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var mapped = _mapper.Map<IEnumerable<OrderResponseDto>>(pageItems);
 
             return (mapped, totalCount);
         }
+
 
 
 
