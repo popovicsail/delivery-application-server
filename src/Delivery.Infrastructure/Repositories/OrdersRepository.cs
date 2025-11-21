@@ -61,8 +61,17 @@ namespace Delivery.Infrastructure.Repositories
                 .AsQueryable();
         }
 
-
-
+        public async Task<Order?> GetOneNotDraftAsync(Guid customerId)
+        {
+            return await _dbContext.Orders
+                .Where(o => o.CustomerId == customerId && (o.Status != "Draft"))
+                .Include(o => o.Items)
+                    .ThenInclude(i => i.Dish)
+                .Include(o => o.Customer)
+                    .ThenInclude(c => c.User)
+                .Include(o => o.Address)
+                .FirstOrDefaultAsync();
+        }
 
 
         public async Task<Order?> GetDraftByCustomerAsync(Guid customerId)

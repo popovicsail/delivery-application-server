@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using Delivery.Application.Dtos.OrderDtos.Requests;
 using Delivery.Application.Interfaces;
 using Delivery.Domain.Entities.OrderEntities.Enums;
@@ -18,6 +19,11 @@ namespace Delivery.Api.Controllers
             _orderService = orderService;
         }
 
+        [HttpGet("/customer")]
+        public async Task<IActionResult> GetOneNotDraftAsync()
+        {
+            return Ok(await _orderService.GetOneNotDraftAsync(User));
+        }
 
         // 1️⃣ Kreiranje porudžbine sa stavkama
         [HttpPost("items")]
@@ -34,8 +40,6 @@ namespace Delivery.Api.Controllers
             return Ok(await _orderService.UpdateDetailsAsync(orderId, request));
         }
 
-
-
         // 3️⃣ Potvrda porudžbine
         [HttpPost("{orderId}/confirm")]
         public async Task<IActionResult> ConfirmOrder(Guid orderId)
@@ -48,7 +52,6 @@ namespace Delivery.Api.Controllers
         [HttpGet("{orderId:guid}")]
         public async Task<IActionResult> GetById(Guid orderId)
         {
-
             var result = await _orderService.GetOneAsync(orderId);
             return Ok(result);
         }
