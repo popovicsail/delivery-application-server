@@ -45,6 +45,10 @@ public class DishesController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<DishDetailResponseDto>> CreateAsync([FromForm] DishCreateRequestDto request, IFormFile? file)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
         if (!string.IsNullOrEmpty(Request.Form["AllergenIds"]))
         {
             request.AllergenIds = JsonConvert.DeserializeObject<List<Guid>>(Request.Form["AllergenIds"]);
@@ -57,6 +61,10 @@ public class DishesController : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateAsync([FromRoute] Guid id, [FromForm] DishUpdateRequestDto request, IFormFile? file)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
         if (!string.IsNullOrEmpty(Request.Form["AllergenIds"]))
         {
             request.AllergenIds = JsonConvert.DeserializeObject<List<Guid>>(Request.Form["AllergenIds"]);

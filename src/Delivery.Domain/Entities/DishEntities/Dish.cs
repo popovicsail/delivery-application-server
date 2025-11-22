@@ -11,6 +11,8 @@ public class Dish
     public double Price { get; set; }
     public string Type { get; set; }
     public string? Picture { get; set; }
+    public double DiscountRate { get; set; }
+    public DateTime? DiscountExpireAt { get; set; }
 
     public Guid MenuId { get; set; }
     public virtual Menu Menu { get; set; }

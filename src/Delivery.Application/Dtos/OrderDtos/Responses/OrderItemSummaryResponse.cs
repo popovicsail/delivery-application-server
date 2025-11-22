@@ -1,10 +1,21 @@
-﻿namespace Delivery.Application.Dtos.OrderDtos.Responses;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Delivery.Application.Dtos.DishDtos;
 
-public class OrderItemSummaryResponse
+namespace Delivery.Application.Dtos.OrderDtos.Responses
 {
-    public Guid Id { get; set; }
-    public string? Name { get; set; }
-    public int Quantity { get; set; }
-    public decimal Price { get; set; }
-    public List<DishOptionDto> DishOptions { get; set; } = new List<DishOptionDto>();
+    public class OrderItemSummaryResponse
+    {
+        public Guid Id { get; set; }
+        public string? Name { get; set; }
+        public int Quantity { get; set; }
+        public double DishPrice { get; set; }
+        public double OptionsPrice { get; set; }
+        public double DiscountRate { get; set; } = 0;
+        public DateTime? DiscountExpireAt { get; set; }
+        public List<DishOptionDto> DishOptions { get; set; } = new List<DishOptionDto>();
+    }
 }

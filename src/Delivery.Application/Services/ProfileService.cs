@@ -8,97 +8,107 @@ using Delivery.Domain.Entities.UserEntities;
 using Delivery.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 
-namespace Delivery.Application.Services;
-
-public class ProfileService : IProfileService
+namespace Delivery.Application.Services
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
-    private readonly UserManager<User> _userManager;
-
-    public ProfileService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<User> userManager)
+    public class ProfileService : IProfileService
     {
-        _unitOfWork = unitOfWork;
-        _mapper = mapper;
-        _userManager = userManager;
-    }
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
+        private readonly UserManager<User> _userManager;
 
-    public async Task<ProfileResponseDto> GetOneAsync(Guid id)
-    {
-        var user = await _userManager.FindByIdAsync(id.ToString());
-
-        if (user == null)
+        public ProfileService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<User> userManager)
         {
-            throw new NotFoundException("User not found.");
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
+            _userManager = userManager;
         }
 
-        var roles = await _userManager.GetRolesAsync(user);
-
-        var response = new ProfileResponseDto
+        public async Task<ProfileResponseDto> GetOneAsync(Guid id)
         {
-            Id = user.Id,
-            UserName = user.UserName,
-            Email = user.Email,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            Roles = roles.ToList(),
-            ProfilePictureBase64 = user.ProfilePictureBase64
-        };
+            var user = await _userManager.FindByIdAsync(id.ToString());
 
-        // Ako je kurir, povuci i status
-        if (roles.Contains("Courier"))
-        {
-            var courier = await _unitOfWork.Couriers.GetOneWithUserAsync(user.Id);
-            if (courier != null)
+            if (user == null)
             {
-                response.CourierId = courier.Id;
-                response.Status = courier.WorkStatus;
+                throw new NotFoundException("User not found.");
             }
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            var response = new ProfileResponseDto
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Roles = roles.ToList(),
+                ProfilePictureBase64 = user.ProfilePictureBase64
+            };
+
+            // Ako je kurir, povuci i status
+            if (roles.Contains("Courier"))
+            {
+                var courier = await _unitOfWork.Couriers.GetOneWithUserAsync(user.Id);
+                if (courier != null)
+                {
+                    response.CourierId = courier.Id;
+                    response.Status = courier.WorkStatus;
+                }
+            }
+            if (roles.Contains("Customer"))
+            {
+                var customer = await _unitOfWork.Customers.GetOneAsync(user.Id);
+                if (customer != null)
+                {
+                    response.CustomerId = customer.Id;
+                }
+            }
+
+
+            return response;
         }
 
-        return response;
-    }
 
-
-    public async Task<ProfileResponseDto> UpdateAsync(ClaimsPrincipal principal, ProfileUpdateRequestDto request)
-    {
-        var user = await _userManager.GetUserAsync(principal);
-        if (user == null) throw new NotFoundException("User not found");
-
-        user.FirstName = request.FirstName;
-        user.LastName = request.LastName;
-        user.Email = request.Email;
-
-        if (request.ProfilePictureBase64 is { Length: > 0 })
+        public async Task<ProfileResponseDto> UpdateAsync(ClaimsPrincipal principal, ProfileUpdateRequestDto request)
         {
-            var allowedMimeTypes = new[] { "image/png", "image/jpeg" };
-            var contentType = request.ProfilePictureBase64.ContentType.ToLower();
+            var user = await _userManager.GetUserAsync(principal);
+            if (user == null) throw new NotFoundException("User not found");
 
-            if (!allowedMimeTypes.Contains(contentType))
-                throw new BadRequestException("Only PNG and JPEG images are allowed.");
+            user.FirstName = request.FirstName;
+            user.LastName = request.LastName;
+            user.Email = request.Email;
 
-            await using var ms = new MemoryStream();
-            await request.ProfilePictureBase64.CopyToAsync(ms);
-            var fileBytes = ms.ToArray();
+            if (request.ProfilePictureBase64 is { Length: > 0 })
+            {
+                var allowedMimeTypes = new[] { "image/png", "image/jpeg" };
+                var contentType = request.ProfilePictureBase64.ContentType.ToLower();
 
-            user.ProfilePictureBase64 = $"data:{contentType};base64,{Convert.ToBase64String(fileBytes)}";
+                if (!allowedMimeTypes.Contains(contentType))
+                    throw new BadRequestException("Only PNG and JPEG images are allowed.");
+
+                await using var ms = new MemoryStream();
+                await request.ProfilePictureBase64.CopyToAsync(ms);
+                var fileBytes = ms.ToArray();
+
+                user.ProfilePictureBase64 = $"data:{contentType};base64,{Convert.ToBase64String(fileBytes)}";
+            }
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+                throw new BadRequestException("Update failed");
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            return new ProfileResponseDto
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                ProfilePictureBase64 = user.ProfilePictureBase64,
+                Roles = roles.ToList()
+            };
         }
-
-        var result = await _userManager.UpdateAsync(user);
-        if (!result.Succeeded)
-            throw new BadRequestException("Update failed");
-
-        var roles = await _userManager.GetRolesAsync(user);
-
-        return new ProfileResponseDto
-        {
-            Id = user.Id,
-            UserName = user.UserName,
-            Email = user.Email,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            ProfilePictureBase64 = user.ProfilePictureBase64,
-            Roles = roles.ToList()
-        };
     }
 }

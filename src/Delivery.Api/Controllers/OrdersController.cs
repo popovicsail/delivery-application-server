@@ -1,13 +1,18 @@
 ﻿using Delivery.Application.Dtos.OrderDtos.Requests;
+﻿using System.Security.Claims;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
+using Delivery.Application.Dtos.OrderDtos.Requests;
 using Delivery.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Delivery.Domain.Entities.OrderEntities.Enums;
 
-namespace Delivery.Api.Controllers;
-
-[Route("api/[controller]")]
-[ApiController]
-public class OrdersController : ControllerBase
+namespace Delivery.Api.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
+    public class OrdersController : ControllerBase
+    {
     private readonly IOrderService _orderService;
 
     public OrdersController(IOrderService orderService)
@@ -15,6 +20,11 @@ public class OrdersController : ControllerBase
         _orderService = orderService;
     }
 
+    [HttpGet("/customer")]
+    public async Task<IActionResult> GetOneNotDraftAsync()
+    {
+        return Ok(await _orderService.GetOneNotDraftAsync(User));
+    }
 
     // 1️⃣ Kreiranje porudžbine sa stavkama
     [HttpPost("items")]
@@ -28,8 +38,7 @@ public class OrdersController : ControllerBase
     [HttpPut("{orderId}/details")]
     public async Task<IActionResult> UpdateOrderDetails(Guid orderId, [FromBody] OrderUpdateDetailsDto request)
     {
-        await _orderService.UpdateDetailsAsync(orderId, request);
-        return NoContent();
+        return Ok(await _orderService.UpdateDetailsAsync(orderId, request));
     }
 
     // 3️⃣ Potvrda porudžbine
@@ -71,11 +80,35 @@ public class OrdersController : ControllerBase
     }
 
     [HttpGet("courier/{courierId:guid}")]
-    public async Task<IActionResult> GetByCourier(Guid courierId)
+    public async Task<IActionResult> GetByCourier(Guid courierId, DateTime? from = null, DateTime? to = null, int page = 1, int pageSize = 5)
     {
-        var result = await _orderService.GetByCourierAsync(courierId);
-        return Ok(result);
+        // konverzija u UTC ako nisu null
+        if (from.HasValue && from.Value.Kind == DateTimeKind.Unspecified)
+            from = DateTime.SpecifyKind(from.Value, DateTimeKind.Utc);
+
+        if (to.HasValue && to.Value.Kind == DateTimeKind.Unspecified)
+            to = DateTime.SpecifyKind(to.Value, DateTimeKind.Utc);
+
+        var result = await _orderService.GetByCourierAsync(courierId, from, to, page, pageSize);
+        return Ok(new
+        {
+            items = result.Items,
+            totalCount = result.TotalCount
+        });
     }
+
+
+    [HttpGet("customer/{customerId:guid}/deliveries-history")]
+    public async Task<IActionResult> GetByCustomer(Guid customerId, int page = 1, int pageSize = 10)
+    {
+        var result = await _orderService.GetByCustomerAsync(customerId, page, pageSize);
+
+        return Ok(new
+        {
+            items = result.Items,
+            totalCount = result.TotalCount
+        });
+     }
 
     // PUT: api/orders/{orderId}/status
     [HttpPut("{orderId:guid}/status")]

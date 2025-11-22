@@ -18,38 +18,32 @@ public class FeedbackService : IFeedbackService
         _mapper = mapper;
     }
 
-    // ✅ 1. Vraća sva pitanja za feedback
     public async Task<IEnumerable<FeedbackQuestionDto>> GetAllQuestionsAsync()
     {
         var questions = await _unitOfWork.FeedbackQuestions.GetAllAsync();
         return _mapper.Map<IEnumerable<FeedbackQuestionDto>>(questions);
     }
 
-    // ✅ 2. Vraća feedback korisnika (ako ga ima)
     public async Task<IEnumerable<FeedbackResponseDto>> GetUserFeedbackAsync(Guid userId)
     {
         var responses = await _unitOfWork.FeedbackResponses.GetByUserIdAsync(userId);
         return _mapper.Map<IEnumerable<FeedbackResponseDto>>(responses);
     }
 
-    // ✅ 3. Kreira ili ažurira feedback korisnika
     public async Task SubmitFeedbackAsync(Guid userId, IEnumerable<FeedbackCreateRequestDto> feedbackDtos)
     {
         var questions = await _unitOfWork.FeedbackQuestions.GetAllAsync();
         var questionCount = questions.Count();
 
-        // ❌ Mora oceniti sva pitanja
         if (feedbackDtos.Count() != questionCount)
         {
             throw new BadRequestException($"You must rate all {questionCount} questions.");
         }
 
-        // ⚙️ Proveri da li korisnik već ima feedback
         var existingResponses = await _unitOfWork.FeedbackResponses.GetByUserIdAsync(userId);
 
         if (existingResponses.Any())
         {
-            // ✅ Ažuriraj postojeće odgovore
             foreach (var responseDto in feedbackDtos)
             {
                 var existing = existingResponses.FirstOrDefault(r => r.QuestionId == responseDto.QuestionId);
@@ -60,7 +54,6 @@ public class FeedbackService : IFeedbackService
                 }
                 else
                 {
-                    // Ako se doda novo pitanje kasnije, napravi novi odgovor
                     var newResponse = new FeedbackResponse(responseDto.QuestionId, responseDto.Rating, responseDto.Comment)
                     {
                         UserId = userId
@@ -71,7 +64,6 @@ public class FeedbackService : IFeedbackService
         }
         else
         {
-            // ✅ Kreiraj nove odgovore
             var responses = feedbackDtos.Select(dto => new FeedbackResponse(dto.QuestionId, dto.Rating, dto.Comment)
             {
                 UserId = userId
@@ -86,31 +78,81 @@ public class FeedbackService : IFeedbackService
         await _unitOfWork.CompleteAsync();
     }
 
-    // ✅ 4. Statistika prosečnih ocena po pitanjima
-    public async Task<IEnumerable<FeedbackStatsDto>> GetStatisticsAsync()
+    public async Task<PagedResultDto<FeedbackResponseWithUserDto>> GetFilteredResponsesAsync(FeedbackFilterRequestDto filter)
     {
-        var questions = await _unitOfWork.FeedbackQuestions.GetAllAsync();
-        var responses = await _unitOfWork.FeedbackResponses.GetAllAsync();
+        var now = DateTime.UtcNow;
 
-        var stats = questions.Select(q =>
+        DateTime from = filter.TimeRange switch
         {
-            var qResponses = responses.Where(r => r.QuestionId == q.Id).ToList();
-            return new FeedbackStatsDto
-            {
-                QuestionId = q.Id,
-                QuestionText = q.Text,
-                AverageRating = qResponses.Any() ? qResponses.Average(r => r.Rating) : 0,
-                TotalResponses = qResponses.Count,
-                DailyAverages = qResponses
-                    .GroupBy(r => r.CreatedAt.Date)
-                    .Select(g => new DailyAverageDto
-                    {
-                        Date = g.Key,
-                        Average = g.Average(r => r.Rating)
-                    })
-            };
+            "LastWeek" => now.AddDays(-7),
+            "LastMonth" => now.AddMonths(-1),
+            "Last3Months" => now.AddMonths(-3),
+            "LastYear" => now.AddYears(-1),
+            _ => DateTime.MinValue
+        };
+
+        var responses = await _unitOfWork.FeedbackResponses.GetResponsesByPeriodAsync(filter.QuestionId, from, now);
+        var query = responses.AsQueryable();
+
+        // 🔍 Filtriranje
+        if (!string.IsNullOrEmpty(filter.SearchTerm))
+        {
+            var term = filter.SearchTerm.ToLower();
+            query = query.Where(r =>
+                (r.User.FirstName + " " + r.User.LastName).ToLower().Contains(term) ||
+                (r.Comment != null && r.Comment.ToLower().Contains(term))
+            );
+        }
+
+        // 📊 Mapiranje
+        var mapped = query.Select(r => new FeedbackResponseWithUserDto
+        {
+            QuestionId = r.QuestionId,
+            UserId = r.UserId,
+            UserFullName = r.User.FirstName + " " + r.User.LastName,
+            Rating = r.Rating,
+            Comment = r.Comment,
+            CreatedAt = r.CreatedAt
         });
 
-        return stats;
+        // 🔽 Sortiranje
+        if (!string.IsNullOrEmpty(filter.SortField))
+        {
+            mapped = (filter.SortField, filter.SortOrder?.ToUpper()) switch
+            {
+                ("Rating", "ASC") => mapped.OrderBy(r => r.Rating),
+                ("Rating", "DESC") => mapped.OrderByDescending(r => r.Rating),
+                ("UserName", "ASC") => mapped.OrderBy(r => r.UserFullName),
+                ("UserName", "DESC") => mapped.OrderByDescending(r => r.UserFullName),
+                ("Date", "ASC") => mapped.OrderBy(r => r.CreatedAt),
+                ("Date", "DESC") => mapped.OrderByDescending(r => r.CreatedAt),
+                _ => mapped.OrderByDescending(r => r.CreatedAt)
+            };
+        }
+
+        // 📄 Paginacija
+        var totalCount = mapped.Count();
+        var totalPages = (int)Math.Ceiling(totalCount / (double)filter.PageSize);
+
+        // Validacija broja strane
+        if (filter.PageNumber < 1)
+            filter.PageNumber = 1;
+        if (filter.PageNumber > totalPages && totalPages > 0)
+            filter.PageNumber = totalPages;
+
+        var pagedItems = mapped
+            .Skip((filter.PageNumber - 1) * filter.PageSize)
+            .Take(filter.PageSize)
+            .ToList();
+
+        // 📦 Vraćanje rezultata
+        return new PagedResultDto<FeedbackResponseWithUserDto>
+        {
+            Items = pagedItems,
+            TotalCount = totalCount,
+            PageNumber = filter.PageNumber,
+            PageSize = filter.PageSize
+        };
     }
+
 }
