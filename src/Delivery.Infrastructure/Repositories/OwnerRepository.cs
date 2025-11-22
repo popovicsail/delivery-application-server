@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using Delivery.Domain.Entities.UserEntities;
+﻿using Delivery.Domain.Entities.UserEntities;
 using Delivery.Domain.Interfaces;
 using Delivery.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;

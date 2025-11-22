@@ -1,7 +1,6 @@
 ﻿using Delivery.Application.Dtos.CommonDtos.WorkScheduleDto;
 using Delivery.Application.Dtos.Users.CourierDtos.Requests;
 using Delivery.Application.Dtos.Users.CourierDtos.Responses;
-using Delivery.Domain.Entities.CommonEntities;
 
 namespace Delivery.Application.Interfaces;
 

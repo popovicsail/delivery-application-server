@@ -3,14 +3,10 @@ using AutoMapper;
 using Delivery.Application.Dtos.DishDtos.Requests;
 using Delivery.Application.Dtos.DishDtos.Responses;
 using Delivery.Application.Dtos.RestaurantDtos;
-using Delivery.Application.Dtos.RestaurantDtos.Responses;
 using Delivery.Application.Exceptions;
 using Delivery.Application.Interfaces;
 using Delivery.Domain.Common;
-using Delivery.Domain.Entities.CommonEntities;
 using Delivery.Domain.Entities.DishEntities;
-using Delivery.Domain.Entities.RestaurantEntities;
-using Delivery.Domain.Entities.UserEntities;
 using Delivery.Domain.Interfaces;
 using Microsoft.AspNetCore.Http;
 

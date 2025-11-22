@@ -1,5 +1,4 @@
-﻿using Delivery.Application.Dtos.CommonDtos.AllergenDtos;
-using Delivery.Application.Dtos.DishDtos.Requests;
+﻿using Delivery.Application.Dtos.DishDtos.Requests;
 using Delivery.Domain.Entities.DishEntities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

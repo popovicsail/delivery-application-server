@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using Delivery.Domain.Entities.UserEntities;
+﻿using Delivery.Domain.Entities.UserEntities;
 
 namespace Delivery.Domain.Entities.CommonEntities;
 

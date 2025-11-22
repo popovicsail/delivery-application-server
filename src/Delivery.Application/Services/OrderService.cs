@@ -21,12 +21,16 @@ namespace Delivery.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly UserManager<User> _userManager;
+        private readonly IMongoUnitOfWork _mongoUnitOfWork;
+        private readonly IPdfService _pdfService;
 
-        public OrderService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<User> userManager)
+        public OrderService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<User> userManager, IMongoUnitOfWork mongoUnitOfWork, IPdfService pdfService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _userManager = userManager;
+            _mongoUnitOfWork = mongoUnitOfWork;
+            _pdfService = pdfService;
         }
 
         public async Task<IEnumerable<OrderResponseDto>> GetByRestaurantAsync(Guid restaurantId)
@@ -255,7 +259,7 @@ namespace Delivery.Application.Services
             return _mapper.Map<IEnumerable<OrderResponseDto>>(orders);
         }
 
-        public async Task UpdateStatusAsync(Guid orderId, int newStatus ,int eta)
+        public async Task<byte[]?> UpdateStatusAsync(Guid orderId, int newStatus, int eta)
         {
             OrderStatus statusEnum = (OrderStatus)newStatus;
 
@@ -271,6 +275,19 @@ namespace Delivery.Application.Services
             order.Status = statusEnum.ToString();
             _unitOfWork.Orders.Update(order);
             await _unitOfWork.CompleteAsync(); // 👈 opet koristi tvoj metod
+
+            if (order.Status == OrderStatus.Zavrsena.ToString())
+            {
+                var bill = _mapper.Map<Bill>(order);
+
+                await _mongoUnitOfWork.Bills.CreateAsync(bill);
+
+                var billPdf = _pdfService.GenerateBillPdf(bill);
+
+                return billPdf;
+            }
+
+            return null;
         }
 
         public async Task DeleteAsync(Guid orderId)
@@ -319,6 +336,20 @@ namespace Delivery.Application.Services
             }
 
             await _unitOfWork.CompleteAsync();
+        }
+        
+        public async Task<byte[]?> GetOrderBillPdfAsync(Guid orderId)
+        {
+            var bill = await _mongoUnitOfWork.Bills.GetByOrderIdAsync(orderId);
+
+            if (bill == null)
+            {
+                return null;
+            }
+
+            var billPdf = _pdfService.GenerateBillPdf(bill);
+
+            return billPdf;
         }
     }
 }

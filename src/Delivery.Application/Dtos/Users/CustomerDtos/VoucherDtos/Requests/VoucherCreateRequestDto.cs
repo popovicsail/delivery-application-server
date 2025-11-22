@@ -1,7 +1,4 @@
-﻿using Delivery.Application.Dtos.CommonDtos.AddressDtos;
-using Delivery.Application.Dtos.CommonDtos.BaseWordSchedDtos;
-
-namespace Delivery.Application.Dtos.Users.CustomerDtos.VoucherDtos.Requests;
+﻿namespace Delivery.Application.Dtos.Users.CustomerDtos.VoucherDtos.Requests;
 
 public class VoucherCreateRequestDto
 {

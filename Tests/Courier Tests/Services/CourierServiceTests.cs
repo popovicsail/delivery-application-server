@@ -1,14 +1,13 @@
-﻿using Xunit;
-using Moq;
+﻿using Moq;
 using Shouldly;
 using Delivery.Application.Services;
 using Delivery.Application.Dtos.Users.CourierDtos.Requests;
-using Delivery.Application.Exceptions;
 using Delivery.Domain.Entities.UserEntities;
 using Delivery.Domain.Entities.CommonEntities;
 using Delivery.Domain.Interfaces;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Delivery.Application.Exceptions;
 
 public class CourierServiceTests
 {

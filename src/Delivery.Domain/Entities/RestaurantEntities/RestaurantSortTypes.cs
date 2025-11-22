@@ -1,8 +1,7 @@
-﻿namespace Delivery.Domain.Entities.RestaurantEntities
+﻿namespace Delivery.Domain.Entities.RestaurantEntities;
+
+public enum RestaurantSortTypes
 {
-    public enum RestaurantSortTypes
-    {
-        NAME_ASC,
-        NAME_DESC
-    }
+    NAME_ASC,
+    NAME_DESC
 }

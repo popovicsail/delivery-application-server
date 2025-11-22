@@ -4,46 +4,45 @@ using Delivery.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Delivery.Api.Controllers
-{
-    [ApiController]
-    [Route("api/[controller]")]
-    [Authorize]
-    public class ProfileController : ControllerBase
-    {
-        private readonly IProfileService _profileService;
+namespace Delivery.Api.Controllers;
 
-        public ProfileController(IProfileService profileService)
-        {
-            _profileService = profileService;
-        }
+[ApiController]
+[Route("api/[controller]")]
+[Authorize]
+public class ProfileController : ControllerBase
+{
+    private readonly IProfileService _profileService;
+
+    public ProfileController(IProfileService profileService)
+    {
+        _profileService = profileService;
+    }
 
 [HttpGet("me")]
 public async Task<IActionResult> GetOneAsync()
 {
-    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-    if (userId == null)
-    {
-        return Unauthorized();
-    }
-
-    var profile = await _profileService.GetOneAsync(Guid.Parse(userId));
-
-
-    return Ok(profile);
+var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+if (userId == null)
+{
+    return Unauthorized();
 }
 
-        [HttpPut("me")]
-        public async Task<IActionResult> UpdateAsync([FromForm] ProfileUpdateRequestDto updateRequest)
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
+var profile = await _profileService.GetOneAsync(Guid.Parse(userId));
 
-            var updated = await _profileService.UpdateAsync(User, updateRequest);
-            return Ok(updated);
+
+return Ok(profile);
+}
+
+    [HttpPut("me")]
+    public async Task<IActionResult> UpdateAsync([FromForm] ProfileUpdateRequestDto updateRequest)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null)
+        {
+            return Unauthorized();
         }
+
+        var updated = await _profileService.UpdateAsync(User, updateRequest);
+        return Ok(updated);
     }
 }
