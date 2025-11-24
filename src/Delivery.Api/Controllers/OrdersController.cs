@@ -13,10 +13,12 @@ namespace Delivery.Api.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly IOrderService _orderService;
+        private readonly ICourierLocationService _locationService;
 
-        public OrdersController(IOrderService orderService)
+        public OrdersController(IOrderService orderService, ICourierLocationService locationService)
         {
             _orderService = orderService;
+            _locationService = locationService;
         }
 
         [HttpGet("/customer")]
@@ -130,5 +132,22 @@ namespace Delivery.Api.Controllers
             await _orderService.DeleteItemAsync(itemId);
             return NoContent();
         }
+
+        [HttpGet("{orderId:guid}/location")]
+        public async Task<ActionResult<CourierLocationDto>> GetLocation(Guid orderId)
+        {
+            var location = await _locationService.GetByOrderAsync(orderId);
+            if (location == null) return NotFound();
+            return Ok(location);
+        }
+
+        [HttpPost("{orderId:guid}/location")]
+        public async Task<IActionResult> UpdateLocation(Guid orderId, [FromBody] CourierLocationDto dto)
+        {
+            await _locationService.UpdateAsync(orderId, dto);
+            return NoContent();
+        }
+
+
     }
 }

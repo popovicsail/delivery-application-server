@@ -26,6 +26,10 @@ namespace Delivery.Domain.Entities.OrderEntities
         public DateTime CreatedAt { get; set; }
         public int? TimeToPrepare { get; set; }
         public string Status { get; set; }
+
+        public double? CourierLocationLat { get; set; }
+        public double? CourierLocationLng { get; set; }
+        public DateTime? CourierLocationUpdatedAt { get; set; }
         public Guid RestaurantId { get; set; }
         public Restaurant Restaurant { get; set; }
 
