@@ -42,7 +42,7 @@ public class Program
             {
                 options.AddPolicy("AllowReactApp", policy =>
                 {
-                    policy.WithOrigins("https://localhost:5173", "http://localhost:5174")
+                    policy.WithOrigins("https://localhost:5173", "http://localhost:5173")
                           .AllowAnyHeader()
                           .AllowAnyMethod()
                           .AllowCredentials();
@@ -82,6 +82,10 @@ public class Program
             // ✅ Servisi
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<ICourierLocationService, CourierLocationService>();
+            builder.Services.AddHttpClient<IAddressValidationService, AddressValidationService>(client =>
+            {
+                client.DefaultRequestHeaders.Add("User-Agent", "DeliveryApp/1.0");
+            });
 
             // ✅ Middleware
             builder.Services.AddTransient<ExceptionHandlingMiddleware>();

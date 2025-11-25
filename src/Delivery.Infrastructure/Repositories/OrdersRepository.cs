@@ -83,6 +83,7 @@ namespace Delivery.Infrastructure.Repositories
                 .Include(o => o.Customer)
                     .ThenInclude(c => c.User)
                 .Include(o => o.Address)
+                .Include(o => o.Restaurant.Address)
                 .FirstOrDefaultAsync();
         }
 
