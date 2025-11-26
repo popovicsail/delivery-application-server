@@ -63,6 +63,56 @@ namespace Delivery.Infrastructure.Services
             return AddressValidationResultDto.Valid();
         }
 
+        public async Task<(double Latitude, double Longitude)?> GetCoordinatesAsync(string address)
+        {
+            if (string.IsNullOrWhiteSpace(address))
+                return null;
+
+            var url = $"https://nominatim.openstreetmap.org/search?q={Uri.EscapeDataString(address)}&format=json&addressdetails=1&limit=5";
+
+            var response = await _httpClient.GetStringAsync(url);
+            var results = JsonConvert.DeserializeObject<List<NominatimResult>>(response);
+
+            if (results == null || results.Count == 0)
+                return null;
+
+            // ✅ Izaberi najbolji rezultat koristeći scoring
+            var bestMatch = results
+                .OrderByDescending(r => CalculateMatchScore(
+                    new NominatimResult
+                    {
+                        display_name = ToLatin(r.display_name),
+                        address = new NominatimAddress
+                        {
+                            city = ToLatin(r.address?.city),
+                            town = ToLatin(r.address?.town),
+                            village = ToLatin(r.address?.village),
+                            road = ToLatin(r.address?.road),
+                            house_number = ToLatin(r.address?.house_number)
+                        },
+                        lat = r.lat,
+                        lon = r.lon
+                    },
+                    ToLatin(address)))
+                .FirstOrDefault();
+
+            if (bestMatch == null)
+                return null;
+
+            // ✅ Parsiraj lat/lon direktno iz bestMatch
+            if (double.TryParse(bestMatch.lat, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var lat) &&
+                double.TryParse(bestMatch.lon, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var lon))
+            {
+                return (lat, lon);
+            }
+
+            return null;
+        }
+
+
+
+
+
         // Helper za poređenje adrese sa rezultatima
         private int CalculateMatchScore(NominatimResult result, string inputAddress)
         {

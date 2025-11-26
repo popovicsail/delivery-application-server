@@ -15,5 +15,6 @@ namespace Delivery.Application.Dtos.AdressValidationDtos.Helpers
         public string house_number { get; set; }
         public string postcode { get; set; }
         public string country { get; set; }
+        
     }
 }

@@ -45,7 +45,11 @@ namespace Delivery.Application.Mappings
                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
                 .ForMember(dest => dest.TotalPrice, opt => opt.MapFrom(src => src.TotalPrice))
-                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt));
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
+                .ForMember(dest => dest.EstimatedReadyAt, opt => opt.MapFrom(src => src.EstimatedReadyAt))
+                .ForMember(dest => dest.DeliveryTimeMinutes, opt => opt.MapFrom(src => src.DeliveryTimeMinutes))
+                .ForMember(dest => dest.EstimatedDeliveryAt, opt => opt.MapFrom(src => src.EstimatedDeliveryAt))
+                .ForMember(dest => dest.DeliveryEstimateMessage, opt => opt.MapFrom(src => src.DeliveryEstimateMessage));
 
             // 🔹 OrderItem → OrderItemDto
             CreateMap<OrderItem, OrderItemDto>();

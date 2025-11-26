@@ -12,5 +12,7 @@ namespace Delivery.Application.Dtos.AdressValidationDtos.Responses
     {
         public string display_name { get; set; }
         public NominatimAddress address { get; set; }
+        public string lat { get; set; }
+        public string lon { get; set; }
     }
 }

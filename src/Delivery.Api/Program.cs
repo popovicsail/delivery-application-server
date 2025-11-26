@@ -81,11 +81,12 @@ public class Program
 
             // ✅ Servisi
             builder.Services.AddScoped<ITokenService, TokenService>();
-            builder.Services.AddScoped<ICourierLocationService, CourierLocationService>();
             builder.Services.AddHttpClient<IAddressValidationService, AddressValidationService>(client =>
             {
                 client.DefaultRequestHeaders.Add("User-Agent", "DeliveryApp/1.0");
             });
+            builder.Services.AddHttpClient<IDeliveryTimeService, DeliveryTimeService>();
+
 
             // ✅ Middleware
             builder.Services.AddTransient<ExceptionHandlingMiddleware>();

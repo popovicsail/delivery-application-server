@@ -96,6 +96,7 @@ namespace Delivery.Infrastructure.Repositories
                     .ThenInclude(c => c.User)
                 .Include(o => o.Address)
                 .Include(o => o.Restaurant)
+                    .ThenInclude(r => r.Address)
                 .FirstOrDefaultAsync(o => o.Id == orderId);
         }
 

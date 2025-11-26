@@ -11,6 +11,7 @@ using Delivery.Application.Interfaces;
 using Delivery.Domain.Entities.CommonEntities;
 using Delivery.Domain.Entities.UserEntities;
 using Delivery.Domain.Interfaces;
+using Delivery.Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
 
 
@@ -22,11 +23,17 @@ public class CustomerService : ICustomerService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly UserManager<User> _userManager;
-    public CustomerService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<User> userManager)
+    private readonly IAddressValidationService _addressValidationService;
+    public CustomerService(
+        IUnitOfWork unitOfWork,
+        IMapper mapper,
+        UserManager<User> userManager,
+        IAddressValidationService addressValidationService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _userManager = userManager;
+        _addressValidationService = addressValidationService;
     }
     public async Task<IEnumerable<CustomerSummaryResponseDto>> GetAllAsync()
     {
@@ -157,11 +164,24 @@ public class CustomerService : ICustomerService
         if (customer == null) throw new NotFoundException("Customer profil nije pronađen.");
 
         var newAddress = _mapper.Map<Address>(request);
+
+        // 👇 Sastavi punu adresu iz requesta
+        var fullAddress = $"{request.StreetAndNumber}, {request.City} {request.PostalCode}";
+
+        // 👇 Dobavi koordinate preko Nominatim servisa
+        var coordinates = await _addressValidationService.GetCoordinatesAsync(fullAddress);
+        if (coordinates != null)
+        {
+            newAddress.Latitude = coordinates.Value.Latitude;
+            newAddress.Longitude = coordinates.Value.Longitude;
+        }
+
         customer.Addresses.Add(newAddress);
 
         _unitOfWork.Customers.Update(customer);
         await _unitOfWork.CompleteAsync();
     }
+
 
     public async Task UpdateAddressAsync(ClaimsPrincipal principal, Guid addressId, AddressUpdateRequest request)
     {
