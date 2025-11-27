@@ -28,12 +28,10 @@ namespace Delivery.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Order>> GetByCourier(
+        public IQueryable<Order> GetByCourier(
         Guid courierId,
         DateTime? from = null,
-        DateTime? to = null,
-        int page = 1,
-        int pageSize = 10)
+        DateTime? to = null)
         {
             var query = _dbContext.Orders
                 .Where(o => o.CourierId == courierId)
@@ -50,31 +48,21 @@ namespace Delivery.Infrastructure.Repositories
             if (to.HasValue)
                 query = query.Where(o => o.CreatedAt <= to.Value.ToUniversalTime());
 
-
-            return await query
-                .OrderByDescending(o => o.CreatedAt)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            return query;
         }
 
-        public async Task<IEnumerable<Order>> GetByCustomer(
-        Guid customerId,
-        int page = 1,
-        int pageSize = 10)
+
+
+        public IQueryable<Order> GetByCustomer(Guid customerId)
         {
-            var query = _dbContext.Orders
+            return _dbContext.Orders
                 .Where(o => o.CustomerId == customerId)
                 .Include(o => o.Items).ThenInclude(i => i.Dish)
                 .Include(o => o.Items).ThenInclude(i => i.Offer)
                 .Include(o => o.Restaurant).ThenInclude(r => r.Address)
                 .Include(o => o.Address)
-                .OrderByDescending(o => o.CreatedAt);
-
-            return await query
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+                .OrderByDescending(o => o.CreatedAt)
+                .AsQueryable();
         }
 
         public async Task<Order?> GetOneNotDraftAsync(Guid customerId)
@@ -91,6 +79,7 @@ namespace Delivery.Infrastructure.Repositories
                 .FirstOrDefaultAsync();
         }
 
+
         public async Task<Order?> GetDraftByCustomerAsync(Guid customerId)
         {
             try
@@ -104,6 +93,7 @@ namespace Delivery.Infrastructure.Repositories
                 .Include(o => o.Customer)
                     .ThenInclude(c => c.User)
                 .Include(o => o.Address)
+                .Include(o => o.Restaurant.Address)
                 .FirstOrDefaultAsync();
             }
             catch (Exception ex)
@@ -125,6 +115,7 @@ namespace Delivery.Infrastructure.Repositories
                     .ThenInclude(c => c.User)
                 .Include(o => o.Address)
                 .Include(o => o.Restaurant)
+                    .ThenInclude(r => r.Address)
                 .FirstOrDefaultAsync(o => o.Id == orderId);
         }
 
@@ -142,6 +133,7 @@ namespace Delivery.Infrastructure.Repositories
                     .ThenInclude(c => c.Addresses)
                 .Include(o => o.Customer)
                     .ThenInclude(c => c.Vouchers)
+                .Include(o => o.Restaurant)
                 .FirstOrDefaultAsync(o => o.Id == orderId);
         }
 
