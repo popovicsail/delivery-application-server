@@ -1,4 +1,5 @@
-﻿namespace Delivery.Application.Dtos.OrderDtos.Responses;
+﻿using Delivery.Domain.Entities.RestaurantEntities;
+
 
 namespace Delivery.Application.Dtos.OrderDtos.Responses
 {

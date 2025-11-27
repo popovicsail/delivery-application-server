@@ -72,7 +72,7 @@ namespace Delivery.Application.Mappings
             CreateMap<OrderItem, BillItem>()
                 .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity))
-                .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price));
+                .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.DishPrice));
         }
     }
 }

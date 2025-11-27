@@ -1,6 +1,4 @@
-﻿namespace Delivery.Application.Dtos.OrderDtos.Requests;
-
-namespace Delivery.Application.Dtos.OrderDtos.Requests
+﻿namespace Delivery.Application.Dtos.OrderDtos.Requests
 {
     public class OrderStatusUpdateRequestDto
     {
