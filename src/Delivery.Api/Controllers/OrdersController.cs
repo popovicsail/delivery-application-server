@@ -101,5 +101,39 @@ namespace Delivery.Api.Controllers
             await _orderService.DeleteItemAsync(itemId);
             return NoContent();
         }
+
+        [HttpGet("restaurant/{restaurantId:guid}/revenue")]
+        public async Task<IActionResult> GetRevenue(
+        Guid restaurantId,
+        [FromQuery] DateTime from,
+        [FromQuery] DateTime to)
+            {
+                var stats = await _orderService.GetRestaurantRevenueStatisticsAsync(restaurantId, from, to);
+                return Ok(stats);
+        }
+
+        [HttpGet("restaurant/{restaurantId:guid}/dishes/{dishId:guid}/revenue")]
+        public async Task<IActionResult> GetDishRevenue(
+        Guid restaurantId,
+        Guid dishId,
+        [FromQuery] DateTime from,
+        [FromQuery] DateTime to)
+            {
+                from = DateTime.SpecifyKind(from, DateTimeKind.Utc);
+                to = DateTime.SpecifyKind(to, DateTimeKind.Utc);
+
+                var stats = await _orderService.GetDishRevenueStatisticsAsync(restaurantId, dishId, from, to);
+                return Ok(stats);
+        }
+
+        [HttpGet("restaurant/{restaurantId:guid}/canceled")]
+        public async Task<IActionResult> GetCanceledOrdersStatistics(
+        Guid restaurantId,
+        [FromQuery] DateTime from,
+        [FromQuery] DateTime to)
+            {
+                var stats = await _orderService.GetCanceledOrdersStatisticsAsync(restaurantId, from, to);
+                return Ok(stats);
+            }
     }
 }

@@ -88,5 +88,44 @@ namespace Delivery.Infrastructure.Repositories
                 .Include(o => o.Address)
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<Order>> GetByRestaurantAndDateRangeAsync(Guid restaurantId, DateTime from, DateTime to)
+        {
+            return await _dbContext.Orders
+                .Where(o => o.RestaurantId == restaurantId &&
+                            o.CreatedAt >= from &&
+                            o.CreatedAt <= to &&
+                            o.Status != "Draft")
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Order>> GetByDishAndDateRangeAsync(Guid restaurantId, Guid dishId, DateTime from, DateTime to)
+                {
+                    return await _dbContext.Orders
+                        .Where(o =>
+                            o.RestaurantId == restaurantId &&
+                            o.CreatedAt >= from &&
+                            o.CreatedAt <= to &&
+                            o.Status != "Draft" &&
+                            o.Items.Any(i => i.DishId == dishId))
+                        .Include(o => o.Items)
+                            .ThenInclude(i => i.Dish)
+                        .Include(o => o.Customer)
+                            .ThenInclude(c => c.User)
+                        .Include(o => o.Address)
+                        .ToListAsync();
+                }
+
+        public async Task<IEnumerable<Order>> GetCanceledByRestaurantAndDateRangeAsync(Guid restaurantId, DateTime from, DateTime to)
+        {
+            return await _dbContext.Orders
+                .Where(o =>
+                    o.RestaurantId == restaurantId &&
+                    o.CreatedAt >= from &&
+                    o.CreatedAt <= to &&
+                    o.Status == "Odbijena")
+                .ToListAsync();
+        }
     }
+
 }

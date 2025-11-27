@@ -26,5 +26,8 @@ namespace Delivery.Application.Interfaces
 
         Task<IEnumerable<OrderResponseDto>> GetByCourierAsync(Guid courierId);
         Task<OrderDraftResponseDto>? GetDraftByCustomerAsync(ClaimsPrincipal User);
+        Task<RestaurantRevenueStatisticsDto> GetRestaurantRevenueStatisticsAsync(Guid restaurantId, DateTime from, DateTime to);
+        Task<DishRevenueStatisticsResponse> GetDishRevenueStatisticsAsync(Guid restaurantId, Guid dishId, DateTime from, DateTime to);
+        Task<CanceledOrdersStatisticsDto> GetCanceledOrdersStatisticsAsync(Guid restaurantId, DateTime from, DateTime to);
     }
 }

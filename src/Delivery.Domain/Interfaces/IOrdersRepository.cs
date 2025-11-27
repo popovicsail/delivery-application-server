@@ -15,5 +15,8 @@ namespace Delivery.Domain.Interfaces
         Task<IEnumerable<Order>> GetByCourier(Guid courierId);
         Task<Order?> GetOneWithCustomerAsync(Guid orderId);
         Task<Order?> GetDraftByCustomerAsync(Guid customerId);
+        Task<IEnumerable<Order>> GetByRestaurantAndDateRangeAsync(Guid restaurantId, DateTime from, DateTime to);
+        Task<IEnumerable<Order>> GetByDishAndDateRangeAsync(Guid restaurantId, Guid dishId, DateTime from, DateTime to);
+        Task<IEnumerable<Order>> GetCanceledByRestaurantAndDateRangeAsync(Guid restaurantId, DateTime from, DateTime to);
     }
 }
