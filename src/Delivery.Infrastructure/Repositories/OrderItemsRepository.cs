@@ -19,6 +19,7 @@ namespace Delivery.Infrastructure.Repositories
         {
             return await _dbContext.OrderItems
                 .Include(oi => oi.Dish)
+                .Include(oi => oi.Offer)
                 .Where(oi => oi.OrderId == orderId)
                 .ToListAsync();
         }

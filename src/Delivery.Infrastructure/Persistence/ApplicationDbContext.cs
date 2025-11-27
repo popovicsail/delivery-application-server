@@ -1,12 +1,14 @@
 ﻿using Delivery.Domain.Entities.CommonEntities;
 using Delivery.Domain.Entities.DishEntities;
 using Delivery.Domain.Entities.FeedbackEntities;
+using Delivery.Domain.Entities.OfferEntities;
 using Delivery.Domain.Entities.OrderEntities;
 using Delivery.Domain.Entities.RestaurantEntities;
 using Delivery.Domain.Entities.UserEntities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions.Infrastructure;
 
 namespace Delivery.Infrastructure.Persistence;
 
@@ -17,6 +19,9 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
     public DbSet<Dish> Dishes { get; set; }
     public DbSet<DishOption> DishOptions { get; set; }
     public DbSet<DishOptionGroup> DishOptionGroups { get; set; }
+    
+    public DbSet<Offer> Offers { get; set; }
+    public DbSet<OfferDish> OfferDishes { get; set; }
 
     public DbSet<Address> Addresses { get; set; }
     public DbSet<Allergen> Allergens { get; set; }
@@ -96,6 +101,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
         builder.Entity<Restaurant>().HasOne(r => r.BaseWorkSched).WithOne(b => b.Restaurant).HasForeignKey<BaseWorkSched>(b => b.RestaurantId).OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<Menu>().HasMany(m => m.Dishes).WithOne(d => d.Menu).HasForeignKey(d => d.MenuId);
+        builder.Entity<Menu>().HasMany(m => m.Offers).WithOne(d => d.Menu).HasForeignKey(d => d.MenuId);
 
         builder.Entity<Dish>().HasMany(d => d.DishOptionGroups).WithOne(g => g.Dish).HasForeignKey(g => g.DishId);
         builder.Entity<Dish>().HasMany(d => d.Allergens).WithMany(a => a.Dishes);
@@ -109,11 +115,9 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
         builder.Entity<Order>().HasMany(o => o.Items).WithOne(i => i.Order).HasForeignKey(i => i.OrderId).OnDelete(DeleteBehavior.Cascade);
         builder.Entity<OrderItem>().HasIndex(o => o.Id).IsUnique();
         builder.Entity<OrderItem>().HasOne(i => i.Order).WithMany(o => o.Items).HasForeignKey(i => i.OrderId).OnDelete(DeleteBehavior.Cascade);
-        builder.Entity<OrderItem>().HasOne(i => i.Dish).WithMany().HasForeignKey(i => i.DishId).OnDelete(DeleteBehavior.Restrict);
+        builder.Entity<OrderItem>().HasOne(i => i.Dish).WithMany().HasForeignKey(i => i.DishId).OnDelete(DeleteBehavior.Cascade).IsRequired(false);
+        builder.Entity<OrderItem>().HasOne(i => i.Offer).WithMany().HasForeignKey(i => i.OfferId).OnDelete(DeleteBehavior.Cascade).IsRequired(false);
         builder.Entity<OrderItem>().Property(i => i.Quantity).IsRequired();
-        builder.Entity<OrderItem>().Property(i => i.DishPrice).HasColumnType("decimal(18,2)");
-        builder.Entity<OrderItem>().Property(i => i.OptionsPrice).HasColumnType("decimal(18,2)");
-        builder.Entity<Order>().Property(o => o.TotalPrice).HasColumnType("decimal(18,2)");
 
         builder.Entity<OrderItem>().HasMany(oi => oi.DishOptions).WithMany()
         .UsingEntity<Dictionary<string, object>>(
@@ -121,6 +125,9 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
             j => j.HasOne<DishOption>().WithMany().HasForeignKey("DishOptionId").OnDelete(DeleteBehavior.Cascade),
             j => j.HasOne<OrderItem>().WithMany().HasForeignKey("OrderItemId").OnDelete(DeleteBehavior.Cascade)
         );
+
+        builder.Entity<Offer>().HasMany(o => o.OfferDishes).WithOne(od => od.Offer).HasForeignKey(od => od.OfferId).OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<OfferDish>().HasOne(od => od.Dish).WithMany().HasForeignKey(od => od.DishId).OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<FeedbackQuestion>(entity =>
         {

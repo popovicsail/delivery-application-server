@@ -11,5 +11,5 @@ public interface IOwnerService
     Task<OwnerDetailResponseDto> AddAsync(OwnerCreateRequestDto request);
     Task UpdateAsync(Guid id, OwnerUpdateRequestDto request);
     Task DeleteAsync(Guid id);
-    Task<bool> GetMenuPermissionAsync(ClaimsPrincipal User, Guid menuId);
+    Task<bool> GetRestaurantPermissionAsync(ClaimsPrincipal User, Guid restaurantId);
 }

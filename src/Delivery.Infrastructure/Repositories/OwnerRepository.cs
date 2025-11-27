@@ -39,7 +39,7 @@ public class OwnerRepository : GenericRepository<Owner>, IOwnerRepository
         return owner;
     }
 
-    public async Task<bool> GetMenuPermissionAsync(User user, Guid menuId)
+    public async Task<bool> GetRestaurantPermissionAsync(User user, Guid restaurantId)
     {
         var ownerId = await _dbContext.Owners
             .Include(o => o.User)
@@ -48,7 +48,7 @@ public class OwnerRepository : GenericRepository<Owner>, IOwnerRepository
             .FirstOrDefaultAsync();
 
         return await _dbContext.Restaurants
-            .Include(r => r.Menus)
-            .AnyAsync(r => r.OwnerId == ownerId && r.Menus.Any(m => m.Id == menuId));
+            .Where(r => r.Id == restaurantId)
+            .AnyAsync(r => r.OwnerId == ownerId);
     }
 }

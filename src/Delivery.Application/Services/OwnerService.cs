@@ -97,10 +97,10 @@ public class OwnerService : IOwnerService
         await _unitOfWork.CompleteAsync();
     }
 
-    public async Task<bool> GetMenuPermissionAsync(ClaimsPrincipal User, Guid menuId)
+    public async Task<bool> GetRestaurantPermissionAsync(ClaimsPrincipal User, Guid restaurantId)
     {
         var user = await _userManager.GetUserAsync(User);
-        bool permitGranted = await _unitOfWork.Owners.GetMenuPermissionAsync(user!, menuId);
+        bool permitGranted = await _unitOfWork.Owners.GetRestaurantPermissionAsync(user!, restaurantId);
         if (permitGranted)
         {
             return true;

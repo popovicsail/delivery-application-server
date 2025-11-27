@@ -6,6 +6,7 @@ using Delivery.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Quartz;
 
 namespace Delivery.Infrastructure;
@@ -25,7 +26,9 @@ public static class InfrastructureServiceExtensions
         services.ConfigureOptions<LoggingBackgroundJobSetup>();
 
         services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")).UseSnakeCaseNamingConvention());
+            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")).UseSnakeCaseNamingConvention()
+            .EnableSensitiveDataLogging()
+                .LogTo(Console.WriteLine, LogLevel.Information));
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IRestaurantRepository, RestaurantRepository>();

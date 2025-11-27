@@ -20,19 +20,27 @@ public class DishesController : ControllerBase
     }
 
     [HttpGet("paged")]
-    public async Task<IActionResult> GetPagedAsync([FromQuery] DishFiltersMix filters, int sort, int page = 1)
+    public async Task<IActionResult> GetPagedAsync([FromQuery] DishFiltersMix filters, string sort, int page = 1)
     {
         var restaurants = await _dishService.GetPagedAsync(sort, filters, page, User);
 
         return Ok(restaurants);
     }
 
+    [HttpGet("filtered")]
+    public async Task<IActionResult> GetAllFilteredAsync([FromQuery] DishFiltersMix filters, string sort)
+    {
+        var dishes = await _dishService.GetAllFilteredAsync(filters, sort);
+
+        return Ok(dishes);
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetAllAsync()
     {
-        var dishs = await _dishService.GetAllAsync();
+        var dishes = await _dishService.GetAllAsync();
 
-        return Ok(dishs);
+        return Ok(dishes);
     }
 
     [HttpGet("{id}")]

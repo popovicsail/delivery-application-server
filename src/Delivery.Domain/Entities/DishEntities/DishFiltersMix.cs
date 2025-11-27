@@ -8,6 +8,7 @@ namespace Delivery.Domain.Entities.DishEntities
 {
     public class DishFiltersMix
     {
+        public Guid? RestaurantId { get; set; }
         public string? Name { get; set; }
         public string? Type { get; set; }
         public double? MinPrice { get; set; } = 0;

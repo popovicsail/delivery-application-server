@@ -11,6 +11,8 @@ public interface IUnitOfWork : IDisposable
     ICourierRepository Couriers { get; }
     IWorkerRepository Workers { get; }
     IDishRepository Dishes { get; }
+    IOfferRepository Offers { get; }
+    IOfferDishRepository OfferDishes { get; }
     IVoucherRepository Vouchers { get; }
     IFeedbackQuestionRepository FeedbackQuestions { get; }
     IFeedbackResponseRepository FeedbackResponses { get; }
