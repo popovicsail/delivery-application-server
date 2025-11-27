@@ -1,11 +1,16 @@
-﻿namespace Delivery.Application.Dtos.OrderDtos.Responses;
+﻿using Delivery.Domain.Entities.RestaurantEntities;
 
-public class OrderDraftResponseDto
+
+namespace Delivery.Application.Dtos.OrderDtos.Responses
 {
-    public Guid Id { get; set; }
-    public decimal TotalPrice { get; set; }
-    public string Status { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public Guid RestaurantId { get; set; }
-    public List<OrderItemSummaryResponse> Items { get; set; } = new List<OrderItemSummaryResponse>();
+    public class OrderDraftResponseDto
+    {
+        public Guid Id { get; set; }
+        public decimal TotalPrice { get; set; }
+        public string Status { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public Guid RestaurantId { get; set; }
+        public Restaurant Restaurant { get; set; }
+        public List<OrderItemSummaryResponse> Items { get; set; } = new List<OrderItemSummaryResponse>();
+    }
 }

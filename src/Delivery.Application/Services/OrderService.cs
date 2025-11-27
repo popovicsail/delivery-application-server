@@ -23,14 +23,16 @@ namespace Delivery.Application.Services
         private readonly UserManager<User> _userManager;
         private readonly IMongoUnitOfWork _mongoUnitOfWork;
         private readonly IPdfService _pdfService;
+        private IDeliveryTimeService _deliveryTimeService;
 
-        public OrderService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<User> userManager, IMongoUnitOfWork mongoUnitOfWork, IPdfService pdfService)
+        public OrderService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<User> userManager, IMongoUnitOfWork mongoUnitOfWork, IPdfService pdfService, IDeliveryTimeService deliveryTimeService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _userManager = userManager;
             _mongoUnitOfWork = mongoUnitOfWork;
             _pdfService = pdfService;
+            _deliveryTimeService = deliveryTimeService;
         }
 
         public async Task<IEnumerable<OrderResponseDto>> GetByRestaurantAsync(Guid restaurantId)
@@ -267,12 +269,54 @@ namespace Delivery.Application.Services
             if (order == null)
                 throw new NotFoundException($"Order with ID '{orderId}' not found.");
 
+            // Ako restoran definiše vreme pripreme
             if (eta > 0)
             {
                 order.TimeToPrepare = eta;
+                order.EstimatedReadyAt = order.CreatedAt.AddMinutes(eta);
             }
 
             order.Status = statusEnum.ToString();
+
+            if (statusEnum == OrderStatus.Preuzeto)
+            {
+                order.DeliveryTimeMinutes = null;
+                order.EstimatedDeliveryAt = null;
+                order.DeliveryEstimateMessage = "Dostavljac je preuzeo dostavu.";
+            }
+
+            // 👇 Kada kurir preuzme porudžbinu → pozovi DeliveryTimeService
+            if (statusEnum == OrderStatus.DostavaUToku)
+            {
+                var customerAddress = order.Address ?? order.Customer.Addresses.FirstOrDefault();
+                if (customerAddress == null || !customerAddress.Latitude.HasValue || !customerAddress.Longitude.HasValue)
+                {
+                    order.DeliveryTimeMinutes = null;
+                    order.EstimatedDeliveryAt = null;
+                    order.DeliveryEstimateMessage = "Customer address coordinates are missing";
+                }
+                else
+                { 
+                    var minutes = await _deliveryTimeService.GetEstimatedDeliveryTimeMinutesAsync(
+                        order.Restaurant.Address.Latitude ?? 0, order.Restaurant.Address.Longitude ?? 0,
+                        customerAddress.Latitude.Value, customerAddress.Longitude.Value);
+
+                    if (minutes.HasValue)
+                    {
+                        order.DeliveryTimeMinutes = minutes.Value;
+                        order.EstimatedDeliveryAt = DateTime.UtcNow.AddMinutes(minutes.Value);
+                        order.DeliveryEstimateMessage = $"Procena vremena dostave je {minutes.Value} minuta." +
+                                                        $"Vreme dostave moze da varira u zavisnosti od uslova na putu.";
+                    }
+                    else
+                    {
+                        order.DeliveryTimeMinutes = null;
+                        order.EstimatedDeliveryAt = null;
+                        order.DeliveryEstimateMessage = "Procena vremena nije dostupna";
+                    }
+                }
+            }
+
             _unitOfWork.Orders.Update(order);
             await _unitOfWork.CompleteAsync(); // 👈 opet koristi tvoj metod
 
@@ -289,6 +333,7 @@ namespace Delivery.Application.Services
 
             return null;
         }
+
 
         public async Task DeleteAsync(Guid orderId)
         {
