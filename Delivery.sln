@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36429.23
+# Visual Studio Version 18
+VisualStudioVersion = 18.3.11206.111
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Delivery.Api", "src\Delivery.Api\Delivery.Api.csproj", "{B2F2ED87-2A1C-47B0-A287-1EC55AC06BC4}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Delivery.Infrastructure", "src\Delivery.Infrastructure\Delivery.Infrastructure.csproj", "{E3308C59-6187-89D8-DCB0-DFC7512569AE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Delivery.Tests", "Tests\Delivery.Tests.csproj", "{73379FAE-052C-45A8-9C0E-80B0077FE0C5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Delivery.QuestCompanion", "src\PdfConsoleApp\Delivery.QuestCompanion.csproj", "{AC10C84C-8037-2D36-06CD-996F58429CE1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{73379FAE-052C-45A8-9C0E-80B0077FE0C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73379FAE-052C-45A8-9C0E-80B0077FE0C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{73379FAE-052C-45A8-9C0E-80B0077FE0C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC10C84C-8037-2D36-06CD-996F58429CE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC10C84C-8037-2D36-06CD-996F58429CE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC10C84C-8037-2D36-06CD-996F58429CE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC10C84C-8037-2D36-06CD-996F58429CE1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

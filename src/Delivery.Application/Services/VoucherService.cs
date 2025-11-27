@@ -5,7 +5,6 @@ using Delivery.Application.Exceptions;
 using Delivery.Application.Interfaces;
 using Delivery.Domain.Entities.UserEntities;
 using Delivery.Domain.Interfaces;
-using Microsoft.AspNetCore.Identity;
 
 namespace Delivery.Application.Services;
 
