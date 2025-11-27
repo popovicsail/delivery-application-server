@@ -1,6 +1,4 @@
-﻿namespace Delivery.Domain.Entities.DishEntities;
-
-namespace Delivery.Domain.Entities.DishEntities
+﻿namespace Delivery.Domain.Entities.DishEntities
 {
     public class DishFiltersMix
     {
