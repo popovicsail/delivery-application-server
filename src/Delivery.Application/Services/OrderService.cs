@@ -473,6 +473,95 @@ namespace Delivery.Application.Services
 
             await _unitOfWork.CompleteAsync();
         }
+
+        public async Task<RestaurantRevenueStatisticsDto> GetRestaurantRevenueStatisticsAsync(Guid restaurantId, DateTime from, DateTime to)
+        {
+            var orders = await _unitOfWork.Orders.GetByRestaurantAndDateRangeAsync(restaurantId, from, to);
+
+            var daily = orders
+                .GroupBy(o => o.CreatedAt.Date)
+                .Select(g => new RestaurantDailyRevenueDto
+                {
+                    Date = g.Key,
+                    Revenue = g.Sum(x => x.TotalPrice)
+                })
+                .OrderBy(x => x.Date)
+                .ToList();
+
+            decimal total = daily.Sum(d => d.Revenue);
+            int orderCount = orders.Count();
+            decimal average = orderCount > 0 ? total / orderCount : 0;
+
+            return new RestaurantRevenueStatisticsDto
+            {
+                Daily = daily,
+                TotalRevenue = total,
+                OrderCount = orderCount,
+                AverageOrderValue = average
+            };
+        }
+
+        public async Task<DishRevenueStatisticsResponse> GetDishRevenueStatisticsAsync(Guid restaurantId, Guid dishId, DateTime from, DateTime to)
+        {
+            var orders = await _unitOfWork.Orders.GetByRestaurantAndDateRangeAsync(restaurantId, from, to);
+
+            var dishEntries = orders
+                .SelectMany(o => o.Items.Where(i => i.Id == dishId)
+                    .Select(i => new
+                    {
+                        Date = o.CreatedAt.Date,
+                        Revenue = i.Price * i.Quantity
+                    }))
+                .ToList();
+
+            var daily = dishEntries
+                .GroupBy(x => x.Date)
+                .Select(g => new DailyDishRevenue
+                {
+                    Date = g.Key,
+                    Revenue = g.Sum(x => x.Revenue)
+                })
+                .OrderBy(d => d.Date)
+                .ToList();
+
+            decimal totalRevenue = daily.Sum(x => x.Revenue);
+            int totalOrders = dishEntries.Count;
+            decimal average = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+
+            return new DishRevenueStatisticsResponse
+            {
+                Daily = daily,
+                TotalRevenue = totalRevenue,
+                TotalOrders = totalOrders,
+                AverageRevenue = average
+            };
+        }
+
+        public async Task<CanceledOrdersStatisticsDto> GetCanceledOrdersStatisticsAsync(Guid restaurantId, DateTime from, DateTime to)
+        {
+            var canceledOrders = await _unitOfWork.Orders.GetCanceledByRestaurantAndDateRangeAsync(restaurantId, from, to);
+
+            var daily = canceledOrders
+                .GroupBy(o => o.CreatedAt.Date)
+                .Select(g => new DailyCanceledOrdersDto
+                {
+                    Date = g.Key,
+                    Count = g.Count()
+                })
+                .OrderBy(x => x.Date)
+                .ToList();
+
+            int totalCanceled = daily.Sum(d => d.Count);
+
+            int totalDays = (to.Date - from.Date).Days + 1;
+            double average = totalDays > 0 ? (double)totalCanceled / totalDays : 0;
+
+            return new CanceledOrdersStatisticsDto
+            {
+                Daily = daily,
+                TotalCanceled = totalCanceled,
+                AverageCanceledPerDay = Math.Round(average, 2)
+            };
         
         public async Task<byte[]?> GetOrderBillPdfAsync(Guid orderId)
         {
