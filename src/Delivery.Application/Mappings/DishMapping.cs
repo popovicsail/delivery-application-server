@@ -2,9 +2,7 @@
 using Delivery.Application.Dtos.DishDtos;
 using Delivery.Application.Dtos.DishDtos.Requests;
 using Delivery.Application.Dtos.DishDtos.Responses;
-using Delivery.Application.Dtos.RestaurantDtos;
 using Delivery.Domain.Entities.DishEntities;
-using Delivery.Domain.Entities.RestaurantEntities;
 
 
 namespace Delivery.Application.Mappings;

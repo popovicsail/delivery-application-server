@@ -1,16 +1,11 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using AutoMapper;
-using Delivery.Application.Interfaces;
+﻿using AutoMapper;
 using Delivery.Application.Services;
 using Delivery.Domain.Entities.CommonEntities;
 using Delivery.Domain.Entities.UserEntities;
 using Delivery.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Shouldly;
-using Xunit;
 
 public class CourierStatusUpdaterTests
 {

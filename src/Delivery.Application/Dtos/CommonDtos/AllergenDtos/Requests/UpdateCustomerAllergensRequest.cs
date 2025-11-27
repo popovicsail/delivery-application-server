@@ -1,7 +1,6 @@
-﻿namespace Delivery.Application.Dtos.CommonDtos.AllergenDtos.Requests
+﻿namespace Delivery.Application.Dtos.CommonDtos.AllergenDtos.Requests;
+
+public class UpdateCustomerAllergensRequest
 {
-    public class UpdateCustomerAllergensRequest
-    {
-        public List<Guid> AllergenIds { get; set; }
-    }
+    public List<Guid> AllergenIds { get; set; }
 }

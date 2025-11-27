@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Delivery.Domain.Entities.RestaurantEntities;
+﻿namespace Delivery.Application.Dtos.OrderDtos.Responses;
 
 namespace Delivery.Application.Dtos.OrderDtos.Responses
 {

@@ -50,4 +50,3 @@ namespace Delivery.Domain.Entities.OrderEntities
         }
     }
 }
-

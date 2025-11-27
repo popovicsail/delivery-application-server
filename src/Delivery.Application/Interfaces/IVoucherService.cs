@@ -1,8 +1,5 @@
-﻿using System.Security.Claims;
-using Delivery.Application.Dtos.Users.CustomerDtos.VoucherDtos.Responses;
+﻿using Delivery.Application.Dtos.Users.CustomerDtos.VoucherDtos.Responses;
 using Delivery.Application.Dtos.Users.CustomerDtos.VoucherDtos.Requests;
-using Delivery.Domain.Common;
-using Microsoft.AspNetCore.Http;
 
 namespace Delivery.Application.Interfaces;
 

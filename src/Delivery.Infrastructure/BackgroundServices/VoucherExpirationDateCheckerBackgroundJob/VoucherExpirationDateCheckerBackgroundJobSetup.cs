@@ -1,19 +1,18 @@
 ﻿using Microsoft.Extensions.Options;
 using Quartz;
 
-namespace Delivery.Infrastructure.BackgroundServices.BirthdayVoucherBackgroundJob
+namespace Delivery.Infrastructure.BackgroundServices.VoucherExpirationDateCheckerBackgroundJob;
+
+public class VoucherExpirationDateCheckerBackgroundJobSetup : IConfigureOptions<QuartzOptions>
 {
-    public class VoucherExpirationDateCheckerBackgroundJobSetup : IConfigureOptions<QuartzOptions>
+    public void Configure(QuartzOptions options)
     {
-        public void Configure(QuartzOptions options)
-        {
-            JobKey jobKey = JobKey.Create(nameof(VoucherExpirationDateCheckerBackgroundJob));
-            options
-                .AddJob<VoucherExpirationDateCheckerBackgroundJob>(jobBuilder => jobBuilder.WithIdentity(jobKey))
-                .AddTrigger(trigger =>
-                    trigger
-                        .ForJob(jobKey)
-                        .WithCronSchedule("0 0 0 * * ?"));
-        }
+        JobKey jobKey = JobKey.Create(nameof(VoucherExpirationDateCheckerBackgroundJob));
+        options
+            .AddJob<VoucherExpirationDateCheckerBackgroundJob>(jobBuilder => jobBuilder.WithIdentity(jobKey))
+            .AddTrigger(trigger =>
+                trigger
+                    .ForJob(jobKey)
+                    .WithCronSchedule("0 0 0 * * ?"));
     }
 }
