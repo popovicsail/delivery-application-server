@@ -55,6 +55,15 @@ namespace Delivery.Application.Services
                     response.Status = courier.WorkStatus;
                 }
             }
+            if (roles.Contains("Customer"))
+            {
+                var customer = await _unitOfWork.Customers.GetOneAsync(user.Id);
+                if (customer != null)
+                {
+                    response.CustomerId = customer.Id;
+                }
+            }
+
 
             return response;
         }

@@ -1,12 +1,14 @@
 ﻿using Delivery.Domain.Entities.CommonEntities;
 using Delivery.Domain.Entities.DishEntities;
 using Delivery.Domain.Entities.FeedbackEntities;
+using Delivery.Domain.Entities.OfferEntities;
 using Delivery.Domain.Entities.OrderEntities;
 using Delivery.Domain.Entities.RestaurantEntities;
 using Delivery.Domain.Entities.UserEntities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions.Infrastructure;
 
 namespace Delivery.Infrastructure.Persistence;
 
@@ -17,6 +19,9 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
     public DbSet<Dish> Dishes { get; set; }
     public DbSet<DishOption> DishOptions { get; set; }
     public DbSet<DishOptionGroup> DishOptionGroups { get; set; }
+    
+    public DbSet<Offer> Offers { get; set; }
+    public DbSet<OfferDish> OfferDishes { get; set; }
 
     public DbSet<Address> Addresses { get; set; }
     public DbSet<Allergen> Allergens { get; set; }
@@ -31,6 +36,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Owner> Owners { get; set; }
     public DbSet<Worker> Workers { get; set; }
+    public DbSet<Support> Supports { get; set; }
 
     public DbSet<Voucher> Vouchers { get; set; }
 
@@ -38,6 +44,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
     public DbSet<FeedbackResponse> FeedbackResponses { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
+    public DbSet<Rating> Rating { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -46,12 +53,14 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
         var passwordHasher = new PasswordHasher<User>();
 
         var adminRoleId = Guid.Parse("2301d884-221a-4e7d-b509-0113dcc043e1");
+        var supportRoleId = Guid.Parse("523E6BF7-9BF9-45FB-9848-317195F21378");
         builder.Entity<IdentityRole<Guid>>().HasData(
             new IdentityRole<Guid> { Id = adminRoleId, Name = "Administrator", NormalizedName = "ADMINISTRATOR" },
             new IdentityRole<Guid> { Id = Guid.Parse("5b00155d-77a2-438c-b18f-dc1cc8af5a43"), Name = "Customer", NormalizedName = "CUSTOMER" },
             new IdentityRole<Guid> { Id = Guid.Parse("190d206e-0b99-4d0f-b3fa-da6ceea6d8cb"), Name = "Courier", NormalizedName = "COURIER" },
             new IdentityRole<Guid> { Id = Guid.Parse("fc7e84f2-e37e-46e2-a222-a839d3e1a3bb"), Name = "Owner", NormalizedName = "OWNER" },
-            new IdentityRole<Guid> { Id = Guid.Parse("f09ece5a-1c11-4792-815b-4ef1bc6c6c20"), Name = "Worker", NormalizedName = "WORKER" }
+            new IdentityRole<Guid> { Id = Guid.Parse("f09ece5a-1c11-4792-815b-4ef1bc6c6c20"), Name = "Worker", NormalizedName = "WORKER" },
+            new IdentityRole<Guid> { Id = supportRoleId, Name = "Support", NormalizedName = "SUPPORT"}
         );
 
         var adminUser1 = new User { Id = Guid.Parse("b22698b8-42a2-4115-9631-1c2d1e2ac5f7"), UserName = "admin1", NormalizedUserName = "ADMIN1", Email = "admin1@example.com", NormalizedEmail = "ADMIN1@EXAMPLE.COM", FirstName = "Main", LastName = "Admin", EmailConfirmed = true, SecurityStamp = Guid.NewGuid().ToString(), ProfilePictureBase64 = DefaultAvatar.Base64 };
@@ -64,10 +73,17 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
 
         builder.Entity<User>().HasData(adminUser1, adminUser2, adminUser3);
 
+        var supportUser1 = new User { Id = Guid.Parse("B8DCC582-DF52-4F25-8387-E9ED49F062C9"), UserName = "support1", NormalizedUserName = "SUPPORT1", Email = "support1@example.com", NormalizedEmail = "SUPPORT1@EXAMPLE.COM", FirstName = "First", LastName = "Support", EmailConfirmed = true, SecurityStamp = Guid.NewGuid().ToString(), ProfilePictureBase64 = DefaultAvatar.Base64 };
+       
+        supportUser1.PasswordHash = passwordHasher.HashPassword(supportUser1, "SupportPass1!");
+
+        builder.Entity<User>().HasData(supportUser1);
+
         builder.Entity<IdentityUserRole<Guid>>().HasData(
             new IdentityUserRole<Guid> { RoleId = adminRoleId, UserId = adminUser1.Id },
             new IdentityUserRole<Guid> { RoleId = adminRoleId, UserId = adminUser2.Id },
-            new IdentityUserRole<Guid> { RoleId = adminRoleId, UserId = adminUser3.Id }
+            new IdentityUserRole<Guid> { RoleId = adminRoleId, UserId = adminUser3.Id },
+            new IdentityUserRole<Guid> { RoleId = supportRoleId, UserId = supportUser1.Id }
         );
 
         builder.Entity<WorkSchedule>(entity =>
@@ -95,6 +111,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
         builder.Entity<Restaurant>().HasOne(r => r.BaseWorkSched).WithOne(b => b.Restaurant).HasForeignKey<BaseWorkSched>(b => b.RestaurantId).OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<Menu>().HasMany(m => m.Dishes).WithOne(d => d.Menu).HasForeignKey(d => d.MenuId);
+        builder.Entity<Menu>().HasMany(m => m.Offers).WithOne(d => d.Menu).HasForeignKey(d => d.MenuId);
 
         builder.Entity<Dish>().HasMany(d => d.DishOptionGroups).WithOne(g => g.Dish).HasForeignKey(g => g.DishId);
         builder.Entity<Dish>().HasMany(d => d.Allergens).WithMany(a => a.Dishes);
@@ -108,10 +125,9 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
         builder.Entity<Order>().HasMany(o => o.Items).WithOne(i => i.Order).HasForeignKey(i => i.OrderId).OnDelete(DeleteBehavior.Cascade);
         builder.Entity<OrderItem>().HasIndex(o => o.Id).IsUnique();
         builder.Entity<OrderItem>().HasOne(i => i.Order).WithMany(o => o.Items).HasForeignKey(i => i.OrderId).OnDelete(DeleteBehavior.Cascade);
-        builder.Entity<OrderItem>().HasOne(i => i.Dish).WithMany().HasForeignKey(i => i.DishId).OnDelete(DeleteBehavior.Restrict);
+        builder.Entity<OrderItem>().HasOne(i => i.Dish).WithMany().HasForeignKey(i => i.DishId).OnDelete(DeleteBehavior.Cascade).IsRequired(false);
+        builder.Entity<OrderItem>().HasOne(i => i.Offer).WithMany().HasForeignKey(i => i.OfferId).OnDelete(DeleteBehavior.Cascade).IsRequired(false);
         builder.Entity<OrderItem>().Property(i => i.Quantity).IsRequired();
-        builder.Entity<OrderItem>().Property(i => i.Price).HasColumnType("decimal(18,2)");
-        builder.Entity<Order>().Property(o => o.TotalPrice).HasColumnType("decimal(18,2)");
 
         builder.Entity<OrderItem>().HasMany(oi => oi.DishOptions).WithMany()
         .UsingEntity<Dictionary<string, object>>(
@@ -119,6 +135,9 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
             j => j.HasOne<DishOption>().WithMany().HasForeignKey("DishOptionId").OnDelete(DeleteBehavior.Cascade),
             j => j.HasOne<OrderItem>().WithMany().HasForeignKey("OrderItemId").OnDelete(DeleteBehavior.Cascade)
         );
+
+        builder.Entity<Offer>().HasMany(o => o.OfferDishes).WithOne(od => od.Offer).HasForeignKey(od => od.OfferId).OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<OfferDish>().HasOne(od => od.Dish).WithMany().HasForeignKey(od => od.DishId).OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<FeedbackQuestion>(entity =>
         {

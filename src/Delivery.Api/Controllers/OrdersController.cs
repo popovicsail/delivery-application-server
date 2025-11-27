@@ -1,9 +1,11 @@
+﻿using Delivery.Application.Dtos.OrderDtos.Requests;
 ﻿using System.Security.Claims;
 using System.Text.Json.Serialization;
-using Delivery.Application.Dtos.OrderDtos.Requests;
+using System.Threading.Tasks;
 using Delivery.Application.Interfaces;
-using Delivery.Domain.Entities.OrderEntities.Enums;
 using Microsoft.AspNetCore.Mvc;
+using Delivery.Domain.Entities.OrderEntities.Enums;
+using Delivery.Application.Dtos.OrderDtos.Requests;
 
 namespace Delivery.Api.Controllers
 {
@@ -12,12 +14,19 @@ namespace Delivery.Api.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly IOrderService _orderService;
+        private readonly ICourierLocationService _locationService;
 
-        public OrdersController(IOrderService orderService)
+        public OrdersController(IOrderService orderService, ICourierLocationService locationService)
         {
             _orderService = orderService;
+            _locationService = locationService;
         }
 
+        [HttpGet("/customer")]
+        public async Task<IActionResult> GetOneNotDraftAsync()
+        {
+            return Ok(await _orderService.GetOneNotDraftAsync(User));
+        }
 
         // 1️⃣ Kreiranje porudžbine sa stavkama
         [HttpPost("items")]
@@ -31,8 +40,7 @@ namespace Delivery.Api.Controllers
         [HttpPut("{orderId}/details")]
         public async Task<IActionResult> UpdateOrderDetails(Guid orderId, [FromBody] OrderUpdateDetailsDto request)
         {
-            await _orderService.UpdateDetailsAsync(orderId, request);
-            return NoContent();
+            return Ok(await _orderService.UpdateDetailsAsync(orderId, request));
         }
 
         // 3️⃣ Potvrda porudžbine
@@ -74,17 +82,47 @@ namespace Delivery.Api.Controllers
         }
 
         [HttpGet("courier/{courierId:guid}")]
-        public async Task<IActionResult> GetByCourier(Guid courierId)
+        public async Task<IActionResult> GetByCourier(Guid courierId, DateTime? from = null, DateTime? to = null, int page = 1, int pageSize = 5)
         {
-            var result = await _orderService.GetByCourierAsync(courierId);
-            return Ok(result);
+            // konverzija u UTC ako nisu null
+            if (from.HasValue && from.Value.Kind == DateTimeKind.Unspecified)
+                from = DateTime.SpecifyKind(from.Value, DateTimeKind.Utc);
+
+            if (to.HasValue && to.Value.Kind == DateTimeKind.Unspecified)
+                to = DateTime.SpecifyKind(to.Value, DateTimeKind.Utc);
+
+            var result = await _orderService.GetByCourierAsync(courierId, from, to, page, pageSize);
+            return Ok(new
+            {
+                items = result.Items,
+                totalCount = result.TotalCount
+            });
+        }
+
+
+        [HttpGet("customer/{customerId:guid}/deliveries-history")]
+        public async Task<IActionResult> GetByCustomer(Guid customerId, int page = 1, int pageSize = 10)
+        {
+            var result = await _orderService.GetByCustomerAsync(customerId, page, pageSize);
+
+            return Ok(new
+            {
+                items = result.Items,
+                totalCount = result.TotalCount
+            });
         }
 
         // PUT: api/orders/{orderId}/status
         [HttpPut("{orderId:guid}/status")]
         public async Task<IActionResult> UpdateStatus(Guid orderId, [FromBody] OrderStatusUpdateRequestDto request)
         {
-            await _orderService.UpdateStatusAsync(orderId, request.NewStatus, request.PrepTime);
+            byte[]? bill = await _orderService.UpdateStatusAsync(orderId, request.NewStatus, request.PrepTime);
+
+            if (bill != null)
+            {
+                return Ok(File(bill, "application/pdf", $"bill-{orderId}.pdf"));
+            }
+
             return NoContent();
         }
 
@@ -135,5 +173,33 @@ namespace Delivery.Api.Controllers
                 var stats = await _orderService.GetCanceledOrdersStatisticsAsync(restaurantId, from, to);
                 return Ok(stats);
             }
+        [HttpGet("{orderId:guid}/location")]
+        public async Task<ActionResult<CourierLocationDto>> GetLocation(Guid orderId)
+        {
+            var location = await _locationService.GetByOrderAsync(orderId);
+            if (location == null) return NotFound();
+            return Ok(location);
+        }
+
+        [HttpPost("{orderId:guid}/location")]
+        public async Task<IActionResult> UpdateLocation(Guid orderId, [FromBody] CourierLocationDto dto)
+        {
+            await _locationService.UpdateAsync(orderId, dto);
+            return NoContent();
+        }
+
+
+        [HttpGet("get-bill-pdf")]
+        public async Task<IActionResult> GetBillPdf(Guid orderId)
+        {
+            var bill = await _orderService.GetOrderBillPdfAsync(orderId);
+
+            if (bill == null)
+            {
+                return NotFound(new { Message = "ERROR: No bill for this order. Try again later." });
+            }
+
+            return Ok(File(bill, "application/pdf", $"bill-{orderId}.pdf"));
+        }
     }
 }

@@ -1,6 +1,8 @@
-﻿using Delivery.Domain.Interfaces;
+﻿using Delivery.Domain.Entities.OrderEntities;
+using Delivery.Domain.Interfaces;
 using Delivery.Infrastructure.Persistence;
 using Delivery.Infrastructure.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 
 
@@ -18,12 +20,14 @@ public class UnitOfWork : IUnitOfWork
     public IWorkerRepository Workers { get; private set; }
     public ICourierRepository Couriers { get; private set; }
     public IDishRepository Dishes { get; private set; }
+    public IOfferRepository Offers { get; private set; }
+    public IOfferDishRepository OfferDishes { get; private set; }
     public IVoucherRepository Vouchers { get; private set; }
     public IFeedbackQuestionRepository FeedbackQuestions { get; private set; }
     public IFeedbackResponseRepository FeedbackResponses { get; private set; }
     public IOrderItemsRepository OrderItems { get; private set; }
     public IOrdersRepository Orders { get; private set; }
-
+    public IRatingRepository Rates { get; private set; }
     public UnitOfWork(ApplicationDbContext dbContext)
     {
         _dbContext = dbContext;
@@ -36,11 +40,14 @@ public class UnitOfWork : IUnitOfWork
         Workers = new WorkerRepository(_dbContext);
         Couriers = new CourierRepository(_dbContext);
         Dishes = new DishRepository(_dbContext);
+        Offers = new OfferRepository(_dbContext);
+        OfferDishes = new OfferDishRepository(_dbContext);
         Vouchers = new VoucherRepository(_dbContext);
         FeedbackQuestions = new FeedbackQuestionRepository(_dbContext);
         FeedbackResponses = new FeedbackResponseRepository(_dbContext);
         OrderItems = new OrderItemsRepository(_dbContext);
         Orders = new OrdersRepository(_dbContext);
+        Rates = new RatingRepository(_dbContext);
     }
 
     public Task<int> CompleteAsync()

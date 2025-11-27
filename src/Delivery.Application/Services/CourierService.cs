@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using AutoMapper;
+﻿using AutoMapper;
 using Delivery.Application.Dtos.CommonDtos.WorkScheduleDto;
 using Delivery.Application.Dtos.Users.CourierDtos.Requests;
 using Delivery.Application.Dtos.Users.CourierDtos.Responses;
@@ -9,7 +8,6 @@ using Delivery.Domain.Entities.CommonEntities;
 using Delivery.Domain.Entities.UserEntities;
 using Delivery.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace Delivery.Application.Services;
 

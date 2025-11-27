@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Delivery.Domain.Entities.OrderEntities;
+﻿using Delivery.Domain.Entities.OrderEntities;
 using Delivery.Domain.Interfaces;
 using Delivery.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +14,7 @@ namespace Delivery.Infrastructure.Repositories
         {
             return await _dbContext.OrderItems
                 .Include(oi => oi.Dish)
+                .Include(oi => oi.Offer)
                 .Where(oi => oi.OrderId == orderId)
                 .ToListAsync();
         }

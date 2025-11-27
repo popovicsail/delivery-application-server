@@ -1,5 +1,4 @@
-﻿using Delivery.Application.Dtos.CommonDtos.AllergenDtos;
-using Delivery.Application.Dtos.DishDtos.Requests;
+﻿using Delivery.Application.Dtos.DishDtos.Requests;
 using Delivery.Domain.Entities.DishEntities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,19 +19,27 @@ public class DishesController : ControllerBase
     }
 
     [HttpGet("paged")]
-    public async Task<IActionResult> GetPagedAsync([FromQuery] DishFiltersMix filters, int sort, int page = 1)
+    public async Task<IActionResult> GetPagedAsync([FromQuery] DishFiltersMix filters, string sort, int page = 1)
     {
         var restaurants = await _dishService.GetPagedAsync(sort, filters, page, User);
 
         return Ok(restaurants);
     }
 
+    [HttpGet("filtered")]
+    public async Task<IActionResult> GetAllFilteredAsync([FromQuery] DishFiltersMix filters, string sort)
+    {
+        var dishes = await _dishService.GetAllFilteredAsync(filters, sort);
+
+        return Ok(dishes);
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetAllAsync()
     {
-        var dishs = await _dishService.GetAllAsync();
+        var dishes = await _dishService.GetAllAsync();
 
-        return Ok(dishs);
+        return Ok(dishes);
     }
 
     [HttpGet("{id}")]
@@ -46,6 +53,10 @@ public class DishesController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<DishDetailResponseDto>> CreateAsync([FromForm] DishCreateRequestDto request, IFormFile? file)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
         if (!string.IsNullOrEmpty(Request.Form["AllergenIds"]))
         {
             request.AllergenIds = JsonConvert.DeserializeObject<List<Guid>>(Request.Form["AllergenIds"]);
@@ -58,6 +69,10 @@ public class DishesController : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateAsync([FromRoute] Guid id, [FromForm] DishUpdateRequestDto request, IFormFile? file)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
         if (!string.IsNullOrEmpty(Request.Form["AllergenIds"]))
         {
             request.AllergenIds = JsonConvert.DeserializeObject<List<Guid>>(Request.Form["AllergenIds"]);

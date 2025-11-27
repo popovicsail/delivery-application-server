@@ -1,5 +1,4 @@
 ﻿using Delivery.Domain.Entities.UserEntities;
-using Microsoft.EntityFrameworkCore;
 
 namespace Delivery.Domain.Interfaces;
 

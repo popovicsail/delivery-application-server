@@ -22,10 +22,20 @@ namespace Delivery.Domain.Entities.OrderEntities
         public Guid? AddressId { get; set; }
         public Address? Address { get; set; }
 
-        public decimal TotalPrice { get; set; }
+        public double TotalPrice { get; set; }
+        public bool FreeDelivery { get; set; } = false;
         public DateTime CreatedAt { get; set; }
         public int? TimeToPrepare { get; set; }
+        public DateTime? EstimatedReadyAt { get; set; }
+        public int? DeliveryTimeMinutes { get; set; }
+        public DateTime? EstimatedDeliveryAt { get; set; }
+        public string? DeliveryEstimateMessage { get; set; }
+
         public string Status { get; set; }
+
+        public double? CourierLocationLat { get; set; }
+        public double? CourierLocationLng { get; set; }
+        public DateTime? CourierLocationUpdatedAt { get; set; }
         public Guid RestaurantId { get; set; }
         public Restaurant Restaurant { get; set; }
 
@@ -33,8 +43,11 @@ namespace Delivery.Domain.Entities.OrderEntities
 
         public void SetTotalPrice()
         {
-            TotalPrice = (TotalPrice != 0) ? TotalPrice : (Items.Count > 0) ? Items.Sum(i => i.Price) : 0;
+            TotalPrice = Items.Count > 0
+                ? Items.Sum(i => (i.DishPrice + i.OptionsPrice) * i.Quantity - (i.DiscountExpireAt != null && i.DiscountExpireAt > DateTime.UtcNow && i.DiscountRate != 0
+                ? i.DiscountRate * i.DishPrice * i.Quantity
+                : 0))
+                : 0;
         }
     }
 }
-

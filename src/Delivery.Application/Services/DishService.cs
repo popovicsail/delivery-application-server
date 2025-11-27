@@ -3,14 +3,10 @@ using AutoMapper;
 using Delivery.Application.Dtos.DishDtos.Requests;
 using Delivery.Application.Dtos.DishDtos.Responses;
 using Delivery.Application.Dtos.RestaurantDtos;
-using Delivery.Application.Dtos.RestaurantDtos.Responses;
 using Delivery.Application.Exceptions;
 using Delivery.Application.Interfaces;
 using Delivery.Domain.Common;
-using Delivery.Domain.Entities.CommonEntities;
 using Delivery.Domain.Entities.DishEntities;
-using Delivery.Domain.Entities.RestaurantEntities;
-using Delivery.Domain.Entities.UserEntities;
 using Delivery.Domain.Interfaces;
 using Microsoft.AspNetCore.Http;
 
@@ -34,7 +30,13 @@ public class DishService : IDishService
         return _mapper.Map<IEnumerable<DishDetailResponseDto>>(dishes);
     }
 
-    public async Task<PaginatedList<DishSummaryResponseDto>> GetPagedAsync(int sort, DishFiltersMix filters, int page, ClaimsPrincipal User)
+    public async Task<IEnumerable<DishDetailResponseDto>> GetAllFilteredAsync(DishFiltersMix filters, string sort)
+    {
+        var dishes = await _unitOfWork.Dishes.GetAllFilteredAsync(filters, sort);
+        return _mapper.Map<IEnumerable<DishDetailResponseDto>>(dishes);
+    }
+
+    public async Task<PaginatedList<DishSummaryResponseDto>> GetPagedAsync(string sort, DishFiltersMix filters, int page, ClaimsPrincipal User)
     {
         if (page < 1)
         {

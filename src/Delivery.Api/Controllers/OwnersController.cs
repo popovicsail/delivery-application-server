@@ -1,7 +1,6 @@
 ﻿using Delivery.Application.Dtos.Users.OwnerDtos.Requests;
 using Delivery.Application.Dtos.Users.OwnerDtos.Responses;
 using Delivery.Application.Interfaces;
-using Delivery.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -59,10 +58,10 @@ public class OwnersController : ControllerBase
         return NoContent();
     }
 
-    [HttpGet("permit/menu/{menuId:guid}")]
-    public async Task<IActionResult> GetMenuPermissionAsync(Guid userId, Guid menuId)
+    [HttpGet("permit/restaurant/{restaurantId:guid}")]
+    public async Task<IActionResult> GetMenuPermissionAsync(Guid userId, Guid restaurantId)
     {
-        var permit = await _ownerService.GetMenuPermissionAsync(User!, menuId);
+        var permit = await _ownerService.GetRestaurantPermissionAsync(User!, restaurantId);
         return Ok(permit);
     }
 }

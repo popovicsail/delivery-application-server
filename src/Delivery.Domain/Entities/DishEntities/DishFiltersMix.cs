@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Delivery.Domain.Entities.DishEntities;
 
 namespace Delivery.Domain.Entities.DishEntities
 {
     public class DishFiltersMix
     {
+        public Guid? RestaurantId { get; set; }
         public string? Name { get; set; }
         public string? Type { get; set; }
         public double? MinPrice { get; set; } = 0;

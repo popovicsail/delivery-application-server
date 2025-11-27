@@ -4,6 +4,7 @@ using Delivery.Application.Dtos.OrderDtos.Requests;
 using Delivery.Application.Dtos.OrderDtos.Responses;
 using Delivery.Application.Exceptions;
 using Delivery.Application.Interfaces;
+using Delivery.Domain.Entities.DishEntities;
 using Delivery.Domain.Entities.OrderEntities;
 using Delivery.Domain.Entities.OrderEntities.Enums;
 using Delivery.Domain.Entities.RestaurantEntities;
@@ -11,6 +12,7 @@ using Delivery.Domain.Entities.UserEntities;
 using Delivery.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 
 namespace Delivery.Application.Services
@@ -20,12 +22,18 @@ namespace Delivery.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly UserManager<User> _userManager;
+        private readonly IMongoUnitOfWork _mongoUnitOfWork;
+        private readonly IPdfService _pdfService;
+        private IDeliveryTimeService _deliveryTimeService;
 
-        public OrderService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<User> userManager)
+        public OrderService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<User> userManager, IMongoUnitOfWork mongoUnitOfWork, IPdfService pdfService, IDeliveryTimeService deliveryTimeService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _userManager = userManager;
+            _mongoUnitOfWork = mongoUnitOfWork;
+            _pdfService = pdfService;
+            _deliveryTimeService = deliveryTimeService;
         }
 
         public async Task<IEnumerable<OrderResponseDto>> GetByRestaurantAsync(Guid restaurantId)
@@ -35,11 +43,61 @@ namespace Delivery.Application.Services
             return _mapper.Map<IEnumerable<OrderResponseDto>>(orders);
         }
 
-        public async Task<IEnumerable<OrderResponseDto>> GetByCourierAsync(Guid courierId)
+        public async Task<(IEnumerable<OrderResponseDto> Items, int TotalCount)> GetByCourierAsync(
+        Guid courierId,
+        DateTime? from = null,
+        DateTime? to = null,
+        int page = 1,
+        int pageSize = 10)
         {
-            var orders = await _unitOfWork.Orders.GetByCourier(courierId);
-            return _mapper.Map<IEnumerable<OrderResponseDto>>(orders);
+            var query = _unitOfWork.Orders.GetByCourier(courierId, from, to);
+
+            var totalCount = await query.CountAsync(); // ukupan broj pre paginacije
+
+            var pageItems = await query
+                .OrderByDescending(o => o.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var mapped = _mapper.Map<IEnumerable<OrderResponseDto>>(pageItems);
+
+            return (mapped, totalCount);
         }
+
+
+
+
+        public async Task<(IEnumerable<OrderResponseDto> Items, int TotalCount)> GetByCustomerAsync(
+        Guid customerId,
+        int page = 1,
+        int pageSize = 10)
+        {
+            var query = _unitOfWork.Orders.GetByCustomer(customerId);
+
+            var totalCount = await query.CountAsync(); // ukupan broj pre paginacije
+
+            var pageItems = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var mapped = _mapper.Map<IEnumerable<OrderResponseDto>>(pageItems);
+
+            return (mapped, totalCount);
+        }
+
+        public async Task<OrderResponseDto> GetOneNotDraftAsync(ClaimsPrincipal User)
+        {
+            var user = _userManager.GetUserAsync(User).Result
+                    ?? throw new Exception($"Not authorized");
+            var customer = await _unitOfWork.Customers.GetOneAsync(user.Id)
+                ?? throw new NotFoundException($"Customer with ID '{user.Id}' not found.");
+
+            var orders = await _unitOfWork.Orders.GetOneNotDraftAsync(customer.Id);
+            return _mapper.Map<OrderResponseDto>(orders);
+        }
+
 
         public async Task<OrderDraftResponseDto>? GetDraftByCustomerAsync(ClaimsPrincipal User)
         {
@@ -48,12 +106,17 @@ namespace Delivery.Application.Services
             var customer = await _unitOfWork.Customers.GetOneAsync(user.Id)
                 ?? throw new NotFoundException($"Customer with ID '{user.Id}' not found.");
 
-            var orders = await _unitOfWork.Orders.GetDraftByCustomerAsync(customer.Id);
-            return _mapper.Map<OrderDraftResponseDto>(orders);
+            var order = await _unitOfWork.Orders.GetDraftByCustomerAsync(customer.Id);
+            return _mapper.Map<OrderDraftResponseDto>(order);
         }
 
         public async Task<Guid> CreateItemsAsync(OrderItemsCreateRequestDto request, ClaimsPrincipal User)
         {
+            if (request.Items.Count == 0)
+            {
+                throw new ArgumentException("Order is empty");
+            }
+
             var user = _userManager.GetUserAsync(User).Result
                 ?? throw new Exception($"Not authorized");
 
@@ -61,81 +124,168 @@ namespace Delivery.Application.Services
             var customer = await _unitOfWork.Customers.GetOneAsync(user.Id)
                 ?? throw new NotFoundException($"Customer with ID '{user.Id}' not found.");
 
-            var draftOrder = await GetDraftByCustomerAsync(User);
+            var draftOrder = await _unitOfWork.Orders.GetDraftByCustomerAsync(customer.Id);
 
-            // 2. Učitaj jela
-            var dishIds = request.Items.Select(i => i.Id).ToList();
+            // 2. Učitaj jela i ponude
+            var dishIds = request.Items.Where(i => i.ItemType == "DISH").Select(i => i.Id).ToList();
             var dishes = await _unitOfWork.Dishes.GetByIdsWithAllergensAsync(dishIds);
+
+            var offerIds = request.Items.Where(i => i.ItemType == "OFFER").Select(i => i.Id).ToList();
+            var offers = await _unitOfWork.Offers.GetByIdsWithAllergensAsync(offerIds);
 
             // 3. Validacija alergena
             var customerAllergens = customer.Allergens.Select(a => a.Name).ToHashSet();
             foreach (var dish in dishes)
             {
-                if (dish.Allergens.Any(a => customerAllergens.Contains(a.Name)))
+                if (dish.Allergens!.Any(a => customerAllergens.Contains(a.Name)))
                     throw new BadRequestException($"Dish '{dish.Name}' contains allergens for this customer.");
             }
 
+            foreach(var offer in offers)
+            {
+                foreach(var od in offer.OfferDishes)
+                {
+                    if (od.Dish!.Allergens!.Any(a => customerAllergens.Contains(a.Name)))
+                        throw new BadRequestException($"Dish '{od.Dish.Name}' contains allergens for this customer.");
+                }
+            }
+
+
+            //Grupisanje Offer-a jer nemaju dish-options za sad
+            var finalReq = new List<OrderItemDto>();
+
+            var groupedOffers = request.Items
+                .Where(i => i.ItemType == "OFFER")
+                .GroupBy(x => x.Id)
+                .Select(g => new OrderItemDto
+                {
+                    Id = g.Key,
+                    Quantity = g.Sum(x => x.Quantity),
+                    ItemType = g.First().ItemType,
+                }).ToList();
+
+            var dishesReq = request.Items
+                    .Where(i => i.ItemType == "DISH")
+                    .ToList();
+
+            finalReq = groupedOffers.Concat(dishesReq).ToList();
+
             // 4. Mapiraj Order iz DTO
-            var order = _mapper.Map<Order>(request); // koristi CreateMap<CreateOrderItemsDto, Order>
+            var order = new Order
+            {
+                CustomerId = customer.Id,
+                FreeDelivery = false,
+                Items = new List<OrderItem>(),
+                RestaurantId = request.RestaurantId
+            };
 
             // 5. Mapiraj stavke i izračunaj cenu
-            foreach (var itemDto in request.Items)
+            foreach (var itemDto in finalReq)
             {
-                var dish = dishes.First(d => d.Id == itemDto.Id);
-                itemDto.Name = dish.Name;
-                var item = _mapper.Map<OrderItem>(itemDto); // koristi CreateMap<OrderItemDto, OrderItem>
-                item.Price = itemDto.Price * itemDto.Quantity;
-                //Izracunavanje cena za opcije
-                if (itemDto.DishOptionGroups != null && itemDto.DishOptionGroups.Count > 0)
+                var item = new OrderItem();
+                if (itemDto.ItemType == "OFFER")
                 {
-                    foreach (var optionGroupDto in itemDto.DishOptionGroups)
+                    var offer = offers.First(o => o.Id == itemDto.Id);
+                    itemDto.Name = offer.Name;
+                    itemDto.DiscountExpireAt = offer.ExpiresAt;
+                    item = _mapper.Map<OrderItem>(itemDto);
+                    item.DishPrice = offer.Price;
+                    item.OptionsPrice = 0;         //Za sad je ovako
+                    order.FreeDelivery = order.FreeDelivery == false && offer.FreeDelivery;
+                    
+                }
+                else if (itemDto.ItemType == "DISH")
+                {
+                    var dish = dishes.First(d => d.Id == itemDto.Id);
+                    itemDto.Name = dish.Name;
+                    itemDto.DiscountRate = dish.DiscountRate;
+                    itemDto.DiscountExpireAt = dish.DiscountExpireAt;
+                    item = _mapper.Map<OrderItem>(itemDto); // koristi CreateMap<OrderItemDto, OrderItem>
+                    item.DishPrice = dish.Price;
+
+                    //Izracunavanje cena za opcije
+                    if (itemDto.DishOptionGroups != null && itemDto.DishOptionGroups.Count > 0)
                     {
-                        if (optionGroupDto.DishOptions != null && optionGroupDto.DishOptions.Count > 0)
+                        foreach (var optionGroupDto in itemDto.DishOptionGroups)
                         {
-                            foreach (var optionDto in optionGroupDto.DishOptions)
+                            if (optionGroupDto.DishOptions != null && optionGroupDto.DishOptions.Count > 0)
                             {
-                                optionDto.Name = dish.DishOptionGroups
-                                    .First(og => og.Id == optionGroupDto.Id)
-                                    .DishOptions.First(o => o.Id == optionDto.Id).Name;
-                                if (optionDto != null)
+                                foreach (var optionDto in optionGroupDto.DishOptions)
                                 {
-                                    item.Price += (decimal)(optionDto.Price * itemDto.Quantity);
+                                    optionDto.Name = dish.DishOptionGroups
+                                        .First(og => og.Id == optionGroupDto.Id)
+                                        .DishOptions.First(o => o.Id == optionDto.Id).Name;
+                                    if (optionDto != null)
+                                    {
+                                        item.OptionsPrice += optionDto.Price * itemDto.Quantity;
+                                    }
                                 }
                             }
                         }
                     }
+                    var optionIds = itemDto.DishOptionGroups?
+                        .SelectMany(g => g.DishOptions)
+                        .Select(o => o.Id)
+                        .ToList() ?? new List<Guid>();
+
+                    var options = await _unitOfWork.Dishes.GetDishOptionsByIdsAsync(optionIds);
+
+                    item.DishOptions = options.ToList();
                 }
+                if (item.ItemType == "OFFER" && item.DiscountExpireAt != null && item.DiscountExpireAt < DateTime.UtcNow)
+                    throw new ProductStateUnavailableException("Offer or Discount EXPIRED!");
 
-                var optionIds = itemDto.DishOptionGroups?
-                    .SelectMany(g => g.DishOptions)
-                    .Select(o => o.Id)
-                    .ToList() ?? new List<Guid>();
-
-                item.DishOptions = await _unitOfWork.Dishes.GetDishOptionsByIdsAsync(optionIds);
                 order.Items.Add(item);
             }
-            order.CustomerId = customer.Id;
 
             // 6. Sačuvaj porudžbinu
             if (draftOrder != null)
             {
                 foreach(var newItem in order.Items)
                 {
-                    newItem.OrderId = draftOrder.Id;
-                    await _unitOfWork.OrderItems.AddAsync(newItem);
+                    if (newItem == null) continue;
+
+                    if (newItem.Id == default) newItem.Id = Guid.NewGuid();
+
+                    if (newItem != null && newItem.ItemType == "DISH")
+                    {
+                        newItem.OrderId = draftOrder.Id;
+                        await _unitOfWork.OrderItems.AddAsync(newItem);
+                        draftOrder.Items.Add(newItem);
+                    }
+                    if (newItem != null && newItem.ItemType == "OFFER")
+                    {
+                        if (draftOrder.Items.Any(i => i.OfferId == newItem.OfferId))
+                        {
+                            var existing = draftOrder.Items.FirstOrDefault(i => i.OfferId == newItem.OfferId);
+                            existing.Quantity += newItem.Quantity;
+                        }
+                        else
+                        {
+                            newItem.OrderId = draftOrder.Id;
+                            await _unitOfWork.OrderItems.AddAsync(newItem);
+                            draftOrder.Items.Add(newItem);
+                        }
+                    }
+                }
+
+                if (draftOrder.FreeDelivery == false)
+                {
+                    draftOrder.FreeDelivery = order.FreeDelivery;
                 }
             }
             else
             {
+                order.Status = OrderStatus.Draft.ToString();
                 await _unitOfWork.Orders.AddAsync(order);
             }
             await _unitOfWork.CompleteAsync();
 
-            return order.Id;
+            return draftOrder != null ? draftOrder.Id : order.Id;
         }
 
 
-        public async Task UpdateDetailsAsync(Guid orderId, OrderUpdateDetailsDto request)
+        public async Task<OrderResponseDto> UpdateDetailsAsync(Guid orderId, OrderUpdateDetailsDto request)
         {
             var order = await _unitOfWork.Orders.GetOneWithCustomerAsync(orderId)
                 ?? throw new NotFoundException($"Order with ID '{orderId}' not found.");
@@ -156,7 +306,7 @@ namespace Delivery.Application.Services
                 if (voucher == null)
                     throw new BadRequestException("Selected voucher is invalid or inactive.");
 
-                order.TotalPrice -= (decimal)voucher.DiscountAmount;
+                order.TotalPrice -= voucher.DiscountAmount;
                 if (order.TotalPrice < 0) order.TotalPrice = 0;
 
                 voucher.Status = "Inactive";
@@ -168,6 +318,7 @@ namespace Delivery.Application.Services
             _unitOfWork.Orders.Update(order);
 
             await _unitOfWork.CompleteAsync();
+            return _mapper.Map<OrderResponseDto>(order);
         }
 
 
@@ -201,7 +352,7 @@ namespace Delivery.Application.Services
             return _mapper.Map<IEnumerable<OrderResponseDto>>(orders);
         }
 
-        public async Task UpdateStatusAsync(Guid orderId, int newStatus ,int eta)
+        public async Task<byte[]?> UpdateStatusAsync(Guid orderId, int newStatus, int eta)
         {
             OrderStatus statusEnum = (OrderStatus)newStatus;
 
@@ -209,15 +360,71 @@ namespace Delivery.Application.Services
             if (order == null)
                 throw new NotFoundException($"Order with ID '{orderId}' not found.");
 
+            // Ako restoran definiše vreme pripreme
             if (eta > 0)
             {
                 order.TimeToPrepare = eta;
+                order.EstimatedReadyAt = order.CreatedAt.AddMinutes(eta);
             }
 
             order.Status = statusEnum.ToString();
+
+            if (statusEnum == OrderStatus.Preuzeto)
+            {
+                order.DeliveryTimeMinutes = null;
+                order.EstimatedDeliveryAt = null;
+                order.DeliveryEstimateMessage = "Dostavljac je preuzeo dostavu.";
+            }
+
+            // 👇 Kada kurir preuzme porudžbinu → pozovi DeliveryTimeService
+            if (statusEnum == OrderStatus.DostavaUToku)
+            {
+                var customerAddress = order.Address ?? order.Customer.Addresses.FirstOrDefault();
+                if (customerAddress == null || !customerAddress.Latitude.HasValue || !customerAddress.Longitude.HasValue)
+                {
+                    order.DeliveryTimeMinutes = null;
+                    order.EstimatedDeliveryAt = null;
+                    order.DeliveryEstimateMessage = "Customer address coordinates are missing";
+                }
+                else
+                { 
+                    var minutes = await _deliveryTimeService.GetEstimatedDeliveryTimeMinutesAsync(
+                        order.Restaurant.Address.Latitude ?? 0, order.Restaurant.Address.Longitude ?? 0,
+                        customerAddress.Latitude.Value, customerAddress.Longitude.Value);
+
+                    if (minutes.HasValue)
+                    {
+                        order.DeliveryTimeMinutes = minutes.Value;
+                        order.EstimatedDeliveryAt = DateTime.UtcNow.AddMinutes(minutes.Value);
+                        order.DeliveryEstimateMessage = $"Procena vremena dostave je {minutes.Value} minuta." +
+                                                        $"Vreme dostave moze da varira u zavisnosti od uslova na putu.";
+                    }
+                    else
+                    {
+                        order.DeliveryTimeMinutes = null;
+                        order.EstimatedDeliveryAt = null;
+                        order.DeliveryEstimateMessage = "Procena vremena nije dostupna";
+                    }
+                }
+            }
+
             _unitOfWork.Orders.Update(order);
             await _unitOfWork.CompleteAsync(); // 👈 opet koristi tvoj metod
+
+            if (order.Status == OrderStatus.Zavrsena.ToString())
+            {
+                var bill = _mapper.Map<Bill>(order);
+
+                await _mongoUnitOfWork.Bills.CreateAsync(bill);
+
+                var billPdf = _pdfService.GenerateBillPdf(bill);
+
+                return billPdf;
+            }
+
+            return null;
         }
+
 
         public async Task DeleteAsync(Guid orderId)
         {
@@ -355,6 +562,19 @@ namespace Delivery.Application.Services
                 TotalCanceled = totalCanceled,
                 AverageCanceledPerDay = Math.Round(average, 2)
             };
+        
+        public async Task<byte[]?> GetOrderBillPdfAsync(Guid orderId)
+        {
+            var bill = await _mongoUnitOfWork.Bills.GetByOrderIdAsync(orderId);
+
+            if (bill == null)
+            {
+                return null;
+            }
+
+            var billPdf = _pdfService.GenerateBillPdf(bill);
+
+            return billPdf;
         }
     }
 }
