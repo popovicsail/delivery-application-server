@@ -17,21 +17,34 @@ public class DishRepository : GenericRepository<Dish>, IDishRepository
             .AsNoTracking()
             .Where(d => dishIds.Contains(d.Id))
             .Include(d => d.Allergens)
-            .Include(d => d.DishOptionGroups)
+            .Include(d => d.DishOptionGroups!)
                 .ThenInclude(g => g.DishOptions)
             .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Dish>> GetAllFilteredAsync(DishFiltersMix filters, string sort)
+    {
+        IQueryable<Dish> query = _dbContext.Dishes
+            .Include(d => d.DishOptionGroups!)
+                .ThenInclude(g => g.DishOptions)
+            .Include(d => d.Allergens);
+
+        query = ApplyFilters(query, filters);
+        query = ApplySorting(query, sort);
+        
+        return await query.ToListAsync();
     }
 
     public new async Task<IEnumerable<Dish>> GetAllAsync()
     {
         return await _dbContext.Dishes
-            .Include(d => d.DishOptionGroups)
-                .ThenInclude(g => g.DishOptions) // Include sve dish options
-            .Include(d => d.Allergens) // ako želiš i alergene
+            .Include(d => d.DishOptionGroups!)
+                .ThenInclude(g => g.DishOptions)
+            .Include(d => d.Allergens)
             .ToListAsync();
     }
 
-    public async Task<PaginatedList<Dish>> GetPagedAsync(int sort, DishFiltersMix filterMix, int page)
+    public async Task<PaginatedList<Dish>> GetPagedAsync(string sort, DishFiltersMix filterMix, int page)
     {
         int pageSize = 6;
 
@@ -53,7 +66,7 @@ public class DishRepository : GenericRepository<Dish>, IDishRepository
     public new async Task<Dish?> GetOneAsync(Guid id)
     {
         return await _dbContext.Dishes
-            .Include(d => d.DishOptionGroups)
+            .Include(d => d.DishOptionGroups!)
                 .ThenInclude(g => g.DishOptions)
             .Include(d => d.Allergens)
             .FirstOrDefaultAsync(d => d.Id == id);
@@ -62,10 +75,14 @@ public class DishRepository : GenericRepository<Dish>, IDishRepository
     public async Task<Menu?> GetMenuAsync(Guid menuId)
     {
         return await _dbContext.Menus
+            .Include(m => m.Offers)
+                .ThenInclude(o => o.OfferDishes)
+                    .ThenInclude(od => od.Dish)
+                        .ThenInclude(d => d.Allergens)
             .Include(m => m.Dishes)
                 .ThenInclude(d => d.Allergens)
             .Include(m => m.Dishes)
-                .ThenInclude(d => d.DishOptionGroups)
+                .ThenInclude(d => d.DishOptionGroups!)
                     .ThenInclude(g => g.DishOptions)
             .FirstOrDefaultAsync(m => m.Id == menuId);
     }
@@ -77,21 +94,37 @@ public class DishRepository : GenericRepository<Dish>, IDishRepository
             .ToListAsync();
     }
 
-    private IQueryable<Dish> ApplySorting(IQueryable<Dish> query, int sort)
+    public async Task<List<Guid>> GetManyIdsAsync(List<Guid> dishIds)
     {
-        return sort switch
+        return await _dbContext.Dishes
+            .Where(d => dishIds.Contains(d.Id))
+            .Select(d => d.Id)
+            .ToListAsync();
+    }
+
+    private IQueryable<Dish> ApplySorting(IQueryable<Dish> query, string sort)
+    {
+        if (!Enum.TryParse<DishSortTypes>(sort, true, out var sortType))
+            sortType = DishSortTypes.NAME_ASC;
+
+        return sortType switch
         {
-            (int)DishSortTypes.NAME_DESC => query.OrderByDescending(d => d.Name),
-            (int)DishSortTypes.TYPE_ASC => query.OrderBy(d => d.Type),
-            (int)DishSortTypes.TYPE_DESC => query.OrderByDescending(d => d.Type),
-            (int)DishSortTypes.PRICE_ASC => query.OrderBy(d => d.Price),
-            (int)DishSortTypes.PRICE_DESC => query.OrderByDescending(d => d.Price),
+            DishSortTypes.NAME_DESC => query.OrderByDescending(d => d.Name),
+            DishSortTypes.TYPE_ASC => query.OrderBy(d => d.Type),
+            DishSortTypes.TYPE_DESC => query.OrderByDescending(d => d.Type),
+            DishSortTypes.PRICE_ASC => query.OrderBy(d => d.Price),
+            DishSortTypes.PRICE_DESC => query.OrderByDescending(d => d.Price),
             _ => query.OrderBy(d => d.Name)
         };
     }
 
     private IQueryable<Dish> ApplyFilters(IQueryable<Dish> dishes, DishFiltersMix filterMix)
     {
+        if (filterMix.RestaurantId.HasValue)
+        {
+            dishes = dishes.Where(r => r.Menu.RestaurantId == filterMix.RestaurantId.Value);
+        }
+
         if (!string.IsNullOrEmpty(filterMix.Name))
         {
             dishes = dishes.Where(r => r.Name.ToLower().Contains(filterMix.Name.ToLower()));

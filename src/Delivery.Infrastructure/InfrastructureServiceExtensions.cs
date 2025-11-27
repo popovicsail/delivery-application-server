@@ -14,6 +14,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
+using Microsoft.Extensions.Logging;
 using Quartz;
 using QuestPDF.Infrastructure;
 
@@ -36,7 +37,9 @@ public static class InfrastructureServiceExtensions
         services.ConfigureOptions<LoggingBackgroundJobSetup>();
 
         services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")).UseSnakeCaseNamingConvention());
+            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")).UseSnakeCaseNamingConvention()
+            .EnableSensitiveDataLogging()
+                .LogTo(Console.WriteLine, LogLevel.Information));
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IRestaurantRepository, RestaurantRepository>();

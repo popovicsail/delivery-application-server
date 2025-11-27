@@ -8,8 +8,9 @@ using Microsoft.AspNetCore.Http;
 
 public interface IDishService
 {
-    Task<PaginatedList<DishSummaryResponseDto>> GetPagedAsync(int sort, DishFiltersMix filters, int page, ClaimsPrincipal User);
-    Task<IEnumerable<DishDetailResponseDto>> GetAllAsync();  // promenjeno
+    Task<PaginatedList<DishSummaryResponseDto>> GetPagedAsync(string sort, DishFiltersMix filters, int page, ClaimsPrincipal User);
+    Task<IEnumerable<DishDetailResponseDto>> GetAllFilteredAsync(DishFiltersMix filters, string sort);
+    Task<IEnumerable<DishDetailResponseDto>> GetAllAsync();
     Task<DishDetailResponseDto?> GetOneAsync(Guid id);
     Task<DishDetailResponseDto> AddAsync(DishCreateRequestDto request, IFormFile? file);
     Task UpdateAsync(Guid id, DishUpdateRequestDto request, IFormFile? file);

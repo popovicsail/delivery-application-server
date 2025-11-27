@@ -20,6 +20,8 @@ namespace Delivery.Infrastructure.Repositories
                 .Where(o => o.RestaurantId == restaurantId)
                 .Include(o => o.Items)
                     .ThenInclude(i => i.Dish)
+                .Include(o => o.Items)
+                    .ThenInclude(i => i.Offer)
                 .Include(o => o.Customer)
                     .ThenInclude(c => c.User)
                 .Include(o => o.Address)
@@ -34,6 +36,7 @@ namespace Delivery.Infrastructure.Repositories
             var query = _dbContext.Orders
                 .Where(o => o.CourierId == courierId)
                 .Include(o => o.Items).ThenInclude(i => i.Dish)
+                .Include(o => o.Items).ThenInclude(i => i.Offer)
                 .Include(o => o.Customer).ThenInclude(c => c.User)
                 .Include(o => o.Address)
                 .Include(o => o.Restaurant).ThenInclude(r => r.Address)
@@ -55,6 +58,7 @@ namespace Delivery.Infrastructure.Repositories
             return _dbContext.Orders
                 .Where(o => o.CustomerId == customerId)
                 .Include(o => o.Items).ThenInclude(i => i.Dish)
+                .Include(o => o.Items).ThenInclude(i => i.Offer)
                 .Include(o => o.Restaurant).ThenInclude(r => r.Address)
                 .Include(o => o.Address)
                 .OrderByDescending(o => o.CreatedAt)
@@ -67,6 +71,8 @@ namespace Delivery.Infrastructure.Repositories
                 .Where(o => o.CustomerId == customerId && (o.Status != "Draft"))
                 .Include(o => o.Items)
                     .ThenInclude(i => i.Dish)
+                .Include(o => o.Items)
+                    .ThenInclude(i => i.Offer)
                 .Include(o => o.Customer)
                     .ThenInclude(c => c.User)
                 .Include(o => o.Address)
@@ -76,15 +82,26 @@ namespace Delivery.Infrastructure.Repositories
 
         public async Task<Order?> GetDraftByCustomerAsync(Guid customerId)
         {
-            return await _dbContext.Orders
+            try
+            {
+                return await _dbContext.Orders
                 .Where(o => o.CustomerId == customerId && (o.Status == "Draft"))
                 .Include(o => o.Items)
                     .ThenInclude(i => i.Dish)
+                .Include(o => o.Items)
+                    .ThenInclude(i => i.Offer)
                 .Include(o => o.Customer)
                     .ThenInclude(c => c.User)
                 .Include(o => o.Address)
                 .Include(o => o.Restaurant.Address)
                 .FirstOrDefaultAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("LOAD ERROR:");
+                Console.WriteLine(ex.Message);
+            }
+            return null;
         }
 
         public async Task<Order?> GetOneWithItemsAsync(Guid orderId)
@@ -92,6 +109,8 @@ namespace Delivery.Infrastructure.Repositories
             return await _dbContext.Orders
                 .Include(o => o.Items)
                     .ThenInclude(i => i.Dish)
+                .Include(o => o.Items)
+                    .ThenInclude(i => i.Offer)
                 .Include(o => o.Customer)
                     .ThenInclude(c => c.User)
                 .Include(o => o.Address)
@@ -106,6 +125,8 @@ namespace Delivery.Infrastructure.Repositories
             return await _dbContext.Orders
                 .Include(o => o.Items)
                     .ThenInclude(i => i.Dish)
+                .Include(o => o.Items)
+                    .ThenInclude(i => i.Offer)
                 .Include(o => o.Customer)
                     .ThenInclude(c => c.User)
                 .Include(o => o.Customer)
@@ -121,6 +142,8 @@ namespace Delivery.Infrastructure.Repositories
             return await _dbContext.Orders
                 .Include(o => o.Items)
                     .ThenInclude(i => i.Dish)
+                .Include(o => o.Items)
+                    .ThenInclude(i => i.Offer)
                 .Include(o => o.Customer)
                     .ThenInclude(c => c.User)
                 .Include(o => o.Address)

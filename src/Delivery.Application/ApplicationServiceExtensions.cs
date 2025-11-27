@@ -21,6 +21,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<IRestaurantService, RestaurantService>();
         services.AddScoped<IDishService, DishService>();
         services.AddScoped<IDishOptionGroupService, DishOptionGroupService>();
+        services.AddScoped<IOfferService, OfferService>();
         services.AddScoped<IFeedbackService, FeedbackService>();
         services.AddScoped<IOrderService, OrderService>();
         services.AddScoped<IVoucherService, VoucherService>();

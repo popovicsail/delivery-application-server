@@ -23,6 +23,7 @@ namespace Delivery.Domain.Entities.OrderEntities
         public Address? Address { get; set; }
 
         public double TotalPrice { get; set; }
+        public bool FreeDelivery { get; set; } = false;
         public DateTime CreatedAt { get; set; }
         public int? TimeToPrepare { get; set; }
         public DateTime? EstimatedReadyAt { get; set; }

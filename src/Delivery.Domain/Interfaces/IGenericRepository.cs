@@ -1,4 +1,6 @@
-﻿namespace Delivery.Domain.Interfaces;
+﻿using Delivery.Domain.Entities.DishEntities;
+
+namespace Delivery.Domain.Interfaces;
 
 public interface IGenericRepository<T> where T : class
 {

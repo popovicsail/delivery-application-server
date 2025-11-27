@@ -3,19 +3,21 @@ using Delivery.Domain.Interfaces;
 using Delivery.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace Delivery.Infrastructure.Repositories;
-
-public class OrderItemsRepository : GenericRepository<OrderItem>, IOrderItemsRepository
+namespace Delivery.Infrastructure.Repositories
 {
-    public OrderItemsRepository(ApplicationDbContext dbContext) : base(dbContext)
+    public class OrderItemsRepository : GenericRepository<OrderItem>, IOrderItemsRepository
     {
-    }
-    public async Task<IEnumerable<OrderItem>> GetByOrderIdAsync(Guid orderId)
-    {
-        return await _dbContext.OrderItems
-            .Include(oi => oi.Dish)
-            .Where(oi => oi.OrderId == orderId)
-            .ToListAsync();
+        public OrderItemsRepository(ApplicationDbContext dbContext) : base(dbContext)
+        {
+        }
+        public async Task<IEnumerable<OrderItem>> GetByOrderIdAsync(Guid orderId)
+        {
+            return await _dbContext.OrderItems
+                .Include(oi => oi.Dish)
+                .Include(oi => oi.Offer)
+                .Where(oi => oi.OrderId == orderId)
+                .ToListAsync();
+        }
     }
 }
 

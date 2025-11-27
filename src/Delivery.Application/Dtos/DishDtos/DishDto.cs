@@ -12,6 +12,8 @@ public class DishDto
     public double DiscountRate { get; set; }
     public DateTime? DiscountExpireAt { get; set; }
     public string? Picture { get; set; }
+
+    public Guid MenuId { get; set; }
     public List<AllergenDto>? Allergens { get; set; } = new List<AllergenDto>();
     public List<DishOptionGroupDto>? DishOptionGroups { get; set; } = new List<DishOptionGroupDto>();
 }

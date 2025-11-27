@@ -24,7 +24,16 @@ namespace Delivery.Application.Mappings
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
                 .ForMember(dest => dest.DishPrice, opt => opt.Ignore()) // računa se ručno
                 .ForMember(dest => dest.OptionsPrice, opt => opt.Ignore()) // računa se ručno
-                .ForMember(dest => dest.DishId, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.DishId, opt =>
+                {
+                    opt.Condition(src => src.ItemType == "DISH");
+                    opt.MapFrom(src => src.Id);
+                })
+                .ForMember(dest => dest.OfferId, opt =>
+                {
+                    opt.Condition(src => src.ItemType == "OFFER");
+                    opt.MapFrom(src => src.Id);
+                })
                 .ForMember(dest => dest.DishOptions, opt => opt.Ignore())
                 .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity))
                 .ForMember(dest => dest.Name, opt =>

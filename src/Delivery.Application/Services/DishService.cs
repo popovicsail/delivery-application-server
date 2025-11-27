@@ -30,7 +30,13 @@ public class DishService : IDishService
         return _mapper.Map<IEnumerable<DishDetailResponseDto>>(dishes);
     }
 
-    public async Task<PaginatedList<DishSummaryResponseDto>> GetPagedAsync(int sort, DishFiltersMix filters, int page, ClaimsPrincipal User)
+    public async Task<IEnumerable<DishDetailResponseDto>> GetAllFilteredAsync(DishFiltersMix filters, string sort)
+    {
+        var dishes = await _unitOfWork.Dishes.GetAllFilteredAsync(filters, sort);
+        return _mapper.Map<IEnumerable<DishDetailResponseDto>>(dishes);
+    }
+
+    public async Task<PaginatedList<DishSummaryResponseDto>> GetPagedAsync(string sort, DishFiltersMix filters, int page, ClaimsPrincipal User)
     {
         if (page < 1)
         {
