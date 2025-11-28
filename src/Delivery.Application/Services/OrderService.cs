@@ -176,7 +176,8 @@ namespace Delivery.Application.Services
                 CustomerId = customer.Id,
                 FreeDelivery = false,
                 Items = new List<OrderItem>(),
-                RestaurantId = request.RestaurantId
+                RestaurantId = request.RestaurantId,
+                CreatedAt = DateTime.UtcNow,
             };
 
             // 5. Mapiraj stavke i izračunaj cenu
@@ -352,9 +353,12 @@ namespace Delivery.Application.Services
             return _mapper.Map<IEnumerable<OrderResponseDto>>(orders);
         }
 
-        public async Task<byte[]?> UpdateStatusAsync(Guid orderId, int newStatus, int eta)
+        public async Task<byte[]?> UpdateStatusAsync(Guid orderId, string newStatus, int eta)
         {
-            OrderStatus statusEnum = (OrderStatus)newStatus;
+            if (!Enum.TryParse<OrderStatus>(newStatus, true, out var statusEnum))
+            {
+                throw new ArgumentException($"Invalid order status: {newStatus}");
+            }
 
             var order = await _unitOfWork.Orders.GetOneWithItemsAsync(orderId);
             if (order == null)
@@ -364,7 +368,7 @@ namespace Delivery.Application.Services
             if (eta > 0)
             {
                 order.TimeToPrepare = eta;
-                order.EstimatedReadyAt = order.CreatedAt.AddMinutes(eta);
+                order.EstimatedReadyAt = order.CreatedAt.AddMinutes(eta).ToUniversalTime();
             }
 
             order.Status = statusEnum.ToString();
