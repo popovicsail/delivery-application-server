@@ -150,9 +150,8 @@ namespace Delivery.Api.Controllers
                 return Ok(stats);
         }
 
-        [HttpGet("restaurant/{restaurantId:guid}/dishes/{dishId:guid}/revenue")]
+        [HttpGet("dishes/{dishId:guid}/revenue")]
         public async Task<IActionResult> GetDishRevenue(
-        Guid restaurantId,
         Guid dishId,
         [FromQuery] DateTime from,
         [FromQuery] DateTime to)
@@ -160,7 +159,7 @@ namespace Delivery.Api.Controllers
                 from = DateTime.SpecifyKind(from, DateTimeKind.Utc);
                 to = DateTime.SpecifyKind(to, DateTimeKind.Utc);
 
-                var stats = await _orderService.GetDishRevenueStatisticsAsync(restaurantId, dishId, from, to);
+                var stats = await _orderService.GetDishRevenueStatisticsAsync(dishId, from, to);
                 return Ok(stats);
         }
 

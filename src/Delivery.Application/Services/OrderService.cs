@@ -477,7 +477,7 @@ namespace Delivery.Application.Services
         public async Task<RestaurantRevenueStatisticsDto> GetRestaurantRevenueStatisticsAsync(Guid restaurantId, DateTime from, DateTime to)
         {
             var orders = await _unitOfWork.Orders.GetByRestaurantAndDateRangeAsync(restaurantId, from, to);
-
+            
             var daily = orders
                 .GroupBy(o => o.CreatedAt.Date)
                 .Select(g => new RestaurantDailyRevenueDto
@@ -488,9 +488,9 @@ namespace Delivery.Application.Services
                 .OrderBy(x => x.Date)
                 .ToList();
 
-            decimal total = daily.Sum(d => d.Revenue);
+            double total = daily.Sum(d => d.Revenue);
             int orderCount = orders.Count();
-            decimal average = orderCount > 0 ? total / orderCount : 0;
+            double average = orderCount > 0 ? total / orderCount : 0;
 
             return new RestaurantRevenueStatisticsDto
             {
@@ -501,16 +501,27 @@ namespace Delivery.Application.Services
             };
         }
 
-        public async Task<DishRevenueStatisticsResponse> GetDishRevenueStatisticsAsync(Guid restaurantId, Guid dishId, DateTime from, DateTime to)
+        public async Task<DishRevenueStatisticsResponse> GetDishRevenueStatisticsAsync(Guid dishId, DateTime from, DateTime to)
         {
-            var orders = await _unitOfWork.Orders.GetByRestaurantAndDateRangeAsync(restaurantId, from, to);
+            var dish = await _unitOfWork.Dishes.GetOneAsync(dishId);
+            if (dish == null)
+            {
+                throw new NotFoundException($"Dish with ID '{dishId}' not found.");
+            }
+            var menu = await _unitOfWork.Dishes.GetMenuAsync(dish.MenuId);
+            if (menu == null)
+            {
+                throw new NotFoundException($"Menu with ID '{dish.MenuId}' not found.");
+            }
+            var orders = await _unitOfWork.Orders.GetByRestaurantAndDateRangeAsync(menu.RestaurantId, from, to);
+           
 
             var dishEntries = orders
                 .SelectMany(o => o.Items.Where(i => i.Id == dishId)
                     .Select(i => new
                     {
                         Date = o.CreatedAt.Date,
-                        Revenue = i.Price * i.Quantity
+                        Revenue = i.DishPrice * i.Quantity
                     }))
                 .ToList();
 
@@ -524,9 +535,9 @@ namespace Delivery.Application.Services
                 .OrderBy(d => d.Date)
                 .ToList();
 
-            decimal totalRevenue = daily.Sum(x => x.Revenue);
+            double totalRevenue = daily.Sum(x => x.Revenue);
             int totalOrders = dishEntries.Count;
-            decimal average = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+            double average = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
             return new DishRevenueStatisticsResponse
             {
@@ -562,6 +573,7 @@ namespace Delivery.Application.Services
                 TotalCanceled = totalCanceled,
                 AverageCanceledPerDay = Math.Round(average, 2)
             };
+        }
         
         public async Task<byte[]?> GetOrderBillPdfAsync(Guid orderId)
         {

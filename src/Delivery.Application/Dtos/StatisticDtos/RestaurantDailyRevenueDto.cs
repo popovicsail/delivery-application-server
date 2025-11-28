@@ -1,5 +1,5 @@
 ﻿public class RestaurantDailyRevenueDto
 {
     public DateTime Date { get; set; }
-    public decimal Revenue { get; set; }
+    public double Revenue { get; set; }
 }

@@ -160,8 +160,10 @@ namespace Delivery.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Order>> GetByDishAndDateRangeAsync(Guid restaurantId, Guid dishId, DateTime from, DateTime to)
+        public async Task<IEnumerable<Order>> GetByDishAndDateRangeAsync(Guid dishId, DateTime from, DateTime to)
                 {
+                    var restaurantId = _dbContext.Dishes.Where(d => d.Id == dishId).Include(d => d.MenuId).First().Menu.RestaurantId;
+
                     return await _dbContext.Orders
                         .Where(o =>
                             o.RestaurantId == restaurantId &&

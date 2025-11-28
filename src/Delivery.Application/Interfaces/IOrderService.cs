@@ -30,9 +30,8 @@ public interface IOrderService
         int pageSize = 10);
         Task<OrderDraftResponseDto>? GetDraftByCustomerAsync(ClaimsPrincipal User);
         Task<RestaurantRevenueStatisticsDto> GetRestaurantRevenueStatisticsAsync(Guid restaurantId, DateTime from, DateTime to);
-        Task<DishRevenueStatisticsResponse> GetDishRevenueStatisticsAsync(Guid restaurantId, Guid dishId, DateTime from, DateTime to);
+        Task<DishRevenueStatisticsResponse> GetDishRevenueStatisticsAsync(Guid dishId, DateTime from, DateTime to);
         Task<CanceledOrdersStatisticsDto> GetCanceledOrdersStatisticsAsync(Guid restaurantId, DateTime from, DateTime to);
-    }
+        Task<byte[]> GetOrderBillPdfAsync(Guid orderId);
 
-    Task<byte[]> GetOrderBillPdfAsync(Guid orderId);
 }
