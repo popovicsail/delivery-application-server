@@ -4,6 +4,7 @@ using Delivery.Application.Dtos.OrderDtos.Requests;
 using Delivery.Application.Dtos.OrderDtos.Responses;
 using Delivery.Application.Exceptions;
 using Delivery.Application.Interfaces;
+using Delivery.Domain.Entities.CommonEntities;
 using Delivery.Domain.Entities.OrderEntities;
 using Delivery.Domain.Entities.OrderEntities.Enums;
 using Delivery.Domain.Entities.UserEntities;
@@ -118,6 +119,8 @@ public class OrderService : IOrderService
         }
         order.CustomerId = customer.Id;
 
+        
+
         // 6. Sačuvaj porudžbinu
         if (draftOrder != null)
         {
@@ -148,7 +151,15 @@ public class OrderService : IOrderService
             throw new BadRequestException("Invalid delivery address for this customer.");
 
         order.AddressId = request.AddressId;
+
         order.SetTotalPrice();
+
+        bool isWeatherGood = await _unitOfWork.AreasOfOperation.GetAreaConditionsByCity(order.Address.City);
+
+        if (isWeatherGood == false)
+        {
+            order.TotalPrice += 200;
+        }
 
         if (request.VoucherId.HasValue)
         {

@@ -6,6 +6,9 @@ namespace Delivery.Application.Interfaces;
 
 public interface IOrderService
 {
+    //summary
+    //HELLO
+    //summary
     Task ConfirmAsync(Guid orderId);
     Task<Guid> CreateItemsAsync(OrderItemsCreateRequestDto request, ClaimsPrincipal User);
     Task UpdateDetailsAsync(Guid orderId, OrderUpdateDetailsDto request);

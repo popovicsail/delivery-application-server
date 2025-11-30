@@ -115,6 +115,6 @@ public class OrdersController : ControllerBase
             return NotFound(new { Message = "ERROR: No bill for this order. Try again later." });
         }
         
-        return Ok(File(bill, "application/pdf", $"bill-{orderId}.pdf"));
+        return File(bill, "application/pdf", $"bill-{orderId}.pdf");
     }
 }

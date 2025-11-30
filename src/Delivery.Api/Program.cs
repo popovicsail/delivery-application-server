@@ -3,7 +3,6 @@ using Delivery.Api.Middleware;
 using Delivery.Application;
 using Delivery.Application.Mappings;
 using Delivery.Domain.Entities.UserEntities;
-using Delivery.Domain.Interfaces;
 using Delivery.Infrastructure;
 using Delivery.Infrastructure.BackgroundServices.CourierStatusUpdater;
 using Delivery.Infrastructure.Persistence;

@@ -13,6 +13,7 @@ public class Order
     public Customer Customer { get; set; }
     public Guid? CourierId { get; set; }
     public Courier? Courier { get; set; }
+    public bool IsWeatherGood { get; set; }
 
     public Guid? AddressId { get; set; }
     public Address? Address { get; set; }

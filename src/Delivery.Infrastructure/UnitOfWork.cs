@@ -2,8 +2,6 @@
 using Delivery.Infrastructure.Persistence;
 using Delivery.Infrastructure.Repositories;
 
-
-
 namespace Delivery.Infrastructure;
 
 public class UnitOfWork : IUnitOfWork
@@ -23,6 +21,7 @@ public class UnitOfWork : IUnitOfWork
     public IFeedbackResponseRepository FeedbackResponses { get; private set; }
     public IOrderItemsRepository OrderItems { get; private set; }
     public IOrdersRepository Orders { get; private set; }
+    public IAreasOfOperationRepository AreasOfOperation { get; private set; }
 
     public UnitOfWork(ApplicationDbContext dbContext)
     {
@@ -41,6 +40,7 @@ public class UnitOfWork : IUnitOfWork
         FeedbackResponses = new FeedbackResponseRepository(_dbContext);
         OrderItems = new OrderItemsRepository(_dbContext);
         Orders = new OrdersRepository(_dbContext);
+        AreasOfOperation = new AreasOfOperationRepository(_dbContext);
     }
 
     public Task<int> CompleteAsync()

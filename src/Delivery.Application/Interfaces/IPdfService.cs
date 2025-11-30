@@ -1,9 +1,8 @@
 ﻿using Delivery.Domain.Entities.OrderEntities;
 
-namespace Delivery.Application.Interfaces
+namespace Delivery.Application.Interfaces;
+
+public interface IPdfService
 {
-    public interface IPdfService
-    {
-        byte[] GenerateBillPdf(Bill bill);
-    }
+    byte[] GenerateBillPdf(Bill bill);
 }
