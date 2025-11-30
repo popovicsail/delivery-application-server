@@ -7,17 +7,18 @@ using Delivery.Domain.Entities.CommonEntities;
 using Delivery.Domain.Entities.RestaurantEntities;
 using Delivery.Domain.Entities.UserEntities;
 
-namespace Delivery.Domain.Entities.OrderEntities
+namespace Delivery.Domain.Entities.OrderEntities;
+
+public class Order
 {
-    public class Order
-    {
-        public Guid Id { get; set; }
-        public Guid? VoucherId { get; set; }
-        public Voucher? Voucher { get; set; }
-        public Guid CustomerId { get; set; }
-        public Customer Customer { get; set; }
-        public Guid? CourierId { get; set; }
-        public Courier? Courier { get; set; }
+    public Guid Id { get; set; }
+    public Guid? VoucherId { get; set; }
+    public Voucher? Voucher { get; set; }
+    public Guid CustomerId { get; set; }
+    public Customer Customer { get; set; }
+    public Guid? CourierId { get; set; }
+    public Courier? Courier { get; set; }
+    public bool IsWeatherGood { get; set; }
 
         public Guid? AddressId { get; set; }
         public Address? Address { get; set; }

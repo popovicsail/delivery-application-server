@@ -4,30 +4,29 @@ using Microsoft.Extensions.Options;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 
-namespace Delivery.Infrastructure.Services
+namespace Delivery.Infrastructure.Services;
+
+public class EmailSender : IEmailSender
 {
-    public class EmailSender : IEmailSender
+    private readonly EmailSenderSettings _emailSettings;
+
+    public EmailSender(IOptions<EmailSenderSettings> emailSettings)
     {
-        private readonly EmailSenderSettings _emailSettings;
-
-        public EmailSender(IOptions<EmailSenderSettings> emailSettings)
+        _emailSettings = emailSettings.Value;
+    }
+    public async Task SendEmailAsync(string email, string subject, string htmlMessage)
+    {
+        if (string.IsNullOrEmpty(_emailSettings.ApiKey))
         {
-            _emailSettings = emailSettings.Value;
+            throw new Exception("ERROR: SendGrid API Key not configured in appsettings.json.");
         }
-        public async Task SendEmailAsync(string email, string subject, string htmlMessage)
-        {
-            if (string.IsNullOrEmpty(_emailSettings.ApiKey))
-            {
-                throw new Exception("ERROR: SendGrid API Key (EmailSettings.ApiKey) nije konfigurisan u appsettings.");
-            }
 
-            var client = new SendGridClient(_emailSettings.ApiKey);
-            var from = new EmailAddress(_emailSettings.FromEmail, _emailSettings.FromName);
-            var to = new EmailAddress(email);
+        var client = new SendGridClient(_emailSettings.ApiKey);
+        var from = new EmailAddress(_emailSettings.FromEmail, _emailSettings.FromName);
+        var to = new EmailAddress(email);
 
-            var msg = MailHelper.CreateSingleEmail(from, to, subject, "", htmlMessage);
+        var msg = MailHelper.CreateSingleEmail(from, to, subject, "", htmlMessage);
 
-            var response = await client.SendEmailAsync(msg);
-        }
+        var response = await client.SendEmailAsync(msg);
     }
 }

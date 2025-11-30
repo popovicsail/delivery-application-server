@@ -2,24 +2,23 @@
 using Delivery.Infrastructure.Repositories;
 using MongoDB.Driver;
 
-namespace Delivery.Infrastructure
+namespace Delivery.Infrastructure;
+
+public class MongoUnitOfWork : IMongoUnitOfWork
 {
-    public class MongoUnitOfWork : IMongoUnitOfWork
+    private readonly IMongoDatabase _database;
+    private IBillRepository _bills;
+
+    public MongoUnitOfWork(IMongoDatabase database)
     {
-        private readonly IMongoDatabase _database;
-        private IBillRepository _bills;
+        _database = database;
+    }
 
-        public MongoUnitOfWork(IMongoDatabase database)
+    public IBillRepository Bills
+    {
+        get
         {
-            _database = database;
-        }
-
-        public IBillRepository Bills
-        {
-            get
-            {
-                return _bills ??= new BillRepository(_database);
-            }
+            return _bills ??= new BillRepository(_database);
         }
     }
 }

@@ -6,7 +6,6 @@ using Delivery.Application.Interfaces;
 using Delivery.Application.Mappings;
 using Delivery.Application.Services;
 using Delivery.Domain.Entities.UserEntities;
-using Delivery.Domain.Interfaces;
 using Delivery.Infrastructure;
 using Delivery.Infrastructure.BackgroundServices.CourierStatusUpdater;
 using Delivery.Infrastructure.Persistence;

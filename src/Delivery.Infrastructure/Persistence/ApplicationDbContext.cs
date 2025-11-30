@@ -1,4 +1,5 @@
-﻿using Delivery.Domain.Entities.CommonEntities;
+﻿using Delivery.Domain.Common;
+using Delivery.Domain.Entities.CommonEntities;
 using Delivery.Domain.Entities.DishEntities;
 using Delivery.Domain.Entities.FeedbackEntities;
 using Delivery.Domain.Entities.OfferEntities;
@@ -46,17 +47,20 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
     public DbSet<OrderItem> OrderItems { get; set; }
     public DbSet<Rating> Rating { get; set; }
 
+    public DbSet<AreaOfOperation> AreasOfOperation { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        base.OnModelCreating(builder);
+        base.OnModelCreating(builder);  
 
         var passwordHasher = new PasswordHasher<User>();
 
         var adminRoleId = Guid.Parse("2301d884-221a-4e7d-b509-0113dcc043e1");
         var supportRoleId = Guid.Parse("523E6BF7-9BF9-45FB-9848-317195F21378");
+        var customerRoleId = Guid.Parse("5b00155d-77a2-438c-b18f-dc1cc8af5a43");
         builder.Entity<IdentityRole<Guid>>().HasData(
             new IdentityRole<Guid> { Id = adminRoleId, Name = "Administrator", NormalizedName = "ADMINISTRATOR" },
-            new IdentityRole<Guid> { Id = Guid.Parse("5b00155d-77a2-438c-b18f-dc1cc8af5a43"), Name = "Customer", NormalizedName = "CUSTOMER" },
+            new IdentityRole<Guid> { Id = customerRoleId, Name = "Customer", NormalizedName = "CUSTOMER" },
             new IdentityRole<Guid> { Id = Guid.Parse("190d206e-0b99-4d0f-b3fa-da6ceea6d8cb"), Name = "Courier", NormalizedName = "COURIER" },
             new IdentityRole<Guid> { Id = Guid.Parse("fc7e84f2-e37e-46e2-a222-a839d3e1a3bb"), Name = "Owner", NormalizedName = "OWNER" },
             new IdentityRole<Guid> { Id = Guid.Parse("f09ece5a-1c11-4792-815b-4ef1bc6c6c20"), Name = "Worker", NormalizedName = "WORKER" },
@@ -92,6 +96,10 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
             entity.Property(e => e.WorkEnd).HasColumnType("time");
             entity.Property(e => e.Date).HasColumnName("date").HasColumnType("text").IsRequired();
         });
+
+        builder.Entity<AreaOfOperation>().HasData(
+            new AreaOfOperation { Id = Guid.NewGuid(), City = "Novi Sad", Country = "Srbija", PostalCode = 21000, Lat = 45.25167, Lon = 19.83694 }
+            );
 
         builder.Entity<Customer>().HasOne(p => p.User).WithOne().HasForeignKey<Customer>(p => p.UserId).IsRequired();
         builder.Entity<Courier>().HasOne(p => p.User).WithOne().HasForeignKey<Courier>(p => p.UserId).IsRequired();

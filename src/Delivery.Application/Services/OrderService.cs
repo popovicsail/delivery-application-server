@@ -4,6 +4,7 @@ using Delivery.Application.Dtos.OrderDtos.Requests;
 using Delivery.Application.Dtos.OrderDtos.Responses;
 using Delivery.Application.Exceptions;
 using Delivery.Application.Interfaces;
+using Delivery.Domain.Entities.CommonEntities;
 using Delivery.Domain.Entities.DishEntities;
 using Delivery.Domain.Entities.OrderEntities;
 using Delivery.Domain.Entities.OrderEntities.Enums;
@@ -296,13 +297,21 @@ namespace Delivery.Application.Services
             if (!customer.Addresses.Any(a => a.Id == request.AddressId))
                 throw new BadRequestException("Invalid delivery address for this customer.");
 
-            order.AddressId = request.AddressId;
-            order.SetTotalPrice();
+        order.AddressId = request.AddressId;
 
-            if (request.VoucherId.HasValue)
-            {
-                var voucher = customer.Vouchers.FirstOrDefault(v =>
-                    v.Id == request.VoucherId.Value && v.Status == "Active");
+        order.SetTotalPrice();
+
+        bool isWeatherGood = await _unitOfWork.AreasOfOperation.GetAreaConditionsByCity(order.Address.City);
+
+        if (isWeatherGood == false)
+        {
+            order.TotalPrice += 200;
+        }
+
+        if (request.VoucherId.HasValue)
+        {
+            var voucher = customer.Vouchers.FirstOrDefault(v =>
+                v.Id == request.VoucherId.Value && v.Status == "Active");
 
                 if (voucher == null)
                     throw new BadRequestException("Selected voucher is invalid or inactive.");

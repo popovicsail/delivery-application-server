@@ -193,12 +193,11 @@ namespace Delivery.Api.Controllers
         {
             var bill = await _orderService.GetOrderBillPdfAsync(orderId);
 
-            if (bill == null)
-            {
-                return NotFound(new { Message = "ERROR: No bill for this order. Try again later." });
-            }
-
-            return Ok(File(bill, "application/pdf", $"bill-{orderId}.pdf"));
+        if (bill == null)
+        {
+            return NotFound(new { Message = "ERROR: No bill for this order. Try again later." });
         }
+        
+        return File(bill, "application/pdf", $"bill-{orderId}.pdf");
     }
 }

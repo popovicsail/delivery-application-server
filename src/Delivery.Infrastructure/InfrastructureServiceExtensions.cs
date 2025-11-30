@@ -2,6 +2,7 @@
 using Delivery.Application.Settings;
 using Delivery.Domain.Interfaces;
 using Delivery.Infrastructure.BackgroundServices.LoggingBackgroundJob;
+using Delivery.Infrastructure.BackgroundServices.UpdateWeatherConditionsBackgroundJob;
 using Delivery.Infrastructure.BackgroundServices.VoucherExpirationDateCheckerBackgroundJob;
 using Delivery.Infrastructure.Persistence;
 using Delivery.Infrastructure.Repositories;
@@ -35,6 +36,7 @@ public static class InfrastructureServiceExtensions
         });
         services.ConfigureOptions<VoucherExpirationDateCheckerBackgroundJobSetup>();
         services.ConfigureOptions<LoggingBackgroundJobSetup>();
+        services.ConfigureOptions<UpdateWeatherConditionsBackgroundJobSetup>();
 
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")).UseSnakeCaseNamingConvention()
@@ -70,7 +72,10 @@ public static class InfrastructureServiceExtensions
 
         QuestPDF.Settings.License = LicenseType.Community;
 
-        services.AddScoped<IPdfService, PdfService>();
+        services.AddScoped<IPdfService, PdfService>();  
+
+        services.Configure<OpenWeatherSettings>(configuration.GetSection(OpenWeatherSettings.SectionName));
+        services.AddHttpClient<IOpenWeatherExternalService, OpenWeatherExternalService>();
 
         return services;
     }
