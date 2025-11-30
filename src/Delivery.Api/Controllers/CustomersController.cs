@@ -75,9 +75,9 @@ public class CustomersController : ControllerBase
     }
 
     [HttpPost("my-addresses")]
-    public async Task<IActionResult> CreateAddress([FromBody] AddressCreateRequest request)
+    public async Task<IActionResult> CreateAddress([FromQuery] double latitude, [FromQuery] double longitude)
     {
-        await _customerService.CreateAddressAsync(User, request);
+        await _customerService.CreateAddressAsync(User, latitude, longitude);
         return Ok();
     }
 

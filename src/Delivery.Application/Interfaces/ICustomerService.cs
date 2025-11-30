@@ -18,7 +18,7 @@ public interface ICustomerService
     Task BirthdayVoucherBackgroundJobAsync();
    
     Task<List<AddressDto>> GetMyAddressesAsync(ClaimsPrincipal user);
-    Task CreateAddressAsync(ClaimsPrincipal user, AddressCreateRequest request);
+    Task CreateAddressAsync(ClaimsPrincipal principal, double latitude, double longitude);
     Task UpdateAddressAsync(ClaimsPrincipal user, Guid addressId, AddressUpdateRequest request);
     Task DeleteAddressAsync(ClaimsPrincipal user, Guid addressId);
 
