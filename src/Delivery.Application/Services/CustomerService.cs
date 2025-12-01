@@ -172,7 +172,8 @@ public class CustomerService : ICustomerService
             City = resolvedAddress.City,
             PostalCode = resolvedAddress.PostalCode,
             Latitude = latitude,
-            Longitude = longitude
+            Longitude = longitude,
+            CustomerId = customer.Id
         };
 
         customer.Addresses.Add(newAddress);
