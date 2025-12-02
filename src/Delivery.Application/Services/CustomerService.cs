@@ -155,7 +155,7 @@ public class CustomerService : ICustomerService
     }
 
     public async Task CreateAddressAsync(ClaimsPrincipal principal, double latitude, double longitude)
-     {
+    {
         var user = await _userManager.GetUserAsync(principal);
         if (user == null) throw new UnauthorizedException("Korisnik mora biti ulogovan");
 
