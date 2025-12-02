@@ -12,8 +12,10 @@ using Delivery.Domain.Entities.CommonEntities;
 using Delivery.Domain.Entities.RestaurantEntities;
 using Delivery.Domain.Entities.UserEntities;
 using Delivery.Domain.Interfaces;
+using Delivery.Infrastructure.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+
 
 
 namespace Delivery.Application.Services;
@@ -23,11 +25,13 @@ public class RestaurantService : IRestaurantService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly UserManager<User> _userManager;
-    public RestaurantService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<User> userManager)
+    private readonly IAddressValidationService _addressValidationService;
+    public RestaurantService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<User> userManager,IAddressValidationService addressValidationService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _userManager = userManager;
+        _addressValidationService = addressValidationService;
     }
 
     public async Task<IEnumerable<RestaurantSummaryResponseDto>> GetAllAsync()
@@ -81,6 +85,15 @@ public class RestaurantService : IRestaurantService
     public async Task<RestaurantDetailResponseDto> AddAsync(RestaurantCreateRequestDto request)
     {
         Guid id = Guid.NewGuid();
+
+        // 1️⃣ Dobavi adresu iz koordinata pomoću servisa
+         var address = await _addressValidationService.GetAddressFromCoordinatesAsync(request.Latitude, request.Longitude);
+
+        if (address == null)
+            throw new Exception("Nije moguće dobiti adresu iz koordinata.");
+
+
+        // 3️⃣ Kreiraj restoran sa vezom na adresu
         var filledRestaurant = new Restaurant()
         {
             Id = id,
@@ -88,12 +101,8 @@ public class RestaurantService : IRestaurantService
             Description = "Popuni",
             PhoneNumber = "Popuni",
             Image = "",
-            Address = new Address()
-            {
-                StreetAndNumber = "Popuni",
-                City = "Popuni",
-                PostalCode = "Popuni"
-            },
+            AddressId = address.Id,
+            Address = address,
             OwnerId = request.OwnerId,
             BaseWorkSched = new BaseWorkSched()
             {
@@ -105,9 +114,9 @@ public class RestaurantService : IRestaurantService
                 WeekendEnd = new TimeSpan(16, 0, 0)
             },
             Menus = new List<Menu>
-            {
-                new Menu { Name = "Main Menu"}
-            }
+        {
+            new Menu { Name = "Main Menu"}
+        }
         };
 
         var createdRestaurant = await _unitOfWork.Restaurants.AddAsync(filledRestaurant);
@@ -115,6 +124,7 @@ public class RestaurantService : IRestaurantService
 
         return _mapper.Map<RestaurantDetailResponseDto>(filledRestaurant);
     }
+
 
     public async Task<RestaurantDetailResponseDto> UpdateAsync(Guid id, RestaurantUpdateRequestDto request, IFormFile? file)
     {

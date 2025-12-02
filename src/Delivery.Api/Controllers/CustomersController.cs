@@ -1,4 +1,5 @@
-﻿using Delivery.Application.Dtos.CommonDtos.AddressDtos;
+﻿using System.Security.Claims;
+using Delivery.Application.Dtos.CommonDtos.AddressDtos;
 using Delivery.Application.Dtos.CommonDtos.AllergenDtos.Requests;
 using Delivery.Application.Dtos.Users.CustomerDtos.Requests;
 using Delivery.Application.Dtos.Users.CustomerDtos.Responses;
@@ -75,9 +76,9 @@ public class CustomersController : ControllerBase
     }
 
     [HttpPost("my-addresses")]
-    public async Task<IActionResult> CreateAddress([FromBody] AddressCreateRequest request)
+    public async Task<IActionResult> CreateAddress([FromQuery] double latitude, [FromQuery] double longitude)
     {
-        await _customerService.CreateAddressAsync(User, request);
+        await _customerService.CreateAddressAsync(User, latitude, longitude);
         return Ok();
     }
 

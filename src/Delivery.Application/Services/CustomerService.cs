@@ -154,7 +154,7 @@ public class CustomerService : ICustomerService
             .ToList();
     }
 
-    public async Task CreateAddressAsync(ClaimsPrincipal principal, AddressCreateRequest request)
+    public async Task CreateAddressAsync(ClaimsPrincipal principal, double latitude, double longitude)
     {
         var user = await _userManager.GetUserAsync(principal);
         if (user == null) throw new UnauthorizedException("Korisnik mora biti ulogovan");
@@ -162,24 +162,27 @@ public class CustomerService : ICustomerService
         var customer = await _unitOfWork.Customers.GetOneAsync(user.Id);
         if (customer == null) throw new NotFoundException("Customer profil nije pronađen.");
 
-        var newAddress = _mapper.Map<Address>(request);
+        var resolvedAddress = await _addressValidationService.GetAddressFromCoordinatesAsync(latitude, longitude);
+        if (resolvedAddress == null)
+            throw new BadRequestException("Nije moguće dobiti adresu iz koordinata.");
 
-        // 👇 Sastavi punu adresu iz requesta
-        var fullAddress = $"{request.StreetAndNumber}, {request.City} {request.PostalCode}";
-
-        // 👇 Dobavi koordinate preko Nominatim servisa
-        var coordinates = await _addressValidationService.GetCoordinatesAsync(fullAddress);
-        if (coordinates != null)
+        var newAddress = new Address
         {
-            newAddress.Latitude = coordinates.Value.Latitude;
-            newAddress.Longitude = coordinates.Value.Longitude;
-        }
+            StreetAndNumber = resolvedAddress.StreetAndNumber,
+            City = resolvedAddress.City,
+            PostalCode = resolvedAddress.PostalCode,
+            Latitude = latitude,
+            Longitude = longitude,
+            CustomerId = customer.Id
+        };
 
         customer.Addresses.Add(newAddress);
 
         _unitOfWork.Customers.Update(customer);
         await _unitOfWork.CompleteAsync();
     }
+
+
 
 
     public async Task UpdateAddressAsync(ClaimsPrincipal principal, Guid addressId, AddressUpdateRequest request)
