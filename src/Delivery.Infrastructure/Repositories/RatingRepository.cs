@@ -44,6 +44,7 @@ namespace Delivery.Infrastructure.Repositories
             var totalCount = await query.CountAsync();
 
             var ratings = await query
+                .Include(r => r.User)
                 .OrderByDescending(r => r.CreatedAt)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)

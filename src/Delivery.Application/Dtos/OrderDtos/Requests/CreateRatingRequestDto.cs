@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 public class CreateRatingRequestDto
 {
     public Guid OrderId { get; set; }
-    public Guid CustomerId { get; set; }
     public Guid TargetId { get; set; }
     public RatingTargetType TargetType { get; set; }
 

@@ -1,21 +1,32 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
 using Delivery.Application.Exceptions;
 using Delivery.Application.Interfaces;
+using Delivery.Domain.Entities.UserEntities;
 using Delivery.Domain.Interfaces;
+using Microsoft.AspNetCore.Identity;
 
 public class RatingService : IRatingService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
+    private readonly UserManager<User> _userManager;
 
-    public RatingService(IUnitOfWork unitOfWork, IMapper mapper)
+    public RatingService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<User> userManager)
     {
+        _userManager = userManager;
         _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
-    public async Task<Guid> CreateRatingAsync(CreateRatingRequestDto dto, Guid userId)
+    public async Task<Guid> CreateRatingAsync(CreateRatingRequestDto dto, ClaimsPrincipal claimsPrincipal)
     {
+        var user = await _userManager.GetUserAsync(claimsPrincipal);
+        if (user == null)
+            throw new NotFoundException("User not found");
+
+        var userId = user.Id;
+
         string? imageBase64 = null;
 
         if (dto.Image is { Length: > 0 })
@@ -75,5 +86,27 @@ public class RatingService : IRatingService
             from,
             to
         );
+    }
+
+    public async Task<double> GetAverageRatingAsync(Guid targetId, int targetType)
+    {
+        if (targetType == (int)RatingTargetType.Restaurant)
+        {
+            var restaurant = await _unitOfWork.Restaurants.GetOneAsync(targetId);
+            if (restaurant == null)
+                throw new NotFoundException($"Restaurant with id: {targetId} was not found");
+
+            return await _unitOfWork.Rates.GetAverageScoreAsync(targetId, RatingTargetType.Restaurant);
+        }
+        else if (targetType == (int)RatingTargetType.Courier)
+        {
+            var courier = await _unitOfWork.Couriers.GetOneAsync(targetId);
+            if (courier == null)
+                throw new NotFoundException($"Courier with id: {targetId} was not found");
+
+            return await _unitOfWork.Rates.GetAverageScoreAsync(targetId, RatingTargetType.Courier);
+        }
+
+        return 0;
     }
 }
