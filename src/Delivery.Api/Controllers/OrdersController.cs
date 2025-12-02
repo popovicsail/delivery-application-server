@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Delivery.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Delivery.Domain.Entities.OrderEntities.Enums;
-using Delivery.Application.Dtos.OrderDtos.Requests;
 
 namespace Delivery.Api.Controllers
 {
