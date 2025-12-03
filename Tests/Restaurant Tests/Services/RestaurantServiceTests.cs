@@ -14,12 +14,15 @@ using Delivery.Application.Dtos.Users.OwnerDtos.Responses;
 using Delivery.Application.Dtos.CommonDtos.BaseWordSchedDtos;
 using Delivery.Application.Dtos.RestaurantDtos;
 using Microsoft.AspNetCore.Http;
+using Delivery.Application.Interfaces;
 
 public class RestaurantServiceTests
 {
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly Mock<IMapper> _mapperMock;
     private readonly Mock<UserManager<User>> _userManagerMock;
+    private readonly Mock<IAddressValidationService> _addressValidationServiceMock;
+
     public RestaurantServiceTests()
     {
         _unitOfWorkMock = new Mock<IUnitOfWork>();
@@ -27,6 +30,7 @@ public class RestaurantServiceTests
         _userManagerMock = new Mock<UserManager<User>>(
             Mock.Of<IUserStore<User>>(), null, null, null, null, null, null, null, null
         );
+        _addressValidationServiceMock = new Mock<IAddressValidationService>();
     }
 
     [Fact]
@@ -37,7 +41,7 @@ public class RestaurantServiceTests
         var restaurant = new Restaurant { Id = Guid.NewGuid() };
         _unitOfWorkMock.Setup(u => u.Restaurants.GetOneAsync(restaurantId))
             .ReturnsAsync((Restaurant?)null);
-        var service = new RestaurantService(_unitOfWorkMock.Object, _mapperMock.Object, _userManagerMock.Object);
+        var service = new RestaurantService(_unitOfWorkMock.Object, _mapperMock.Object, _userManagerMock.Object, _addressValidationServiceMock.Object);
 
         // Act & Assert
         var ex = await Should.ThrowAsync<NotFoundException>(() => service.GetOneAsync(restaurantId));
@@ -70,7 +74,7 @@ public class RestaurantServiceTests
         };
         _mapperMock.Setup(m => m.Map<RestaurantDetailResponseDto>(restaurant))
             .Returns(mappedRestaurant);
-        var service = new RestaurantService(_unitOfWorkMock.Object, _mapperMock.Object, _userManagerMock.Object);
+        var service = new RestaurantService(_unitOfWorkMock.Object, _mapperMock.Object, _userManagerMock.Object, _addressValidationServiceMock.Object);
         // Act
         var result = await service.GetOneAsync(restaurantId);
         // Assert
