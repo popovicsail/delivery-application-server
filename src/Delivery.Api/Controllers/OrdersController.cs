@@ -1,11 +1,6 @@
 ﻿using Delivery.Application.Dtos.OrderDtos.Requests;
-﻿using System.Security.Claims;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using Delivery.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Delivery.Domain.Entities.OrderEntities.Enums;
-using Delivery.Application.Dtos.OrderDtos.Requests;
 
 namespace Delivery.Api.Controllers
 {
@@ -116,12 +111,7 @@ namespace Delivery.Api.Controllers
         [HttpPut("{orderId:guid}/status")]
         public async Task<IActionResult> UpdateStatus(Guid orderId, [FromBody] OrderStatusUpdateRequestDto request)
         {
-            byte[]? bill = await _orderService.UpdateStatusAsync(orderId, request.NewStatus, request.PrepTime);
-
-            if (bill != null)
-            {
-                return Ok(File(bill, "application/pdf", $"bill-{orderId}.pdf"));
-            }
+            await _orderService.UpdateStatusAsync(orderId, request.NewStatus, request.PrepTime);
 
             return NoContent();
         }
@@ -145,9 +135,9 @@ namespace Delivery.Api.Controllers
         Guid restaurantId,
         [FromQuery] DateTime from,
         [FromQuery] DateTime to)
-            {
-                var stats = await _orderService.GetRestaurantRevenueStatisticsAsync(restaurantId, from, to);
-                return Ok(stats);
+        {
+            var stats = await _orderService.GetRestaurantRevenueStatisticsAsync(restaurantId, from, to);
+            return Ok(stats);
         }
 
         [HttpGet("dishes/{dishId:guid}/revenue")]
@@ -155,12 +145,12 @@ namespace Delivery.Api.Controllers
         Guid dishId,
         [FromQuery] DateTime from,
         [FromQuery] DateTime to)
-            {
-                from = DateTime.SpecifyKind(from, DateTimeKind.Utc);
-                to = DateTime.SpecifyKind(to, DateTimeKind.Utc);
+        {
+            from = DateTime.SpecifyKind(from, DateTimeKind.Utc);
+            to = DateTime.SpecifyKind(to, DateTimeKind.Utc);
 
-                var stats = await _orderService.GetDishRevenueStatisticsAsync(dishId, from, to);
-                return Ok(stats);
+            var stats = await _orderService.GetDishRevenueStatisticsAsync(dishId, from, to);
+            return Ok(stats);
         }
 
         [HttpGet("restaurant/{restaurantId:guid}/canceled")]
@@ -168,10 +158,10 @@ namespace Delivery.Api.Controllers
         Guid restaurantId,
         [FromQuery] DateTime from,
         [FromQuery] DateTime to)
-            {
-                var stats = await _orderService.GetCanceledOrdersStatisticsAsync(restaurantId, from, to);
-                return Ok(stats);
-            }
+        {
+            var stats = await _orderService.GetCanceledOrdersStatisticsAsync(restaurantId, from, to);
+            return Ok(stats);
+        }
         [HttpGet("{orderId:guid}/location")]
         public async Task<ActionResult<CourierLocationDto>> GetLocation(Guid orderId)
         {
@@ -188,16 +178,17 @@ namespace Delivery.Api.Controllers
         }
 
 
-        [HttpGet("get-bill-pdf")]
+        [HttpGet("{orderId:guid}/get-bill-pdf")]
         public async Task<IActionResult> GetBillPdf(Guid orderId)
         {
             var bill = await _orderService.GetOrderBillPdfAsync(orderId);
 
-        if (bill == null)
-        {
-            return NotFound(new { Message = "ERROR: No bill for this order. Try again later." });
+            if (bill == null)
+            {
+                return NotFound(new { Message = "ERROR: No bill for this order. Try again later." });
+            }
+
+            return File(bill, "application/pdf", $"bill-{orderId}.pdf");
         }
-        
-        return File(bill, "application/pdf", $"bill-{orderId}.pdf");
     }
 }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Delivery.Domain.Entities.OfferEntities;
+﻿using Delivery.Domain.Entities.OfferEntities;
 using Delivery.Domain.Interfaces;
 using Delivery.Infrastructure.Persistence;
 

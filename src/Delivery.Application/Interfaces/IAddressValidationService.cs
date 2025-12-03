@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Delivery.Application.Dtos.AdressValidationDtos.Responses;
+﻿using Delivery.Application.Dtos.AdressValidationDtos.Responses;
 
 namespace Delivery.Application.Interfaces
 {

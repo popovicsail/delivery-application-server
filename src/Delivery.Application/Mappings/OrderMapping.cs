@@ -3,7 +3,6 @@ using Delivery.Application.Dtos.OrderDtos.Requests;
 using Delivery.Application.Dtos.OrderDtos.Responses;
 using Delivery.Domain.Entities.OrderEntities;
 using Delivery.Domain.Entities.OrderEntities.Enums;
-using Delivery.Domain.Entities.UserEntities;
 
 namespace Delivery.Application.Mappings
 {

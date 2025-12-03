@@ -1,4 +1,5 @@
-﻿using Delivery.Domain.Common;
+﻿using System.Text.Json;
+using Delivery.Domain.Common;
 using Delivery.Domain.Entities.CommonEntities;
 using Delivery.Domain.Entities.DishEntities;
 using Delivery.Domain.Entities.FeedbackEntities;
@@ -9,7 +10,6 @@ using Delivery.Domain.Entities.UserEntities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions.Infrastructure;
 
 namespace Delivery.Infrastructure.Persistence;
 
@@ -48,6 +48,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
     public DbSet<Rating> Rating { get; set; }
 
     public DbSet<AreaOfOperation> AreasOfOperation { get; set; }
+    public DbSet<ExchangeRate> ExchangeRates { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -164,6 +165,14 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
             entity.Property(r => r.Rating).IsRequired();
             entity.Property(r => r.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
         });
+
+        builder.Entity<ExchangeRate>().Property(e => e.Rates)
+                .HasColumnType("jsonb")
+                .HasConversion(
+                v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                v => JsonSerializer.Deserialize<Dictionary<string, decimal>>(v, (JsonSerializerOptions?)null)
+                     ?? new Dictionary<string, decimal>()
+            );
 
         TestSeed.Seed(builder);
     }

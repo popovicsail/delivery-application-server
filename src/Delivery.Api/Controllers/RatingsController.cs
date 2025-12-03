@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Delivery.Application.Interfaces;
-using Delivery.Application.Dtos.OrderDtos;
 
 namespace Delivery.Api.Controllers
 {

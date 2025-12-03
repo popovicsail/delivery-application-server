@@ -20,5 +20,6 @@ public interface IUnitOfWork : IDisposable
     IOrderItemsRepository OrderItems { get; }
     IAreasOfOperationRepository AreasOfOperation { get; }
     IRatingRepository Rates { get; }
+    IExchangeRateRepository ExchangeRates { get; }
     Task<int> CompleteAsync();
 }

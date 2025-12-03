@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Delivery.Application.Dtos.AdressValidationDtos.Helpers;
+﻿using Delivery.Application.Dtos.AdressValidationDtos.Helpers;
 using Delivery.Application.Dtos.AdressValidationDtos.Responses;
 using Delivery.Application.Interfaces;
 using Newtonsoft.Json;

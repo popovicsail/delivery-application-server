@@ -28,6 +28,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<IWeatherService, WeatherService>();
         services.AddScoped<IRatingService, RatingService>();
         services.AddScoped<ICourierLocationService, CourierLocationService>();
+        services.AddScoped<IExchangeRateService, ExchangeRateService>();
 
         return services;
     }

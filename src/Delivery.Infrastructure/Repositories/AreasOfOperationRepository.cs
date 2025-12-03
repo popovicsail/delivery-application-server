@@ -3,7 +3,6 @@ using Delivery.Domain.Common;
 using Delivery.Domain.Interfaces;
 using Delivery.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using MongoDB.Bson.IO;
 
 namespace Delivery.Infrastructure.Repositories
 {
@@ -11,6 +10,7 @@ namespace Delivery.Infrastructure.Repositories
     {
         public AreasOfOperationRepository(ApplicationDbContext dbContext) : base(dbContext)
         {
+
         }
 
         public async Task<bool> GetAreaConditionsByCity(string city)

@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Delivery.Application.Dtos.OrderDtos.Requests;
 using Delivery.Application.Exceptions;
-using Delivery.Application.Interfaces;
 using Delivery.Domain.Interfaces;
 
 namespace Delivery.Application.Services
