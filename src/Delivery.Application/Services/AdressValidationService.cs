@@ -1,6 +1,7 @@
 ﻿using Delivery.Application.Dtos.AdressValidationDtos.Helpers;
 using Delivery.Application.Dtos.AdressValidationDtos.Responses;
 using Delivery.Application.Interfaces;
+using Delivery.Domain.Entities.CommonEntities;
 using Newtonsoft.Json;
 
 namespace Delivery.Infrastructure.Services
@@ -104,6 +105,31 @@ namespace Delivery.Infrastructure.Services
 
             return null;
         }
+
+        public async Task<Address?> GetAddressFromCoordinatesAsync(double latitude, double longitude)
+        {
+            var url = $"https://nominatim.openstreetmap.org/reverse?lat={latitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}&lon={longitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}&format=json&addressdetails=1";
+
+            var response = await _httpClient.GetStringAsync(url);
+            var result = JsonConvert.DeserializeObject<NominatimResult>(response);
+
+            if (result?.address == null)
+                return null;
+            Guid Id = Guid.NewGuid();
+            var address = new Address
+            {
+                Id = Id,
+                StreetAndNumber = ToLatin($"{result.address.road} {result.address.house_number}".Trim()),
+                City = ToLatin(result.address.city ?? result.address.town ?? result.address.village ?? ""),
+                PostalCode = ToLatin(result.address.postcode ?? ""),
+                Latitude = latitude,
+                Longitude = longitude
+            };
+
+            return address;
+        }
+
+
 
 
 

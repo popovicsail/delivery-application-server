@@ -1,6 +1,7 @@
 ﻿using Delivery.Application.Dtos.OrderDtos.Requests;
 using Delivery.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Delivery.Domain.Entities.OrderEntities.Enums;
 
 namespace Delivery.Api.Controllers
 {

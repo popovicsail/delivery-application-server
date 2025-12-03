@@ -134,7 +134,7 @@ public class CourierService : ICourierService
     public async Task UpdateAllCouriersStatusAsync()
     {
         var couriers = await _unitOfWork.Couriers.GetAllWithSchedulesAsync();
-        var now = DateTime.UtcNow;
+        var now = DateTime.Now;
         var today = now.DayOfWeek.ToString();
         var yesterday = now.AddDays(-1).DayOfWeek.ToString();
 
