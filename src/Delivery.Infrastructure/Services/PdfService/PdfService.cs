@@ -11,13 +11,12 @@ public class PdfService : IPdfService
     public byte[] GenerateBillPdf(Bill bill)
     {
         var document = new BillPdfDocument(bill);
+        return document.GeneratePdf();
+    }
 
-            return document.GeneratePdf();
-        }
-        public byte[] GenerateReportPdf(MonthlyReport report)
-        {
-            var document = new ReportPdfDocument(report);
-            return document.GeneratePdf();
-        }
+    public byte[] GenerateReportPdf(MonthlyReport report)
+    {
+        var document = new ReportPdfDocument(report);
+        return document.GeneratePdf();
     }
 }
