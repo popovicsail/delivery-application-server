@@ -1,11 +1,6 @@
 ﻿using Delivery.Application.Dtos.OrderDtos.Requests;
-﻿using System.Security.Claims;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using Delivery.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Delivery.Domain.Entities.OrderEntities.Enums;
-using Delivery.Application.Dtos.OrderDtos.Requests;
 
 namespace Delivery.Api.Controllers
 {
@@ -145,9 +140,9 @@ namespace Delivery.Api.Controllers
         Guid restaurantId,
         [FromQuery] DateTime from,
         [FromQuery] DateTime to)
-            {
-                var stats = await _orderService.GetRestaurantRevenueStatisticsAsync(restaurantId, from, to);
-                return Ok(stats);
+        {
+            var stats = await _orderService.GetRestaurantRevenueStatisticsAsync(restaurantId, from, to);
+            return Ok(stats);
         }
 
         [HttpGet("dishes/{dishId:guid}/revenue")]
@@ -155,12 +150,12 @@ namespace Delivery.Api.Controllers
         Guid dishId,
         [FromQuery] DateTime from,
         [FromQuery] DateTime to)
-            {
-                from = DateTime.SpecifyKind(from, DateTimeKind.Utc);
-                to = DateTime.SpecifyKind(to, DateTimeKind.Utc);
+        {
+            from = DateTime.SpecifyKind(from, DateTimeKind.Utc);
+            to = DateTime.SpecifyKind(to, DateTimeKind.Utc);
 
-                var stats = await _orderService.GetDishRevenueStatisticsAsync(dishId, from, to);
-                return Ok(stats);
+            var stats = await _orderService.GetDishRevenueStatisticsAsync(dishId, from, to);
+            return Ok(stats);
         }
 
         [HttpGet("restaurant/{restaurantId:guid}/canceled")]
@@ -168,10 +163,10 @@ namespace Delivery.Api.Controllers
         Guid restaurantId,
         [FromQuery] DateTime from,
         [FromQuery] DateTime to)
-            {
-                var stats = await _orderService.GetCanceledOrdersStatisticsAsync(restaurantId, from, to);
-                return Ok(stats);
-            }
+        {
+            var stats = await _orderService.GetCanceledOrdersStatisticsAsync(restaurantId, from, to);
+            return Ok(stats);
+        }
         [HttpGet("{orderId:guid}/location")]
         public async Task<ActionResult<CourierLocationDto>> GetLocation(Guid orderId)
         {
@@ -198,7 +193,18 @@ namespace Delivery.Api.Controllers
                 return NotFound(new { Message = "ERROR: No bill for this order. Try again later." });
             }
 
-            return Ok(File(bill, "application/pdf", $"bill-{orderId}.pdf"));
+            return File(bill, "application/pdf", $"bill-{orderId}.pdf");
+        }
+
+        [HttpGet("get-report-pdf")]
+        public async Task<IActionResult> GetReportPdf(Guid restaurantId)
+        {
+            var report = await _orderService.GetReportPdfAsync(restaurantId);
+            if (report == null)
+            {
+                return NotFound(new { Message = "ERROR: No report for this restaurant. Try again later." });
+            }
+            return File(report, "application/pdf", $"report-{restaurantId}.pdf");
         }
     }
 }

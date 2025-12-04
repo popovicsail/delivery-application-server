@@ -17,6 +17,7 @@ using MongoDB.Driver;
 using Microsoft.Extensions.Logging;
 using Quartz;
 using QuestPDF.Infrastructure;
+using Delivery.Infrastructure.Persistence.MongoRepositories;
 
 namespace Delivery.Infrastructure;
 
@@ -67,6 +68,7 @@ public static class InfrastructureServiceExtensions
             var config = configuration.GetSection("MongoDbSettings");
             return client.GetDatabase(config["DatabaseName"]);
         });
+        services.AddScoped<IReportsRepository, ReportsRepository>();
 
         QuestPDF.Settings.License = LicenseType.Community;
 

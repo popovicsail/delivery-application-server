@@ -157,6 +157,7 @@ namespace Delivery.Infrastructure.Repositories
                             o.CreatedAt >= from &&
                             o.CreatedAt <= to &&
                             o.Status != "Draft")
+                 .Include(o => o.Items)
                 .ToListAsync();
         }
 

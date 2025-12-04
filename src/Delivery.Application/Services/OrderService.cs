@@ -25,8 +25,9 @@ namespace Delivery.Application.Services
         private readonly IMongoUnitOfWork _mongoUnitOfWork;
         private readonly IPdfService _pdfService;
         private IDeliveryTimeService _deliveryTimeService;
+        private readonly IReportsService _reportsService;
 
-        public OrderService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<User> userManager, IMongoUnitOfWork mongoUnitOfWork, IPdfService pdfService, IDeliveryTimeService deliveryTimeService)
+        public OrderService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<User> userManager, IMongoUnitOfWork mongoUnitOfWork, IPdfService pdfService, IDeliveryTimeService deliveryTimeService, IReportsService reportsService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -34,6 +35,7 @@ namespace Delivery.Application.Services
             _mongoUnitOfWork = mongoUnitOfWork;
             _pdfService = pdfService;
             _deliveryTimeService = deliveryTimeService;
+            _reportsService = reportsService;
         }
 
         public async Task<IEnumerable<OrderResponseDto>> GetByRestaurantAsync(Guid restaurantId)
@@ -141,9 +143,9 @@ namespace Delivery.Application.Services
                     throw new BadRequestException($"Dish '{dish.Name}' contains allergens for this customer.");
             }
 
-            foreach(var offer in offers)
+            foreach (var offer in offers)
             {
-                foreach(var od in offer.OfferDishes)
+                foreach (var od in offer.OfferDishes)
                 {
                     if (od.Dish!.Allergens!.Any(a => customerAllergens.Contains(a.Name)))
                         throw new BadRequestException($"Dish '{od.Dish.Name}' contains allergens for this customer.");
@@ -192,7 +194,7 @@ namespace Delivery.Application.Services
                     item.DishPrice = offer.Price;
                     item.OptionsPrice = 0;         //Za sad je ovako
                     order.FreeDelivery = order.FreeDelivery == false && offer.FreeDelivery;
-                    
+
                 }
                 else if (itemDto.ItemType == "DISH")
                 {
@@ -241,7 +243,7 @@ namespace Delivery.Application.Services
             // 6. Sačuvaj porudžbinu
             if (draftOrder != null)
             {
-                foreach(var newItem in order.Items)
+                foreach (var newItem in order.Items)
                 {
                     if (newItem == null) continue;
 
@@ -387,7 +389,7 @@ namespace Delivery.Application.Services
                     order.DeliveryEstimateMessage = "Customer address coordinates are missing";
                 }
                 else
-                { 
+                {
                     var minutes = await _deliveryTimeService.GetEstimatedDeliveryTimeMinutesAsync(
                         order.Restaurant.Address.Latitude ?? 0, order.Restaurant.Address.Longitude ?? 0,
                         customerAddress.Latitude.Value, customerAddress.Longitude.Value);
@@ -477,7 +479,7 @@ namespace Delivery.Application.Services
         public async Task<RestaurantRevenueStatisticsDto> GetRestaurantRevenueStatisticsAsync(Guid restaurantId, DateTime from, DateTime to)
         {
             var orders = await _unitOfWork.Orders.GetByRestaurantAndDateRangeAsync(restaurantId, from, to);
-            
+
             var daily = orders
                 .GroupBy(o => o.CreatedAt.Date)
                 .Select(g => new RestaurantDailyRevenueDto
@@ -514,10 +516,10 @@ namespace Delivery.Application.Services
                 throw new NotFoundException($"Menu with ID '{dish.MenuId}' not found.");
             }
             var orders = await _unitOfWork.Orders.GetByRestaurantAndDateRangeAsync(menu.RestaurantId, from, to);
-           
+
 
             var dishEntries = orders
-                .SelectMany(o => o.Items.Where(i => i.Id == dishId)
+                .SelectMany(o => o.Items.Where(i => i.DishId == dishId)
                     .Select(i => new
                     {
                         Date = o.CreatedAt.Date,
@@ -574,7 +576,7 @@ namespace Delivery.Application.Services
                 AverageCanceledPerDay = Math.Round(average, 2)
             };
         }
-        
+
         public async Task<byte[]?> GetOrderBillPdfAsync(Guid orderId)
         {
             var bill = await _mongoUnitOfWork.Bills.GetByOrderIdAsync(orderId);
@@ -587,6 +589,13 @@ namespace Delivery.Application.Services
             var billPdf = _pdfService.GenerateBillPdf(bill);
 
             return billPdf;
+        }
+
+        public async Task<byte[]?> GetReportPdfAsync(Guid restaurantId)
+        {
+            var pdf = await _reportsService.GenerateAndSaveReportPdfAsync(restaurantId, 30);
+
+            return pdf;
         }
     }
 }

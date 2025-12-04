@@ -28,6 +28,7 @@ public class UnitOfWork : IUnitOfWork
     public IOrderItemsRepository OrderItems { get; private set; }
     public IOrdersRepository Orders { get; private set; }
     public IRatingRepository Rates { get; private set; }
+    public IReportsRepository Reports { get; private set; }
     public UnitOfWork(ApplicationDbContext dbContext)
     {
         _dbContext = dbContext;
