@@ -147,14 +147,19 @@ namespace Delivery.Infrastructure.Repositories
 
         public async Task<IEnumerable<Order>> GetByRestaurantAndDateRangeAsync(Guid restaurantId, DateTime from, DateTime to)
         {
+            var utcFrom = from;
+            var utcTo = to.AddDays(1);
+
             return await _dbContext.Orders
-                .Where(o => o.RestaurantId == restaurantId &&
-                            o.CreatedAt >= from &&
-                            o.CreatedAt <= to &&
-                            o.Status != "Draft")
-                 .Include(o => o.Items)
+                .Where(o =>
+                    o.RestaurantId == restaurantId &&
+                    o.CreatedAt >= utcFrom &&
+                    o.CreatedAt < utcTo &&
+                    o.Status == "Zavrsena")
+                .Include(o => o.Items)
                 .ToListAsync();
         }
+
 
         public async Task<IEnumerable<Order>> GetByDishAndDateRangeAsync(Guid dishId, DateTime from, DateTime to)
                 {
