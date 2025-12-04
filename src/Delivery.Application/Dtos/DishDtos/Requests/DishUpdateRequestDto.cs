@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Delivery.Application.Dtos.CommonDtos.AllergenDtos;
 
 namespace Delivery.Application.Dtos.DishDtos.Requests;
 

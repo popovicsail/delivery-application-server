@@ -2,7 +2,6 @@
 using Delivery.Application.Dtos.OfferDtos.Requests;
 using Delivery.Application.Dtos.OfferDtos.Responses;
 using Delivery.Application.Interfaces;
-using Delivery.Domain.Entities.OfferEntities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Delivery.Application.Dtos.Users.AuthDtos.Requests;
 
-namespace Delivery.Application.Dtos.Users.AuthDtos.Requests
+public class ForgotPasswordRequestDto
 {
-    public class ForgotPasswordRequestDto
-    {
-        public string Email { get; set; }
-    }
+    public string Email { get; set; }
 }
