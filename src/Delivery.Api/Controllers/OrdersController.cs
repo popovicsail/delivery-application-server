@@ -1,6 +1,14 @@
 ﻿using Delivery.Application.Dtos.OrderDtos.Requests;
 using Delivery.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Delivery.Domain.Entities.OrderEntities.Enums;
+using Delivery.Application.Dtos.OrderDtos.Requests;
+using Delivery.Application.Dtos.OrderDtos.Requests;
+using Delivery.Application.Dtos.OrderDtos.Requests;
+using Delivery.Application.Dtos.OrderDtos.Requests;
+using Delivery.Application.Dtos.OrderDtos.Requests;
+using Delivery.Application.Dtos.OrderDtos.Requests;
+using Delivery.Application.Dtos.OrderDtos.Requests;
 
 namespace Delivery.Api.Controllers
 {
@@ -111,12 +119,7 @@ namespace Delivery.Api.Controllers
         [HttpPut("{orderId:guid}/status")]
         public async Task<IActionResult> UpdateStatus(Guid orderId, [FromBody] OrderStatusUpdateRequestDto request)
         {
-            byte[]? bill = await _orderService.UpdateStatusAsync(orderId, request.NewStatus, request.PrepTime);
-
-            if (bill != null)
-            {
-                return Ok(File(bill, "application/pdf", $"bill-{orderId}.pdf"));
-            }
+            await _orderService.UpdateStatusAsync(orderId, request.NewStatus, request.PrepTime);
 
             return NoContent();
         }
@@ -183,7 +186,7 @@ namespace Delivery.Api.Controllers
         }
 
 
-        [HttpGet("get-bill-pdf")]
+        [HttpGet("{orderId:guid}/get-bill-pdf")]
         public async Task<IActionResult> GetBillPdf(Guid orderId)
         {
             var bill = await _orderService.GetOrderBillPdfAsync(orderId);

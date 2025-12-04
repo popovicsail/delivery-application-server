@@ -4,15 +4,12 @@ using Delivery.Application.Dtos.OrderDtos.Requests;
 using Delivery.Application.Dtos.OrderDtos.Responses;
 using Delivery.Application.Exceptions;
 using Delivery.Application.Interfaces;
-using Delivery.Domain.Entities.DishEntities;
 using Delivery.Domain.Entities.OrderEntities;
 using Delivery.Domain.Entities.OrderEntities.Enums;
-using Delivery.Domain.Entities.RestaurantEntities;
 using Delivery.Domain.Entities.UserEntities;
 using Delivery.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 
 namespace Delivery.Application.Services
@@ -109,6 +106,28 @@ namespace Delivery.Application.Services
                 ?? throw new NotFoundException($"Customer with ID '{user.Id}' not found.");
 
             var order = await _unitOfWork.Orders.GetDraftByCustomerAsync(customer.Id);
+
+            if (order == null)
+            {
+                return null;
+            }
+
+            var orderAddress = customer.Addresses.FirstOrDefault();
+
+            if (orderAddress == null)
+            {
+                return null;
+            }
+
+            order.Address = orderAddress;
+
+            order.IsWeatherGood = await _unitOfWork.AreasOfOperation.GetAreaConditionsByCity(order.Address.City);
+
+            if (order.IsWeatherGood == false)
+            {
+                order.TotalPrice += 200;
+            }
+
             return _mapper.Map<OrderDraftResponseDto>(order);
         }
 
@@ -178,7 +197,8 @@ namespace Delivery.Application.Services
                 CustomerId = customer.Id,
                 FreeDelivery = false,
                 Items = new List<OrderItem>(),
-                RestaurantId = request.RestaurantId
+                RestaurantId = request.RestaurantId,
+                CreatedAt = DateTime.UtcNow,
             };
 
             // 5. Mapiraj stavke i izračunaj cenu
@@ -294,33 +314,41 @@ namespace Delivery.Application.Services
 
             var customer = order.Customer;
 
-            if (!customer.Addresses.Any(a => a.Id == request.AddressId))
+            var customerAddress = customer.Addresses.FirstOrDefault(a => a.Id == request.AddressId);
+
+            if (customerAddress == null)
                 throw new BadRequestException("Invalid delivery address for this customer.");
 
             order.AddressId = request.AddressId;
-            order.SetTotalPrice();
 
+            order.SetTotalPrice();
+                        
             if (request.VoucherId.HasValue)
             {
                 var voucher = customer.Vouchers.FirstOrDefault(v =>
                     v.Id == request.VoucherId.Value && v.Status == "Active");
 
-                if (voucher == null)
-                    throw new BadRequestException("Selected voucher is invalid or inactive.");
+                    if (voucher == null)
+                        throw new BadRequestException("Selected voucher is invalid or inactive.");
 
-                order.TotalPrice -= voucher.DiscountAmount;
-                if (order.TotalPrice < 0) order.TotalPrice = 0;
+                    order.TotalPrice -= voucher.DiscountAmount;
+                    if (order.TotalPrice < 0) order.TotalPrice = 0;
 
-                voucher.Status = "Inactive";
-                _unitOfWork.Vouchers.Update(voucher);
-                order.VoucherId = voucher.Id;
-            }
+                    voucher.Status = "Inactive";
+                    _unitOfWork.Vouchers.Update(voucher);
+                    order.VoucherId = voucher.Id;
+                }           
 
             order.Status = OrderStatus.NaCekanju.ToString();
-            _unitOfWork.Orders.Update(order);
+                _unitOfWork.Orders.Update(order);
+
+            var bill = _mapper.Map<Bill>(order);
+
+            await _mongoUnitOfWork.Bills.CreateAsync(bill);
 
             await _unitOfWork.CompleteAsync();
-            return _mapper.Map<OrderResponseDto>(order);
+                return _mapper.Map<OrderResponseDto>(order);
+
         }
 
 
@@ -354,9 +382,12 @@ namespace Delivery.Application.Services
             return _mapper.Map<IEnumerable<OrderResponseDto>>(orders);
         }
 
-        public async Task<byte[]?> UpdateStatusAsync(Guid orderId, int newStatus, int eta)
+        public async Task<byte[]?> UpdateStatusAsync(Guid orderId, string newStatus, int eta)
         {
-            OrderStatus statusEnum = (OrderStatus)newStatus;
+            if (!Enum.TryParse<OrderStatus>(newStatus, true, out var statusEnum))
+            {
+                throw new ArgumentException($"Invalid order status: {newStatus}");
+            }
 
             var order = await _unitOfWork.Orders.GetOneWithItemsAsync(orderId);
             if (order == null)
@@ -366,7 +397,7 @@ namespace Delivery.Application.Services
             if (eta > 0)
             {
                 order.TimeToPrepare = eta;
-                order.EstimatedReadyAt = order.CreatedAt.AddMinutes(eta);
+                order.EstimatedReadyAt = order.CreatedAt.AddMinutes(eta).ToUniversalTime();
             }
 
             order.Status = statusEnum.ToString();
@@ -411,18 +442,7 @@ namespace Delivery.Application.Services
             }
 
             _unitOfWork.Orders.Update(order);
-            await _unitOfWork.CompleteAsync(); // 👈 opet koristi tvoj metod
-
-            if (order.Status == OrderStatus.Zavrsena.ToString())
-            {
-                var bill = _mapper.Map<Bill>(order);
-
-                await _mongoUnitOfWork.Bills.CreateAsync(bill);
-
-                var billPdf = _pdfService.GenerateBillPdf(bill);
-
-                return billPdf;
-            }
+            await _unitOfWork.CompleteAsync(); // 👈 opet koristi tvoj metod     
 
             return null;
         }

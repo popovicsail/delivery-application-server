@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Delivery.Application.Dtos.AdressValidationDtos.Helpers
+﻿namespace Delivery.Application.Dtos.AdressValidationDtos.Helpers
 {
     public class NominatimAddress
     {

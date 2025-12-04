@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Security.Claims;
 using Delivery.Application.Dtos.OfferDtos;
 using Delivery.Application.Dtos.OfferDtos.Requests;
 using Delivery.Application.Dtos.OfferDtos.Responses;

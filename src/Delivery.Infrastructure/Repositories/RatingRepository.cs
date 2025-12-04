@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Delivery.Domain.Interfaces;
+﻿using Delivery.Domain.Interfaces;
 using Delivery.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Delivery.Application.Dtos.OrderDtos.Enums;
 
 namespace Delivery.Infrastructure.Repositories
 {
@@ -44,6 +38,7 @@ namespace Delivery.Infrastructure.Repositories
             var totalCount = await query.CountAsync();
 
             var ratings = await query
+                .Include(r => r.User)
                 .OrderByDescending(r => r.CreatedAt)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)

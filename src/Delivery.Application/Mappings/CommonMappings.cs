@@ -36,7 +36,6 @@ public class CommonMappings : Profile
 
         CreateMap<Allergen, AllergenDetailResponseDto>();
 
-        CreateMap<Menu, MenuDto>().ReverseMap();
-
+        CreateMap<Menu, MenuDto>().ReverseMap();      
     }
 }

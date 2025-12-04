@@ -4,13 +4,13 @@ using Delivery.Domain.Entities.ReportEntities;
 using Delivery.Infrastructure.Services.PdfService.PdfDocuments;
 using QuestPDF.Fluent;
 
-namespace Delivery.Infrastructure.Services.PdfService
+namespace Delivery.Infrastructure.Services.PdfService;
+
+public class PdfService : IPdfService
 {
-    public class PdfService : IPdfService
+    public byte[] GenerateBillPdf(Bill bill)
     {
-        public byte[] GenerateBillPdf(Bill bill)
-        {
-            var document = new BillPdfDocument(bill);
+        var document = new BillPdfDocument(bill);
 
             return document.GeneratePdf();
         }

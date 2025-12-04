@@ -20,7 +20,7 @@ public class CouriersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllAsync()
+    public async Task<ActionResult<IEnumerable<CourierSummaryResponseDto>>> GetAllAsync()
     {
         var couriers = await _courierService.GetAllAsync();
 
