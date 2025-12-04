@@ -22,4 +22,5 @@ public interface IRestaurantService
     Task<WorkerDetailResponseDto> RegisterWorkerAsync(Guid restaurantId, WorkerCreateRequestDto request, ClaimsPrincipal User);
     Task<IEnumerable<WorkerSummaryResponseDto>> GetWorkersAsync(Guid restaurantId);
     Task<MenuDto> GetRestaurantMenuAsync(Guid restaurantId);
+    Task<RestaurantChangeSuspendStatusResponseDto> ChangeRestaurantSuspendStatusAsync(Guid restaurantId, RestaurantChangeSuspendStatusRequestDto request);
 }

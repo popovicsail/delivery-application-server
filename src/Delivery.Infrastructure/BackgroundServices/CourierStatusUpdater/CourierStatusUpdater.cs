@@ -13,7 +13,7 @@ public class CourierStatusUpdater : BackgroundService
     private readonly IServiceScopeFactory _scopeFactory;
 
     // Interval između dva osvežavanja (ovde na 1 minut)
-    private readonly TimeSpan _interval = TimeSpan.FromSeconds(30);
+    private readonly TimeSpan _interval = TimeSpan.FromSeconds(5);
 
     public CourierStatusUpdater(IServiceScopeFactory scopeFactory)
     {

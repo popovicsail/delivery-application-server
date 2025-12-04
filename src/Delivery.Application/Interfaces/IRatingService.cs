@@ -1,3 +1,5 @@
+using System.Security.Claims;
+
 namespace Delivery.Application.Interfaces
 {
     public interface IRatingService
