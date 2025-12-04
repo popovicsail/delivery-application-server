@@ -105,4 +105,13 @@ public class RestaurantsController : ControllerBase
         var restaurants = await _restaurantService.GetMyRestaurantsAsync(User);
         return Ok(restaurants);
     }
+
+    [Authorize(Roles = "Administrator")]
+    [HttpPut("{restaurantId}/suspend-restaurant")]
+    public async Task<ActionResult<RestaurantChangeSuspendStatusResponseDto>> ChangeRestaurantSuspendStatusAsync(Guid restaurantId, [FromBody] RestaurantChangeSuspendStatusRequestDto request)
+    {
+        var response = await _restaurantService.ChangeRestaurantSuspendStatusAsync(restaurantId, request);
+
+        return Ok(response);
+    }
 }

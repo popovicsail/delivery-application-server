@@ -14,6 +14,7 @@ using Delivery.Domain.Entities.UserEntities;
 using Delivery.Domain.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 
 
 namespace Delivery.Application.Services;
@@ -23,11 +24,15 @@ public class RestaurantService : IRestaurantService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly UserManager<User> _userManager;
-    public RestaurantService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<User> userManager)
+    private readonly IEmailSender _emailSender;
+    private readonly IConfiguration _configuration;
+    public RestaurantService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<User> userManager, IEmailSender emailSender, IConfiguration configuration)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _userManager = userManager;
+        _emailSender = emailSender;
+        _configuration = configuration;
     }
 
     public async Task<IEnumerable<RestaurantSummaryResponseDto>> GetAllAsync()
@@ -250,5 +255,53 @@ public class RestaurantService : IRestaurantService
         await file.CopyToAsync(ms);
         var fileBytes = ms.ToArray();
         return $"data:{file.ContentType};base64,{Convert.ToBase64String(fileBytes)}";
+    }
+
+    public async Task<RestaurantChangeSuspendStatusResponseDto> ChangeRestaurantSuspendStatusAsync(Guid restaurantId, RestaurantChangeSuspendStatusRequestDto request)
+    {
+        var restaurant = await _unitOfWork.Restaurants.GetOneAsync(restaurantId);
+        if (restaurant == null) throw new NotFoundException($"Restaurant with ID '{restaurantId}' was not found.");
+
+        var owner = await _unitOfWork.Owners.GetOneAsync(restaurant.OwnerId);
+        if (owner == null) throw new NotFoundException($"Owner with ID '{restaurant.OwnerId}' was not found.");
+
+        var user = await _userManager.FindByIdAsync((owner.UserId).ToString());
+        if (user == null) throw new NotFoundException($"User with ID '{owner.UserId}' was not found.");
+
+        restaurant.IsSuspended = request.IsSuspended;
+
+        await _unitOfWork.CompleteAsync();
+
+
+        string emailSubject;
+        string emailBody;
+        if (request.IsSuspended)
+        {
+            emailSubject = "Your restaurant has been suspended";
+            emailBody = $@"
+            <h1>Restaurant Suspended - {restaurant.Name}</h1>
+            <p>Dear {user.FirstName} {user.LastName},</p>
+            <p style='color: red;'>Your restaurant has been suspended.</p>
+            <p>Please contact support for further information.</p>";
+        }
+        else
+        {
+            emailSubject = "Good News: Your restaurant is active";
+            emailBody = $@"
+            <h1>Restaurant Activated - {restaurant.Name}</h1>
+            <p>Dear {user.FirstName} {user.LastName},</p>
+            <p style='color: green;'>Your restaurant has been reactivated and is now visible to customers.</p>";
+        }
+
+        try
+        {
+            await _emailSender.SendEmailAsync(user.Email, emailSubject, emailBody);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error sending email: {ex.Message}");
+        }
+
+        return _mapper.Map<RestaurantChangeSuspendStatusResponseDto>(restaurant);
     }
 }

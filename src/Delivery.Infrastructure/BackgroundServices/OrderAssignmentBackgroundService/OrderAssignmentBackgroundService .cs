@@ -30,7 +30,7 @@ public class OrderAssignmentBackgroundService : BackgroundService
             }
 
             // čekaj 5 sec pre sledeće provere
-            await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
+            await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
         }
     }
 }

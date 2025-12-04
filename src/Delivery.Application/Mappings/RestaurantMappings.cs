@@ -30,5 +30,7 @@ public class RestaurantMappings : Profile
         CreateMap<Restaurant, RestaurantSummaryResponseDto>();
 
         CreateMap<Restaurant, RestaurantDetailResponseDto>();
+
+        CreateMap<Restaurant, RestaurantChangeSuspendStatusResponseDto>();
     }
 }
