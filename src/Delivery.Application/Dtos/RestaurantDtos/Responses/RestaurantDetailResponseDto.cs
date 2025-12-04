@@ -12,6 +12,7 @@ public class RestaurantDetailResponseDto
     public string PhoneNumber { get; set; }
 
     public string Image { get; set; }
+    public bool IsSuspended { get; set; }
 
     public AddressDto Address { get; set; }
     public OwnerDetailResponseDto Owner { get; set; }
