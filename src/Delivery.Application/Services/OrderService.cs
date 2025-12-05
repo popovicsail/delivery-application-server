@@ -35,11 +35,30 @@ namespace Delivery.Application.Services
             _reportsService = reportsService;
         }
 
-        public async Task<IEnumerable<OrderResponseDto>> GetByRestaurantAsync(Guid restaurantId)
+        public async Task<(IEnumerable<OrderResponseDto> Items, int TotalCount)> GetByRestaurantAsync(
+        Guid restaurantId,
+        DateTime? from = null,
+        DateTime? to = null,
+        int page = 1,
+        int pageSize = 10)
         {
-            var orders = await _unitOfWork.Orders.GetByRestaurant(restaurantId);
+            // Uzmi query iz repozitorijuma
+            var query = _unitOfWork.Orders.GetByRestaurant(restaurantId, from, to);
 
-            return _mapper.Map<IEnumerable<OrderResponseDto>>(orders);
+            // Ukupan broj pre paginacije
+            var totalCount = await query.CountAsync();
+
+            // Paginacija + sortiranje
+            var pageItems = await query
+                .OrderByDescending(o => o.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            // Mapiranje u DTO
+            var mapped = _mapper.Map<IEnumerable<OrderResponseDto>>(pageItems);
+
+            return (mapped, totalCount);
         }
 
         public async Task<(IEnumerable<OrderResponseDto> Items, int TotalCount)> GetByCourierAsync(
