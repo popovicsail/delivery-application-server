@@ -1,11 +1,10 @@
 ﻿using Delivery.Domain.Entities.OrderEntities;
 
-namespace Delivery.Domain.Interfaces
-{
-    public interface IBillRepository
-    {
-        Task CreateAsync(Bill bill);
+namespace Delivery.Domain.Interfaces;
 
-        Task<Bill> GetByOrderIdAsync(Guid orderId);
-    }
+public interface IBillRepository
+{
+    Task CreateAsync(Bill bill);
+
+    Task<Bill> GetByOrderIdAsync(Guid orderId);
 }

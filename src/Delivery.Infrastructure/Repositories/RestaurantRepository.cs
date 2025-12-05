@@ -11,7 +11,6 @@ public class RestaurantRepository : GenericRepository<Restaurant>, IRestaurantRe
 {
     public RestaurantRepository(ApplicationDbContext _dbContext) : base(_dbContext)
     {
-
     }
 
     public new async Task<IEnumerable<Restaurant>> GetAllAsync()
@@ -72,6 +71,83 @@ public class RestaurantRepository : GenericRepository<Restaurant>, IRestaurantRe
             .FirstOrDefaultAsync(o => o.Id == id);
 
         return restaurant;
+    }
+
+    public async Task<IEnumerable<Restaurant>> GetTopRatedAsync()
+    {
+        var ids = _dbContext.Rating
+            .Where(r => r.TargetType == RatingTargetType.Restaurant)
+            .GroupBy(r => r.TargetId)
+            .Select(g => new
+            {
+                TargetId = g.Key,
+                AvgScore = g.Average(r => r.Score)
+            })
+            .OrderByDescending(g => g.AvgScore)
+            .Take(3)
+            .Select(g => g.TargetId)
+            .ToList();
+
+        var restaurants = await _dbContext.Restaurants
+            .Include(r => r.Address)
+            .Include(r => r.BaseWorkSched)
+            .Where(r => ids.Contains(r.Id))
+            .ToListAsync();
+        return restaurants;
+    }
+
+    public async Task<IEnumerable<Restaurant>> GetWithMostDiscountsAsync()
+    {
+        return await _dbContext.Restaurants
+            .OrderByDescending(r =>
+                r.Menus
+                    .Where(m => true)               // select the only menu
+                    .SelectMany(m => m.Offers)
+                    .Count(o => o.ExpiresAt > DateTime.UtcNow)
+                +
+                r.Menus
+                    .Where(m => true)
+                    .SelectMany(m => m.Dishes)
+                    .Count(d => d.DiscountExpireAt > DateTime.UtcNow)
+            )
+            .Include(r => r.Address)
+            .Include(r => r.BaseWorkSched)
+            .Take(3)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Restaurant>> GetMostOftenOrderedFromByCustomerAsync(Guid customerId)
+    {
+        var ids = await _dbContext.Orders
+            .Where(o => o.CustomerId == customerId)
+            .GroupBy(o => o.RestaurantId)
+            .OrderByDescending(g => g.Count())
+            .Take(3)
+            .Select(g => g.Key)
+            .ToListAsync();
+
+        return await _dbContext.Restaurants
+            .Where(r => ids.Contains(r.Id))
+            .Include(r => r.Address)
+            .Include(r => r.BaseWorkSched)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Restaurant>> GetMostRecentOrderedFromByCustomerAsync(Guid customerId)
+    {
+        var ids = await _dbContext.Orders
+            .Where(o => o.CustomerId == customerId)
+            .GroupBy(o => o.RestaurantId)
+            .OrderByDescending(g => g.Max(o => o.CreatedAt))
+            .Take(3)
+            .Select(g => g.Key)
+            .ToListAsync();
+
+        return await _dbContext.Restaurants
+            .Where(r => ids.Contains(r.Id))
+            .Include(r => r.Address)
+            .Include(r => r.BaseWorkSched)
+            .ToListAsync();
     }
 
     public async Task<Menu> GetMenuAsync(Guid id)

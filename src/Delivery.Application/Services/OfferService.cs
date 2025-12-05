@@ -5,7 +5,6 @@ using Delivery.Application.Dtos.OfferDtos.Requests;
 using Delivery.Application.Dtos.OfferDtos.Responses;
 using Delivery.Application.Exceptions;
 using Delivery.Application.Interfaces;
-using Delivery.Domain.Entities.DishEntities;
 using Delivery.Domain.Entities.OfferEntities;
 using Delivery.Domain.Entities.UserEntities;
 using Delivery.Domain.Interfaces;

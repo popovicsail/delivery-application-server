@@ -10,7 +10,6 @@ using Delivery.Application.Interfaces;
 using Delivery.Domain.Entities.CommonEntities;
 using Delivery.Domain.Entities.UserEntities;
 using Delivery.Domain.Interfaces;
-using Delivery.Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
 
 

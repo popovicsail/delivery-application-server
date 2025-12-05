@@ -10,7 +10,9 @@ public class Restaurant
     public string Description { get; set; }
     public string PhoneNumber { get; set; }
     public Guid AddressId { get; set; }
-    public virtual Address Address { get; set; }  
+    public virtual Address Address { get; set; }
+
+    public bool IsSuspended { get; set; } = false;
 
     public Guid OwnerId { get; set; }
     public virtual Owner? Owner { get; set; }

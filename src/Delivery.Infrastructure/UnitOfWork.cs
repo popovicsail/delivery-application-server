@@ -1,10 +1,6 @@
-﻿using Delivery.Domain.Entities.OrderEntities;
-using Delivery.Domain.Interfaces;
+﻿using Delivery.Domain.Interfaces;
 using Delivery.Infrastructure.Persistence;
 using Delivery.Infrastructure.Repositories;
-using Microsoft.EntityFrameworkCore;
-
-
 
 namespace Delivery.Infrastructure;
 
@@ -27,7 +23,11 @@ public class UnitOfWork : IUnitOfWork
     public IFeedbackResponseRepository FeedbackResponses { get; private set; }
     public IOrderItemsRepository OrderItems { get; private set; }
     public IOrdersRepository Orders { get; private set; }
+    public IAreasOfOperationRepository AreasOfOperation { get; private set; }
+    public IExchangeRateRepository ExchangeRates { get; private set; }
+
     public IRatingRepository Rates { get; private set; }
+    public IReportsRepository Reports { get; private set; }
     public UnitOfWork(ApplicationDbContext dbContext)
     {
         _dbContext = dbContext;
@@ -47,7 +47,9 @@ public class UnitOfWork : IUnitOfWork
         FeedbackResponses = new FeedbackResponseRepository(_dbContext);
         OrderItems = new OrderItemsRepository(_dbContext);
         Orders = new OrdersRepository(_dbContext);
+        AreasOfOperation = new AreasOfOperationRepository(_dbContext);
         Rates = new RatingRepository(_dbContext);
+        ExchangeRates = new ExchangeRateRepository(_dbContext);
     }
 
     public Task<int> CompleteAsync()

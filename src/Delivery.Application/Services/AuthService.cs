@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Text;
+﻿using System.Text;
 using AutoMapper;
 using Delivery.Application.Dtos.Users.AuthDtos.Requests;
 using Delivery.Application.Dtos.Users.AuthDtos.Responses;
@@ -11,7 +10,6 @@ using Google.Apis.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.WebEncoders;
 
 namespace Delivery.Application.Services;
 

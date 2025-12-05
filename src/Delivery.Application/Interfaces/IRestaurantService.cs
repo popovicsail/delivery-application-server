@@ -15,6 +15,10 @@ public interface IRestaurantService
     Task<IEnumerable<RestaurantSummaryResponseDto>> GetAllAsync();
     Task<PaginatedList<RestaurantSummaryResponseDto>> GetPagedAsync(int sort, RestaurantFiltersMix filters, int page);
     Task<IEnumerable<RestaurantSummaryResponseDto>> GetMyRestaurantsAsync(ClaimsPrincipal User);
+    Task<List<RestaurantSummaryResponseDto>> GetTopRatedAsync();
+    Task<List<RestaurantSummaryResponseDto>> GetWithMostDiscountsAsync();
+    Task<List<RestaurantSummaryResponseDto>> GetMostOftenOrderedFromByCustomerAsync(ClaimsPrincipal claimsPrincipal);
+    Task<List<RestaurantSummaryResponseDto>> GetMostRecentOrderedFromByCustomerAsync(ClaimsPrincipal claimsPrincipal);
     Task<RestaurantDetailResponseDto?> GetOneAsync(Guid id);
     Task<RestaurantDetailResponseDto> AddAsync(RestaurantCreateRequestDto request);
     Task<RestaurantDetailResponseDto> UpdateAsync(Guid id, RestaurantUpdateRequestDto request, IFormFile? file);
@@ -22,4 +26,5 @@ public interface IRestaurantService
     Task<WorkerDetailResponseDto> RegisterWorkerAsync(Guid restaurantId, WorkerCreateRequestDto request, ClaimsPrincipal User);
     Task<IEnumerable<WorkerSummaryResponseDto>> GetWorkersAsync(Guid restaurantId);
     Task<MenuDto> GetRestaurantMenuAsync(Guid restaurantId);
+    Task<RestaurantChangeSuspendStatusResponseDto> ChangeRestaurantSuspendStatusAsync(Guid restaurantId, RestaurantChangeSuspendStatusRequestDto request);
 }
