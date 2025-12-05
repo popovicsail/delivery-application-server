@@ -15,6 +15,10 @@ public interface IRestaurantService
     Task<IEnumerable<RestaurantSummaryResponseDto>> GetAllAsync();
     Task<PaginatedList<RestaurantSummaryResponseDto>> GetPagedAsync(int sort, RestaurantFiltersMix filters, int page);
     Task<IEnumerable<RestaurantSummaryResponseDto>> GetMyRestaurantsAsync(ClaimsPrincipal User);
+    Task<List<RestaurantSummaryResponseDto>> GetTopRatedAsync();
+    Task<List<RestaurantSummaryResponseDto>> GetWithMostDiscountsAsync();
+    Task<List<RestaurantSummaryResponseDto>> GetMostOftenOrderedFromByCustomerAsync(ClaimsPrincipal claimsPrincipal);
+    Task<List<RestaurantSummaryResponseDto>> GetMostRecentOrderedFromByCustomerAsync(ClaimsPrincipal claimsPrincipal);
     Task<RestaurantDetailResponseDto?> GetOneAsync(Guid id);
     Task<RestaurantDetailResponseDto> AddAsync(RestaurantCreateRequestDto request);
     Task<RestaurantDetailResponseDto> UpdateAsync(Guid id, RestaurantUpdateRequestDto request, IFormFile? file);

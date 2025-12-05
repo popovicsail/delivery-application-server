@@ -105,4 +105,36 @@ public class RestaurantsController : ControllerBase
         var restaurants = await _restaurantService.GetMyRestaurantsAsync(User);
         return Ok(restaurants);
     }
+
+    [AllowAnonymous]
+    [HttpGet("top-rated")]
+    public async Task<IActionResult> GetTopRatedAsync()
+    {
+        var restaurants = await _restaurantService.GetTopRatedAsync();
+        return Ok(restaurants);
+    }
+
+    [AllowAnonymous]
+    [HttpGet("most-discounts")]
+    public async Task<IActionResult> GetWithMostDiscountsAsync()
+    {
+        var restaurants = await _restaurantService.GetWithMostDiscountsAsync();
+        return Ok(restaurants);
+    }
+
+    [Authorize(Roles = "Customer")]
+    [HttpGet("customer/most-often-ordered-from")]
+    public async Task<IActionResult> GetMostOftenOrderedFromByCustomerAsync()
+    {
+        var restaurants = await _restaurantService.GetMostOftenOrderedFromByCustomerAsync(User);
+        return Ok(restaurants);
+    }
+
+    [Authorize(Roles = "Customer")]
+    [HttpGet("customer/most-recent-ordered-from")]
+    public async Task<IActionResult> GetMostRecentOrderedFromByCustomerAsync()
+    {
+        var restaurants = await _restaurantService.GetMostRecentOrderedFromByCustomerAsync(User);
+        return Ok(restaurants);
+    }
 }
