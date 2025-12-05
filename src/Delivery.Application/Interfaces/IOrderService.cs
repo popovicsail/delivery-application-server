@@ -13,7 +13,7 @@ public interface IOrderService
         Task<OrderResponseDto> GetOneAsync(Guid orderId);
         Task<IEnumerable<OrderResponseDto>> GetAllAsync();
         Task<byte[]?> UpdateStatusAsync(Guid orderId, string newStatus, int eta);
-        Task<IEnumerable<OrderResponseDto>> GetByRestaurantAsync(Guid restaurantId);
+        Task<(IEnumerable<OrderResponseDto> Items, int TotalCount)> GetByRestaurantAsync(Guid restaurantId, DateTime? from = null,DateTime? to = null, int page = 1,int pageSize = 10);
         Task DeleteItemAsync(Guid orderItemId);
         Task DeleteAsync(Guid orderId);
         Task AutoAssignOrdersAsync();

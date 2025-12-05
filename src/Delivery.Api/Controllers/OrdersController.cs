@@ -70,10 +70,21 @@ namespace Delivery.Api.Controllers
         }
 
         [HttpGet("restaurant/{restaurantId:guid}")]
-        public async Task<IActionResult> GetByRestaurant(Guid restaurantId)
+        public async Task<IActionResult> GetByRestaurant(Guid restaurantId, DateTime? from = null, DateTime? to = null, int page = 1, int pageSize = 10)
         {
-            var result = await _orderService.GetByRestaurantAsync(restaurantId);
-            return Ok(result);
+            // konverzija u UTC ako nisu null
+            if (from.HasValue && from.Value.Kind == DateTimeKind.Unspecified)
+                from = DateTime.SpecifyKind(from.Value, DateTimeKind.Utc);
+
+            if (to.HasValue && to.Value.Kind == DateTimeKind.Unspecified)
+                to = DateTime.SpecifyKind(to.Value, DateTimeKind.Utc);
+
+            var result = await _orderService.GetByRestaurantAsync(restaurantId, from, to, page, pageSize);
+            return Ok(new
+            {
+                items = result.Items,
+                totalCount = result.TotalCount
+            });
         }
 
         // GET: api/orders
