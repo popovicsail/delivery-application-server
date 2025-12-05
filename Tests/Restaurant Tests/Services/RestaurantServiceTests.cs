@@ -28,6 +28,7 @@ public class RestaurantServiceTests
     private readonly Mock<IConfiguration> _configurationMock;
     public RestaurantServiceTests()
     {
+        _addressValidation = new Mock<IAddressValidationService>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
         _mapperMock = new Mock<IMapper>();
         _userManagerMock = new Mock<UserManager<User>>(

@@ -188,6 +188,38 @@ public class RestaurantService : IRestaurantService
         await _unitOfWork.CompleteAsync();
     }
 
+    public async Task<List<RestaurantSummaryResponseDto>> GetTopRatedAsync()
+    {
+        var restaurants = await _unitOfWork.Restaurants.GetTopRatedAsync();
+        return _mapper.Map<List<RestaurantSummaryResponseDto>>(restaurants);
+    }
+
+    public async Task<List<RestaurantSummaryResponseDto>> GetWithMostDiscountsAsync()
+    {
+        var restaurants = await _unitOfWork.Restaurants.GetWithMostDiscountsAsync();
+        return _mapper.Map<List<RestaurantSummaryResponseDto>>(restaurants);
+    }
+
+    public async Task<List<RestaurantSummaryResponseDto>> GetMostOftenOrderedFromByCustomerAsync(ClaimsPrincipal claimsPrincipal)
+    {
+        var user = await _userManager.GetUserAsync(claimsPrincipal);
+        var customer = await _unitOfWork.Customers.GetOneAsync(user.Id);
+        if (customer == null)
+            throw new NotFoundException("Customer not found");
+        var restaurants = await _unitOfWork.Restaurants.GetMostOftenOrderedFromByCustomerAsync(customer.Id);
+        return _mapper.Map<List<RestaurantSummaryResponseDto>>(restaurants);
+    }
+
+    public async Task<List<RestaurantSummaryResponseDto>> GetMostRecentOrderedFromByCustomerAsync(ClaimsPrincipal claimsPrincipal)
+    {
+        var user = await _userManager.GetUserAsync(claimsPrincipal);
+        var customer = await _unitOfWork.Customers.GetOneAsync(user.Id);
+        if (customer == null)
+            throw new NotFoundException("Customer not found");
+        var restaurants = await _unitOfWork.Restaurants.GetMostRecentOrderedFromByCustomerAsync(customer.Id);
+        return _mapper.Map<List<RestaurantSummaryResponseDto>>(restaurants);
+    }
+
     public async Task<WorkerDetailResponseDto> RegisterWorkerAsync(Guid restaurantId, WorkerCreateRequestDto request, ClaimsPrincipal User)
     {
         var restaurant = await _unitOfWork.Restaurants.GetOneAsync(restaurantId);
