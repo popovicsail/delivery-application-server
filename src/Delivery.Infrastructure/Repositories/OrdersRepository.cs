@@ -14,19 +14,29 @@ namespace Delivery.Infrastructure.Repositories
     {
         public OrdersRepository(ApplicationDbContext dbContext) : base(dbContext) { }
 
-        public async Task<IEnumerable<Order>> GetByRestaurant(Guid restaurantId)
+        public IQueryable<Order> GetByRestaurant(
+        Guid restaurantId,
+        DateTime? from = null,
+        DateTime? to = null)
         {
-            return await _dbContext.Orders
+            var query = _dbContext.Orders
                 .Where(o => o.RestaurantId == restaurantId)
-                .Include(o => o.Items)
-                    .ThenInclude(i => i.Dish)
-                .Include(o => o.Items)
-                    .ThenInclude(i => i.Offer)
-                .Include(o => o.Customer)
-                    .ThenInclude(c => c.User)
+                .Include(o => o.Items).ThenInclude(i => i.Dish)
+                .Include(o => o.Items).ThenInclude(i => i.Offer)
+                .Include(o => o.Customer).ThenInclude(c => c.User)
                 .Include(o => o.Address)
-                .ToListAsync();
+                .Include(o => o.Restaurant).ThenInclude(r => r.Address)
+                .AsQueryable();
+
+            if (from.HasValue)
+                query = query.Where(o => o.CreatedAt >= from.Value.ToUniversalTime());
+
+            if (to.HasValue)
+                query = query.Where(o => o.CreatedAt <= to.Value.ToUniversalTime());
+
+            return query;
         }
+
 
         public IQueryable<Order> GetByCourier(
         Guid courierId,

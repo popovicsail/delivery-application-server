@@ -5,6 +5,8 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
+using System.Security.Claims;
+
 namespace Delivery.Application.Interfaces
 {
     public interface IRatingService

@@ -13,7 +13,7 @@ namespace Delivery.Domain.Interfaces
         Task<Order?> GetOneNotDraftAsync(Guid customerId);
         Task<Order?> GetOneWithItemsAsync(Guid orderId);
         Task<IEnumerable<Order>> GetAllWithItemsAsync();
-        Task<IEnumerable<Order>> GetByRestaurant(Guid restaurantId);
+        IQueryable<Order> GetByRestaurant(Guid restaurantId,DateTime? from = null,DateTime? to = null);
         IQueryable<Order> GetByCourier(
         Guid courierId,
         DateTime? from = null,
