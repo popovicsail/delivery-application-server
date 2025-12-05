@@ -151,8 +151,12 @@ public class DishService : IDishService
                 dish.Allergens.Add(allergen);
             }
         }
+        else if (request.AllergenIds == null ||  request.AllergenIds.Count == 0)
+        {
+            dish.Allergens.Clear();
+        }    
 
-        _unitOfWork.Dishes.Update(dish);
+            _unitOfWork.Dishes.Update(dish);
 
         await _unitOfWork.CompleteAsync();
     }
