@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using Delivery.Domain.Entities.OrderEntities;
-using Delivery.Application.Dtos.OrderDtos;
 
 public class RatingProfile : Profile
 {

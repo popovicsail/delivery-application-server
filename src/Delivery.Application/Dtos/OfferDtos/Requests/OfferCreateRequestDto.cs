@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Delivery.Domain.Entities.RestaurantEntities;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Delivery.Application.Dtos.OfferDtos.Requests
 {

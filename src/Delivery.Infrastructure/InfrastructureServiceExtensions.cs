@@ -2,6 +2,7 @@
 using Delivery.Application.Settings;
 using Delivery.Domain.Interfaces;
 using Delivery.Infrastructure.BackgroundServices.LoggingBackgroundJob;
+using Delivery.Infrastructure.BackgroundServices.UpdateWeatherConditionsBackgroundJob;
 using Delivery.Infrastructure.BackgroundServices.VoucherExpirationDateCheckerBackgroundJob;
 using Delivery.Infrastructure.Persistence;
 using Delivery.Infrastructure.Repositories;
@@ -17,6 +18,8 @@ using MongoDB.Driver;
 using Microsoft.Extensions.Logging;
 using Quartz;
 using QuestPDF.Infrastructure;
+using Delivery.Infrastructure.BackgroundServices.UpdateExchangeRateBackgroundJob;
+using Delivery.Infrastructure.Persistence.MongoRepositories;
 
 namespace Delivery.Infrastructure;
 
@@ -35,6 +38,8 @@ public static class InfrastructureServiceExtensions
         });
         services.ConfigureOptions<VoucherExpirationDateCheckerBackgroundJobSetup>();
         services.ConfigureOptions<LoggingBackgroundJobSetup>();
+        services.ConfigureOptions<UpdateWeatherConditionsBackgroundJobSetup>();
+        services.ConfigureOptions<UpdateExchangeRateBackgroundJobSetup>();
 
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")).UseSnakeCaseNamingConvention()
@@ -67,10 +72,17 @@ public static class InfrastructureServiceExtensions
             var config = configuration.GetSection("MongoDbSettings");
             return client.GetDatabase(config["DatabaseName"]);
         });
+        services.AddScoped<IReportsRepository, ReportsRepository>();
 
         QuestPDF.Settings.License = LicenseType.Community;
 
-        services.AddScoped<IPdfService, PdfService>();
+        services.AddScoped<IPdfService, PdfService>();  
+
+        services.Configure<OpenWeatherSettings>(configuration.GetSection(OpenWeatherSettings.SectionName));
+        services.AddHttpClient<IOpenWeatherExternalService, OpenWeatherExternalService>();
+
+        services.Configure<ExchangeRateSettings>(configuration.GetSection(ExchangeRateSettings.SectionName));
+        services.AddHttpClient<IExchangeRateExternalService, ExchangeRateExternalService>();
 
         return services;
     }

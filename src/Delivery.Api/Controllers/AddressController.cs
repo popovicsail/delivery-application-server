@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Delivery.Application.Dtos.AdressValidationDtos.Requests;
+﻿using Delivery.Application.Dtos.AdressValidationDtos.Requests;
 using Delivery.Application.Dtos.AdressValidationDtos.Responses;
 using Delivery.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;

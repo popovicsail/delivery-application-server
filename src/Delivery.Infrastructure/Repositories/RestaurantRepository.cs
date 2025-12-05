@@ -11,7 +11,6 @@ public class RestaurantRepository : GenericRepository<Restaurant>, IRestaurantRe
 {
     public RestaurantRepository(ApplicationDbContext _dbContext) : base(_dbContext)
     {
-
     }
 
     public new async Task<IEnumerable<Restaurant>> GetAllAsync()

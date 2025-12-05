@@ -33,5 +33,5 @@ public interface IOrderService
         Task<DishRevenueStatisticsResponse> GetDishRevenueStatisticsAsync(Guid dishId, DateTime from, DateTime to);
         Task<CanceledOrdersStatisticsDto> GetCanceledOrdersStatisticsAsync(Guid restaurantId, DateTime from, DateTime to);
         Task<byte[]> GetOrderBillPdfAsync(Guid orderId);
-
+        Task<byte[]> GetReportPdfAsync(Guid restaurantId);
 }

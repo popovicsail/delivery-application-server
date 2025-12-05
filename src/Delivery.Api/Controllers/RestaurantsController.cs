@@ -26,7 +26,6 @@ public class RestaurantsController : ControllerBase
     public async Task<IActionResult> GetPagedAsync([FromQuery] RestaurantFiltersMix filters, int sort, int page = 1)
     {
         var restaurants = await _restaurantService.GetPagedAsync(sort, filters, page);
-
         return Ok(restaurants);
     }
 
@@ -35,7 +34,6 @@ public class RestaurantsController : ControllerBase
     public async Task<IActionResult> GetAllAsync()
     {
         var restaurants = await _restaurantService.GetAllAsync();
-
         return Ok(restaurants);
     }
 
@@ -43,7 +41,6 @@ public class RestaurantsController : ControllerBase
     public async Task<ActionResult<RestaurantDetailResponseDto>> GetOneAsync([FromRoute] Guid id)
     {
         var restaurant = await _restaurantService.GetOneAsync(id);
-
         return Ok(restaurant);
     }
 
@@ -52,7 +49,6 @@ public class RestaurantsController : ControllerBase
     public async Task<ActionResult<RestaurantDetailResponseDto>> CreateAsync(RestaurantCreateRequestDto request)
     {
         var restaurant = await _restaurantService.AddAsync(request);
-
         return CreatedAtAction("GetOne", new { id = restaurant.Id }, restaurant);
     }
 
@@ -61,7 +57,6 @@ public class RestaurantsController : ControllerBase
     public async Task<ActionResult> UpdateAsync([FromForm] RestaurantUpdateRequestDto updateRequest, IFormFile? file, [FromRoute] Guid id)
     {
         await _restaurantService.UpdateAsync(id, updateRequest, file);
-
         return NoContent();
     }
 
@@ -70,7 +65,6 @@ public class RestaurantsController : ControllerBase
     public async Task<ActionResult> DeleteAsync([FromRoute] Guid id)
     {
         await _restaurantService.DeleteAsync(id);
-
         return NoContent();
     }
 
@@ -136,5 +130,13 @@ public class RestaurantsController : ControllerBase
     {
         var restaurants = await _restaurantService.GetMostRecentOrderedFromByCustomerAsync(User);
         return Ok(restaurants);
+    }
+    
+    [Authorize(Roles = "Administrator")]
+    [HttpPut("{restaurantId}/suspend-restaurant")]
+    public async Task<ActionResult<RestaurantChangeSuspendStatusResponseDto>> ChangeRestaurantSuspendStatusAsync(Guid restaurantId, [FromBody] RestaurantChangeSuspendStatusRequestDto request)
+    {
+        var response = await _restaurantService.ChangeRestaurantSuspendStatusAsync(restaurantId, request);
+        return Ok(response);
     }
 }

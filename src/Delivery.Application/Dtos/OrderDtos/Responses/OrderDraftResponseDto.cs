@@ -11,6 +11,7 @@ namespace Delivery.Application.Dtos.OrderDtos.Responses
         public DateTime CreatedAt { get; set; }
         public Guid RestaurantId { get; set; }
         public Restaurant Restaurant { get; set; }
+        public bool IsWeatherGood { get; set; }
         public List<OrderItemSummaryResponse> Items { get; set; } = new List<OrderItemSummaryResponse>();
     }
 }

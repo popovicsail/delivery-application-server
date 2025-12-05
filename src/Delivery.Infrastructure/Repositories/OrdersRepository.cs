@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Delivery.Domain.Entities.OrderEntities;
+﻿using Delivery.Domain.Entities.OrderEntities;
 using Delivery.Domain.Interfaces;
 using Delivery.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -152,13 +147,19 @@ namespace Delivery.Infrastructure.Repositories
 
         public async Task<IEnumerable<Order>> GetByRestaurantAndDateRangeAsync(Guid restaurantId, DateTime from, DateTime to)
         {
+            var utcFrom = from;
+            var utcTo = to.AddDays(1);
+
             return await _dbContext.Orders
-                .Where(o => o.RestaurantId == restaurantId &&
-                            o.CreatedAt >= from &&
-                            o.CreatedAt <= to &&
-                            o.Status != "Draft")
+                .Where(o =>
+                    o.RestaurantId == restaurantId &&
+                    o.CreatedAt >= utcFrom &&
+                    o.CreatedAt < utcTo &&
+                    o.Status == "Zavrsena")
+                .Include(o => o.Items)
                 .ToListAsync();
         }
+
 
         public async Task<IEnumerable<Order>> GetByDishAndDateRangeAsync(Guid dishId, DateTime from, DateTime to)
                 {

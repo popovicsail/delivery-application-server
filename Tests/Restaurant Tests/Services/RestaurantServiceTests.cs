@@ -15,14 +15,17 @@ using Delivery.Application.Dtos.CommonDtos.BaseWordSchedDtos;
 using Delivery.Application.Dtos.RestaurantDtos;
 using Microsoft.AspNetCore.Http;
 using Delivery.Infrastructure.Services;
+using Microsoft.Extensions.Configuration;
 using Delivery.Application.Interfaces;
 
 public class RestaurantServiceTests
 {
-    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
-    private readonly Mock<IMapper> _mapperMock;
     private readonly Mock<UserManager<User>> _userManagerMock;
-    private readonly Mock<IAddressValidationService> _addressValidation;
+    private readonly Mock<EmailSender> _emailSenderMock;
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
+    private readonly Mock<IMapper> _mapperMock;  
+    private readonly Mock<IAddressValidationService> _addressValidationServiceMock; 
+    private readonly Mock<IConfiguration> _configurationMock;
     public RestaurantServiceTests()
     {
         _addressValidation = new Mock<IAddressValidationService>();
@@ -31,6 +34,7 @@ public class RestaurantServiceTests
         _userManagerMock = new Mock<UserManager<User>>(
             Mock.Of<IUserStore<User>>(), null, null, null, null, null, null, null, null
         );
+        _addressValidationServiceMock = new Mock<IAddressValidationService>();
     }
 
     [Fact]
@@ -41,7 +45,7 @@ public class RestaurantServiceTests
         var restaurant = new Restaurant { Id = Guid.NewGuid() };
         _unitOfWorkMock.Setup(u => u.Restaurants.GetOneAsync(restaurantId))
             .ReturnsAsync((Restaurant?)null);
-        var service = new RestaurantService(_unitOfWorkMock.Object, _mapperMock.Object, _userManagerMock.Object, _addressValidation.Object);
+        var service = new RestaurantService(_unitOfWorkMock.Object, _mapperMock.Object, _userManagerMock.Object, _emailSenderMock.Object, _configurationMock.Object, _addressValidationServiceMock.Object);
 
         // Act & Assert
         var ex = await Should.ThrowAsync<NotFoundException>(() => service.GetOneAsync(restaurantId));
@@ -74,7 +78,7 @@ public class RestaurantServiceTests
         };
         _mapperMock.Setup(m => m.Map<RestaurantDetailResponseDto>(restaurant))
             .Returns(mappedRestaurant);
-        var service = new RestaurantService(_unitOfWorkMock.Object, _mapperMock.Object, _userManagerMock.Object, _addressValidation.Object);
+        var service = new RestaurantService(_unitOfWorkMock.Object, _mapperMock.Object, _userManagerMock.Object, _emailSenderMock.Object, _configurationMock.Object, _addressValidationServiceMock.Object);
         // Act
         var result = await service.GetOneAsync(restaurantId);
         // Assert
